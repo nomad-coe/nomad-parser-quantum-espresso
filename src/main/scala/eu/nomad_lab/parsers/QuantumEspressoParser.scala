@@ -1,14 +1,23 @@
 package eu.nomad_lab.parsers
-import eu.nomad_lab.DefaultPythonInterpreter
-import eu.nomad_lab.JsonUtils
+
+import eu.{nomad_lab=>lab}
+import eu.nomad_lab.{JsonUtils, DefaultPythonInterpreter}
 import org.{json4s => jn}
 import scala.collection.breakOut
+
 
 object QuantumEspressoParser extends SimpleExternalParserGenerator(
   name = "QuantumEspressoParser",
   parserInfo = jn.JObject(
     ("name" -> jn.JString("QuantumEspressoParser")) ::
-      ("version" -> jn.JString("1.0")) :: Nil),
+      ("parserId" -> jn.JString("QuantumEspressoParser" + lab.QuantumEspressoVersionInfo.version)) ::
+      ("versionInfo" -> jn.JObject(
+        ("nomadCoreVersion" -> jn.JString(lab.NomadCoreVersionInfo.version)) ::
+          (lab.QuantumEspressoVersionInfo.toMap.map{ case (key, value) =>
+            (key -> jn.JString(value.toString))
+          }(breakOut): List[(String, jn.JString)])
+      )) :: Nil
+  ),
   mainFileTypes = Seq("text/.*"),
   mainFileRe = """^\s*Program (?<programName>\S+)\s+v\.(?<version>\S+)(?:\s+\(svn\s+rev\.\s+(?<revision>\d+)\s*\))?\s+starts[^\n]+
 (?:\s*\n?)*This program is part of the open-source Quantum""".r,
