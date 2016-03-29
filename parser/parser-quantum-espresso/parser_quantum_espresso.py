@@ -14,6 +14,7 @@ mainFileDescription = SM(
            repeats = True,
            required = True,
            forwardMatch = True,
+           fixedStartValues={'program_name': 'Quantum Espresso', 'program_basis_set_type': 'plane waves' },
            sections   = ['section_run'],
            subMatchers = [
                SM(name = 'header',
