@@ -1,10 +1,9 @@
 package eu.nomad_lab.parsers
 
-import eu.{nomad_lab=>lab}
-import eu.nomad_lab.{JsonUtils, DefaultPythonInterpreter}
-import org.{json4s => jn}
+import eu.{ nomad_lab => lab }
+import eu.nomad_lab.{ JsonUtils, DefaultPythonInterpreter }
+import org.{ json4s => jn }
 import scala.collection.breakOut
-
 
 object QuantumEspressoParser extends SimpleExternalParserGenerator(
   name = "QuantumEspressoParser",
@@ -13,8 +12,9 @@ object QuantumEspressoParser extends SimpleExternalParserGenerator(
       ("parserId" -> jn.JString("QuantumEspressoParser" + lab.QuantumEspressoVersionInfo.version)) ::
       ("versionInfo" -> jn.JObject(
         ("nomadCoreVersion" -> jn.JString(lab.NomadCoreVersionInfo.version)) ::
-          (lab.QuantumEspressoVersionInfo.toMap.map{ case (key, value) =>
-            (key -> jn.JString(value.toString))
+          (lab.QuantumEspressoVersionInfo.toMap.map {
+            case (key, value) =>
+              (key -> jn.JString(value.toString))
           }(breakOut): List[(String, jn.JString)])
       )) :: Nil
   ),
@@ -43,17 +43,19 @@ object QuantumEspressoParser extends SimpleExternalParserGenerator(
       case Some(str) =>
         mainFileRe.findFirstMatchIn(str) match {
           case Some(m) =>
-            val extraInfo: List[(String, jn.JString)] = m.groupNames.map{ (name: String) =>
-              name -> jn.JString(m.group(name)) }(breakOut)
+            val extraInfo: List[(String, jn.JString)] = m.groupNames.map { (name: String) =>
+              name -> jn.JString(m.group(name))
+            }(breakOut)
             logger.debug(s"$filePath matches parser $name (extraInfo:${JsonUtils.normalizedStr(jn.JObject(extraInfo))}")
             Some(ParserMatch(mainFileMatchPriority, mainFileMatchWeak, jn.JObject(extraInfo)))
           case None =>
             fallbackRe.findFirstMatchIn(str) match {
               case Some(m) =>
-                val extraInfo: List[(String, jn.JString)] = m.groupNames.map{ (name: String) =>
-              name -> jn.JString(m.group(name)) }(breakOut)
+                val extraInfo: List[(String, jn.JString)] = m.groupNames.map { (name: String) =>
+                  name -> jn.JString(m.group(name))
+                }(breakOut)
                 logger.debug(s"$filePath might match parser $name (extraInfo:${JsonUtils.normalizedStr(jn.JObject(extraInfo))}")
-                Some(ParserMatch(mainFileMatchPriority -1, true, jn.JObject(extraInfo)))
+                Some(ParserMatch(mainFileMatchPriority - 1, true, jn.JObject(extraInfo)))
               case None =>
                 logger.debug(s"$filePath does *NOT* match parser $name")
                 None
