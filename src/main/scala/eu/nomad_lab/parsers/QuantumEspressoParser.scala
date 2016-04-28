@@ -11,7 +11,9 @@ object QuantumEspressoParser extends SimpleExternalParserGenerator(
     ("name" -> jn.JString("QuantumEspressoParser")) ::
       ("parserId" -> jn.JString("QuantumEspressoParser" + lab.QuantumEspressoVersionInfo.version)) ::
       ("versionInfo" -> jn.JObject(
-        ("nomadCoreVersion" -> jn.JString(lab.NomadCoreVersionInfo.version)) ::
+        ("nomadCoreVersion" -> jn.JObject(lab.NomadCoreVersionInfo.toMap.map {
+          case (k, v) => k -> jn.JString(v.toString)
+        }(breakOut): List[(String, jn.JString)])) ::
           (lab.QuantumEspressoVersionInfo.toMap.map {
             case (key, value) =>
               (key -> jn.JString(value.toString))
