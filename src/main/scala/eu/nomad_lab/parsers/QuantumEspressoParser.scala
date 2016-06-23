@@ -23,7 +23,7 @@ object QuantumEspressoParser extends SimpleExternalParserGenerator(
   mainFileTypes = Seq("text/.*"),
   mainFileRe = """^\s*Program (?<programName>\S+)\s+v\.(?<version>\S+)(?:\s+\(svn\s+rev\.\s+(?<revision>\d+)\s*\))?\s+starts[^\n]+
 (?:\s*\n?)*This program is part of the open-source Quantum""".r,
-  cmd = Seq(DefaultPythonInterpreter.python2Exe(), "${envDir}/parsers/quantum-espresso/parser/parser-quantum-espresso/parser_quantum_espresso.py",
+  cmd = Seq(DefaultPythonInterpreter.pythonExe(), "${envDir}/parsers/quantum-espresso/parser/parser-quantum-espresso/parser_quantum_espresso.py",
     "--uri", "${mainFileUri}", "${mainFilePath}"),
   resList = Seq(
     "parser-quantum-espresso/parser_quantum_espresso.py",
