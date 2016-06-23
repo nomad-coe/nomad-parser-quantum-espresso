@@ -10,6 +10,8 @@ testing:
     - git submodule foreach git checkout master
     - git submodule foreach git pull
     - sbt quantumEspresso/test
+    - export PYTHONEXE=/labEnv/bin/python
+    - sbt quantumEspresso/test
   only:
     - master
   tags:
