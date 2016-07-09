@@ -13,10 +13,14 @@ mainFileDescription = SM(
     subMatchers=[
         SM(
             name='newRun',
-            startReStr=r"\s*# SampleParser #\s*",
+            startReStr=(
+                r"\s*Program\s+(?P<program_name>\S+)\s+v\." +
+                r"(?P<program_version>\S+(?:\s+\(svn\s+rev\.\s+\d+\s*\))?)" +
+                r"\s+starts" +
+                r"(?:\s+on\s+.+?\s*$)?"),
             repeats=True,
             required=True,
-            forwardMatch=True,
+            forwardMatch=False,
             fixedStartValues={'program_name': 'Quantum Espresso',
                               'program_basis_set_type': 'plane waves'},
             sections=['section_run'],
