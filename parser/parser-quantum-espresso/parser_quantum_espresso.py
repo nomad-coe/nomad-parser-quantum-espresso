@@ -4,6 +4,7 @@ from nomadcore.local_meta_info import loadJsonFile, InfoKindEl
 import os
 import sys
 import json
+import re
 
 # description of the input
 mainFileDescription = SM(
@@ -55,6 +56,18 @@ class QuantumEspressoParserContext(object):
     """main place to keep the parser status, open ancillary files,..."""
     def __init__(self):
         self.scfIterNr = 0
+        coverageIgnoreList = [
+           r"\s*",
+           r"\s*Ultrasoft \(Vanderbilt\) Pseudopotentials\s*",
+           r"\s*This program is part of the open-source Quantum ESPRESSO suite",
+           r"\s*for quantum simulation of materials; please cite",
+           r"\s*\"P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 \(2009\);\s*",
+           r"\s*URL http://www.quantum-espresso.org\",\s*",
+           r"\s*in publications or presentations arising from this work. More details at",
+           r"\s*http://www.quantum-espresso.org/quote",
+        ]
+        self.coverageIgnore = re.compile(r"^(?:" +
+            r"|".join(coverageIgnoreList) + r")$")
 
     def initialize_values(self):
         """allows to reset values if the same superContext is used to parse
