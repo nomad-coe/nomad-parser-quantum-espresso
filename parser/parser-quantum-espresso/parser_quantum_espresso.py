@@ -115,6 +115,17 @@ mainFileDescription = SM(
                     required=True,
                     forwardMatch=False,
                 ),
+                SM(
+                    name='ecut_density',
+                    startReStr=(
+                        r"\s*charge density cutoff\s*=\s*" +
+                        r"(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" +
+                        RE_FORTRAN_FLOAT + r")\s*Ry\s*"
+                    ),
+                    repeats=False,
+                    required=True,
+                    forwardMatch=False,
+                ),
             ],
         )
     ],
