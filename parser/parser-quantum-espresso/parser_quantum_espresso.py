@@ -23,7 +23,7 @@ def adHoc_alat(parser):
     if match:
         alat_au = float(match.group(1))
     else:
-        raise RuntimeError("should not happen: %s", line)
+        raise RuntimeError("This should never happen: %s", line)
     unit_conversion.register_userdefined_quantity('usrAlat', 'bohr', alat_au)
     unit_conversion.register_userdefined_quantity(
         'usrTpiba', '1/bohr', 2*math.pi/alat_au)
