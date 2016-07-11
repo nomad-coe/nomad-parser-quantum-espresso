@@ -93,6 +93,17 @@ mainFileDescription = SM(
                     required=True,
                     forwardMatch=False,
                 ),
+                SM(
+                    name='nks',
+                    startReStr=(
+                        r"\s*number of Kohn-Sham states\s*=\s*" +
+                        r"(?P<x_qe_nks>" +
+                        RE_FORTRAN_INT + r")\s*"
+                    ),
+                    repeats=False,
+                    required=True,
+                    forwardMatch=False,
+                ),
             ],
         )
     ],
