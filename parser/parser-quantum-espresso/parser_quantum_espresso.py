@@ -23,7 +23,8 @@ mainFileDescription = SM(
                 r"\s*Program\s+(?P<program_name>\S+)\s+v\." +
                 r"(?P<program_version>\S+(?:\s+\(svn\s+rev\.\s+\d+\s*\))?)" +
                 r"\s+starts" +
-                r"(?:\s+on\s+.+?\s*$)?"),
+                r"(?:(?:\s+on\s+(?P<x_qe_time_run_date_start>.+?)?)\s*$|"
+                r"(?:\s*\.\.\.)\s*$)"),
             repeats=True,
             required=True,
             forwardMatch=False,
@@ -32,8 +33,10 @@ mainFileDescription = SM(
             sections=['section_run'],
             subMatchers=[
                 SM(
-                    name='header',
-                    startReStr=r"\s*# SampleParser #\s*"
+                    name='run_date',
+                    startReStr=(
+                        r"\s*Today is\s*(?P<x_qe_time_run_date_start>.+?)\s*$"
+                    ),
                 ),
             ],
         )
