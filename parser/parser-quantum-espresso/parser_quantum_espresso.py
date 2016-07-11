@@ -46,6 +46,17 @@ mainFileDescription = SM(
                     required=False,
                     forwardMatch=False,
                 ),
+                SM(
+                    name='alat',
+                    startReStr=(
+                        r"\s*lattice parameter \(a_0\)\s*=\s*" +
+                        r"(?P<x_qe_alat__bohr>" +
+                        RE_FORTRAN_FLOAT + r")\s*a\.u\."
+                    ),
+                    repeats=False,
+                    required=True,
+                    forwardMatch=True,
+                ),
             ],
         )
     ],
