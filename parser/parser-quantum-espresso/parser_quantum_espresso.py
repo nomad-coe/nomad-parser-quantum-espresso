@@ -26,7 +26,7 @@ def adHoc_alat(parser):
         raise RuntimeError("should not happen: %s", line)
     unit_conversion.register_userdefined_quantity('usrAlat', 'bohr', alat_au)
     unit_conversion.register_userdefined_quantity(
-        'usrTpba', '1/bohr', 2*math.pi/alat_au)
+        'usrTpiba', '1/bohr', 2*math.pi/alat_au)
 
 
 # description of the input
