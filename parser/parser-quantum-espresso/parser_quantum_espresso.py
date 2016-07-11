@@ -11,6 +11,10 @@ import calendar
 
 LOGGER = logging.getLogger(__name__)
 
+RE_FORTRAN_FLOAT = r"[+-]?\d+(?:\.\d+)?(?:[eEdD][+-]?\d+)?"
+RE_FORTRAN_INT = r"[+-]?\d+"
+
+
 
 # description of the input
 mainFileDescription = SM(
