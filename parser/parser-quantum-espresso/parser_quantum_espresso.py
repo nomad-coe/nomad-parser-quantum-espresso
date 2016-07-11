@@ -7,6 +7,8 @@ import json
 import re
 import logging
 import calendar
+import nomadcore.unit_conversion.unit_conversion as unit_conversion
+import math
 
 
 LOGGER = logging.getLogger(__name__)
@@ -14,6 +16,17 @@ LOGGER = logging.getLogger(__name__)
 RE_FORTRAN_FLOAT = r"[+-]?\d+(?:\.\d+)?(?:[eEdD][+-]?\d+)?"
 RE_FORTRAN_INT = r"[+-]?\d+"
 
+
+def adHoc_alat(parser):
+    line = parser.fIn.readline()
+    match = re.match(r"[^=]+=\s*(" + RE_FORTRAN_FLOAT + r")\s*a\.u\.", line)
+    if match:
+        alat_au = float(match.group(1))
+    else:
+        raise RuntimeError("should not happen: %s", line)
+    unit_conversion.register_userdefined_quantity('usrAlat', 'bohr', alat_au)
+    unit_conversion.register_userdefined_quantity(
+        'usrTpba', '1/bohr', 2*math.pi/alat_au)
 
 
 # description of the input
@@ -56,6 +69,7 @@ mainFileDescription = SM(
                     repeats=False,
                     required=True,
                     forwardMatch=True,
+                    adHoc=adHoc_alat,
                 ),
             ],
         )
