@@ -48,7 +48,7 @@ mainFileDescription = SM(
             forwardMatch=False,
             fixedStartValues={'program_name': 'Quantum Espresso',
                               'program_basis_set_type': 'plane waves'},
-            sections=['section_run'],
+            sections=['section_run', 'section_basis_set_cell_dependent'],
             subMatchers=[
                 SM(
                     name='run_date',
@@ -99,6 +99,17 @@ mainFileDescription = SM(
                         r"\s*number of Kohn-Sham states\s*=\s*" +
                         r"(?P<x_qe_nks>" +
                         RE_FORTRAN_INT + r")\s*"
+                    ),
+                    repeats=False,
+                    required=True,
+                    forwardMatch=False,
+                ),
+                SM(
+                    name='ecutwfc',
+                    startReStr=(
+                        r"\s*kinetic-energy cutoff\s*=\s*" +
+                        r"(?P<basis_set_planewave_cutoff__rydberg>" +
+                        RE_FORTRAN_FLOAT + r")\s*Ry\s*"
                     ),
                     repeats=False,
                     required=True,
