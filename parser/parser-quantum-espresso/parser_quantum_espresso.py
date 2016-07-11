@@ -42,6 +42,9 @@ mainFileDescription = SM(
                     startReStr=(
                         r"\s*Today is\s*(?P<x_qe_time_run_date_start>.+?)\s*$"
                     ),
+                    repeats=False,
+                    required=False,
+                    forwardMatch=False,
                 ),
             ],
         )
