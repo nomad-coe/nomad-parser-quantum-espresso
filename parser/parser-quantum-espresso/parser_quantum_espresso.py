@@ -5,6 +5,11 @@ import os
 import sys
 import json
 import re
+import logging
+
+
+LOGGER = logging.getLogger(__name__)
+
 
 # description of the input
 mainFileDescription = SM(
@@ -88,14 +93,14 @@ class QuantumEspressoParserContext(object):
         """trigger called when section_single_configuration_calculation
         is closed"""
         # backend.addValue("", self.scfIterNr)
-        logging.getLogger("nomadcore.parsing").info(
+        LOGGER.info(
             "closing section_single_configuration_calculation gIndex %d %s",
             gIndex, section.simpleValues)
         self.scfIterNr = 0
 
     def onClose_section_scf_iteration(self, backend, gIndex, section):
         """trigger called when section_scf_iteration is closed"""
-        logging.getLogger("nomadcore.parsing").info(
+        LOGGER.info(
             "closing section_scf_iteration bla gIndex %d %s",
             gIndex, section.simpleValues)
         self.scfIterNr += 1
