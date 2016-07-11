@@ -82,6 +82,17 @@ mainFileDescription = SM(
                     required=True,
                     forwardMatch=False,
                 ),
+                SM(
+                    name='nsp',
+                    startReStr=(
+                        r"\s*number of atomic types\s*=\s*" +
+                        r"(?P<x_qe_nsp>" +
+                        RE_FORTRAN_INT + r")\s*"
+                    ),
+                    repeats=False,
+                    required=True,
+                    forwardMatch=False,
+                ),
             ],
         )
     ],
