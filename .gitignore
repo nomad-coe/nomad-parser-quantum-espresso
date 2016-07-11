@@ -14,6 +14,9 @@ syntax: glob
 # logging files
 detailed.log
 
+# annotated input files
+*.annotate
+
 # eclipse conf file
 .settings
 .classpath
