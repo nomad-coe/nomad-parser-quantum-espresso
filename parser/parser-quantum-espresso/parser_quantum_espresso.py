@@ -6,6 +6,7 @@ import sys
 import json
 import re
 import logging
+import calendar
 
 
 LOGGER = logging.getLogger(__name__)
@@ -101,12 +102,35 @@ class QuantumEspressoParserContext(object):
             gIndex, section.simpleValues)
         self.scfIterNr = 0
 
+    def onClose_section_run(self, backend, gIndex, section):
+        LOGGER.info("closing section run")
+        string_run_start = section['x_qe_time_run_date_start'][-1]
+        epoch = espresso_date_to_epoch(string_run_start)
+        backend.addValue('time_run_date_start', epoch)
+
     def onClose_section_scf_iteration(self, backend, gIndex, section):
         """trigger called when section_scf_iteration is closed"""
         LOGGER.info(
             "closing section_scf_iteration bla gIndex %d %s",
             gIndex, section.simpleValues)
         self.scfIterNr += 1
+
+MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ]
+MONTH_NUMBER = { MONTHS[num]: num for num in range(0,12) }
+
+def espresso_date_to_epoch(espresso_date):
+    match = re.match(
+        r"(\d+)\s*([A-Za-z]+)\s*(\d+)\s+at\s+(\d+):\s*(\d+):\s*(\d+)",
+        espresso_date)
+    if match:
+        month = MONTH_NUMBER[match.group(2)]
+        epoch = calendar.timegm(
+            (int(match.group(3)), int(month), int(match.group(1)),
+             int(match.group(4)), int(match.group(5)), int(match.group(6))))
+        return(epoch)
+    else:
+        raise RuntimeError("unparsable date: %s", espresso_date)
 
 # which values to cache or forward (mapping meta name -> CachingLevel)
 cachingLevelForMetaName = {}
