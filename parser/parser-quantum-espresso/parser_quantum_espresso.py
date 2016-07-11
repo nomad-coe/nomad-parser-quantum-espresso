@@ -71,6 +71,17 @@ mainFileDescription = SM(
                     forwardMatch=True,
                     adHoc=adHoc_alat,
                 ),
+                SM(
+                    name='nat',
+                    startReStr=(
+                        r"\s*number of atoms/cell\s*=\s*" +
+                        r"(?P<x_qe_nat>" +
+                        RE_FORTRAN_INT + r")\s*"
+                    ),
+                    repeats=False,
+                    required=True,
+                    forwardMatch=False,
+                ),
             ],
         )
     ],
