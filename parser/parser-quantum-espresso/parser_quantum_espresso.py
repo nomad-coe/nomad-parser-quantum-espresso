@@ -17,6 +17,16 @@ RE_FORTRAN_FLOAT = r"[+-]?\d+(?:\.\d+)?(?:[eEdD][+-]?\d+)?"
 RE_FORTRAN_INT = r"[+-]?\d+"
 
 
+def re_vec(name, units=''):
+    """generator for 3-component vector (space separated) regex"""
+    if units:
+        units = '__' + units
+    res = (r'(?P<' + name + r'_x' + units + '>' + RE_FORTRAN_FLOAT + r')\s*' +
+           r'(?P<' + name + r'_y' + units + '>' + RE_FORTRAN_FLOAT + r')\s*' +
+           r'(?P<' + name + r'_z' + units + '>' + RE_FORTRAN_FLOAT + r')')
+    return res
+
+
 def adHoc_alat(parser):
     line = parser.fIn.readline()
     match = re.match(r"[^=]+=\s*(" + RE_FORTRAN_FLOAT + r")\s*a\.u\.", line)
