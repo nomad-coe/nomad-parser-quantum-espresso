@@ -158,6 +158,28 @@ mainFileDescription = SM(
                                 re_vec('x_qe_a3', 'usrAlat'),
                         ),
                     ],
+                ),
+                SM(
+                    name='reciprocal_cell',
+                    startReStr=r"\s*reciprocal axes: \(cart. coord. in units 2 pi/alat\)",
+                    endReStr=r"^\s*$", # empty line ends reciprocal matrix
+                    subMatchers=[
+                        SM(
+                            name='cell_b1',
+                            startReStr=r"\s*b\(1\)\s*=\s*\(\s*" +
+                                re_vec('x_qe_b1', 'usrTpiba'),
+                        ),
+                        SM(
+                            name='cell_b2',
+                            startReStr=r"\s*b\(2\)\s*=\s*\(\s*" +
+                                re_vec('x_qe_b2', 'usrTpiba'),
+                        ),
+                        SM(
+                            name='cell_b3',
+                            startReStr=r"\s*b\(3\)\s*=\s*\(\s*" +
+                                re_vec('x_qe_b3', 'usrTpiba'),
+                        ),
+                    ],
                 )
             ],
         )
@@ -240,6 +262,11 @@ class QuantumEspressoParserContext(object):
             [section['x_qe_a1_x'], section['x_qe_a1_y'], section['x_qe_a1_z']],
             [section['x_qe_a2_x'], section['x_qe_a2_y'], section['x_qe_a2_z']],
             [section['x_qe_a3_x'], section['x_qe_a3_y'], section['x_qe_a3_z']],
+        ]))
+        backend.addArrayValues('x_qe_reciprocal_cell', np.array([
+            [section['x_qe_b1_x'], section['x_qe_b1_y'], section['x_qe_b1_z']],
+            [section['x_qe_b2_x'], section['x_qe_b2_y'], section['x_qe_b2_z']],
+            [section['x_qe_b3_x'], section['x_qe_b3_y'], section['x_qe_b3_z']],
         ]))
 
 MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
