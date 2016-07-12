@@ -58,7 +58,7 @@ mainFileDescription = SM(
             forwardMatch=False,
             fixedStartValues={'program_name': 'Quantum Espresso',
                               'program_basis_set_type': 'plane waves'},
-            sections=['section_run', 'section_basis_set_cell_dependent'],
+            sections=['section_run', 'section_basis_set_cell_dependent', 'section_system'],
             subMatchers=[
                 SM(
                     name='run_date',
@@ -140,7 +140,6 @@ mainFileDescription = SM(
                     name='simulation_cell',
                     startReStr=r"\s*crystal axes: \(cart. coord.",
                     endReStr=r"^\s*$", # empty line ends bravais matrix
-                    sections = ["section_system"],
                     subMatchers=[
                         SM(
                             name='cell_a1',
