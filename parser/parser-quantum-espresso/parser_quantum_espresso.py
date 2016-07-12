@@ -136,6 +136,29 @@ mainFileDescription = SM(
                     required=True,
                     forwardMatch=False,
                 ),
+                SM(
+                    name='simulation_cell',
+                    startReStr=r"\s*crystal axes: \(cart. coord.",
+                    endReStr=r"^\s*$", # empty line ends bravais matrix
+                    sections = ["section_system"],
+                    subMatchers=[
+                        SM(
+                            name='cell_a1',
+                            startReStr=r"\s*a\(1\)\s*=\s*\(\s*" +
+                                re_vec('x_qe_a1', 'usrAlat'),
+                        ),
+                        SM(
+                            name='cell_a2',
+                            startReStr=r"\s*a\(2\)\s*=\s*\(\s*" +
+                                re_vec('x_qe_a2', 'usrAlat'),
+                        ),
+                        SM(
+                            name='cell_a3',
+                            startReStr=r"\s*a\(3\)\s*=\s*\(\s*" +
+                                re_vec('x_qe_a3', 'usrAlat'),
+                        ),
+                    ],
+                )
             ],
         )
     ],
@@ -211,6 +234,13 @@ class QuantumEspressoParserContext(object):
             "closing section_scf_iteration bla gIndex %d %s",
             gIndex, section.simpleValues)
         self.scfIterNr += 1
+
+    def onClose_section_system(self, backend, gIndex, section):
+        backend.addValue('simulation_cell', [
+            [section['x_qe_a1_x'], section['x_qe_a1_y'], section['x_qe_a1_z']],
+            [section['x_qe_a2_x'], section['x_qe_a2_y'], section['x_qe_a2_z']],
+            [section['x_qe_a3_x'], section['x_qe_a3_y'], section['x_qe_a3_z']],
+        ])
 
 MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ]
