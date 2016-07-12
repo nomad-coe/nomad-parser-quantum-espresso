@@ -9,6 +9,7 @@ import logging
 import calendar
 import nomadcore.unit_conversion.unit_conversion as unit_conversion
 import math
+import numpy as np
 
 
 LOGGER = logging.getLogger(__name__)
@@ -235,11 +236,11 @@ class QuantumEspressoParserContext(object):
         self.scfIterNr += 1
 
     def onClose_section_system(self, backend, gIndex, section):
-        backend.addValue('simulation_cell', [
+        backend.addArrayValues('simulation_cell', np.array([
             [section['x_qe_a1_x'], section['x_qe_a1_y'], section['x_qe_a1_z']],
             [section['x_qe_a2_x'], section['x_qe_a2_y'], section['x_qe_a2_z']],
             [section['x_qe_a3_x'], section['x_qe_a3_y'], section['x_qe_a3_z']],
-        ])
+        ]))
 
 MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ]
