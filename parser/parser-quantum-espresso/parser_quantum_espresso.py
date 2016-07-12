@@ -161,7 +161,7 @@ mainFileDescription = SM(
                 ),
                 SM(
                     name='reciprocal_cell',
-                    startReStr=r"\s*reciprocal axes: \(cart. coord. in units 2 pi/alat\)",
+                    startReStr=r"\s*reciprocal axes: \(cart. coord. in units 2 pi/(?:alat|a_0)\)",
                     endReStr=r"^\s*$", # empty line ends reciprocal matrix
                     subMatchers=[
                         SM(
