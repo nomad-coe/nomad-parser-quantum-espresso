@@ -11,11 +11,17 @@ import org.specs2.mutable.Specification
 
 object QuantumEspressoParserSpec extends Specification {
   "QuantumEspressoParserTest" >> {
-    "test with json-events" >> {
+    "test1 (pw.x 5.2.1) with json-events" >> {
       ParserRun.parse(QuantumEspressoParser, "parsers/quantum-espresso/test/examples/PWSCF/benchmark.out.r11920.inp=dft1.in", "json-events") must_== ParseResult.ParseSuccess
     }
-    "test with json" >> {
+    "test1 (pw.x 5.2.1) with json" >> {
       ParserRun.parse(QuantumEspressoParser, "parsers/quantum-espresso/test/examples/PWSCF/benchmark.out.r11920.inp=dft1.in", "json") must_== ParseResult.ParseSuccess
+    }
+    "test2 (pw.x 4.0) with json-events" >> {
+      ParserRun.parse(QuantumEspressoParser, "parsers/quantum-espresso/test/examples/PWSCF/scf-ncpp.ref.1193929391", "json-events") must_== ParseResult.ParseSuccess
+    }
+    "test2 (pw.x 4.0) with json" >> {
+      ParserRun.parse(QuantumEspressoParser, "parsers/quantum-espresso/test/examples/PWSCF/scf-ncpp.ref.1193929391", "json") must_== ParseResult.ParseSuccess
     }
   }
 }
