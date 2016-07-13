@@ -191,7 +191,6 @@ mainFileDescription = SM(
                     #         startReStr=r"\s*PseudoPot\.\s*#\s*\d+",
                     #         adHoc=adHoc
                     forwardMatch=True,
-                    # forwardEndMatch=True,
                 ),
                 SM(
                     name='nsymm',
