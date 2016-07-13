@@ -49,7 +49,7 @@ mainFileDescription = SM(
         SM(
             name='newRun',
             startReStr=(
-                r"\s*Program\s+(?P<program_name>\S+)\s+v\." +
+                r"\s*Program\s+(?P<x_qe_program_name>\S+)\s+v\." +
                 r"(?P<program_version>\S+(?:\s+\(svn\s+rev\.\s+\d+\s*\))?)" +
                 r"\s+starts" +
                 r"(?:(?:\s+on\s+(?P<x_qe_time_run_date_start>.+?)?)\s*$|"
