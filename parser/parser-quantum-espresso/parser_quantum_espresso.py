@@ -180,7 +180,19 @@ mainFileDescription = SM(
                                 re_vec('x_qe_b3', 'usrTpiba'),
                         ),
                     ],
-                )
+                ),
+                SM(
+                    name='pseudopotentials',
+                    startReStr=r"\s*PseudoPot\.\s*#\s*1",
+                    endReStr=r"\s*\d+\s*Sym\.Ops\.",
+                    # subMatchers=[
+                    #     SM(
+                    #         name='pseudopotential',
+                    #         startReStr=r"\s*PseudoPot\.\s*#\s*\d+",
+                    #         adHoc=adHoc
+                    forwardMatch=True,
+                    # forwardEndMatch=True,
+                ),
             ],
         )
     ],
