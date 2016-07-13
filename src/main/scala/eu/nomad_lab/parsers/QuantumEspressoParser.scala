@@ -36,7 +36,8 @@ object QuantumEspressoParser extends SimpleExternalParserGenerator(
   dirMap = Map(
     "parser-quantum-espresso" -> "parsers/quantum-espresso/parser/parser-quantum-espresso",
     "nomad_meta_info" -> "nomad-meta-info/meta_info/nomad_meta_info"
-  ) ++ DefaultPythonInterpreter.commonDirMapping()
+  ) ++ DefaultPythonInterpreter.commonDirMapping(),
+  metaInfoEnv = Some(lab.meta.KnownMetaInfoEnvs.quantumEspresso)
 ) {
 
   val fallbackRe = """\s*Program (?<programName>\S+)\s+v\.(?<version>\S+)(?:\s+\(svn\s+rev\.\s+(?<revision>\d+)\s*\))?\s+starts""".r
