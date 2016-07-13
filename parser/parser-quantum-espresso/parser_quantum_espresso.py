@@ -193,6 +193,11 @@ mainFileDescription = SM(
                     forwardMatch=True,
                     # forwardEndMatch=True,
                 ),
+                SM(
+                    name='nsymm',
+                    startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.",
+                    endReStr=r"\s*Cartesian Axes",
+                ),
             ],
         )
     ],
