@@ -105,10 +105,10 @@ mainFileDescription = SM(
                     forwardMatch=False,
                 ),
                 SM(
-                    name='nks',
+                    name='nbnd',
                     startReStr=(
                         r"\s*number of Kohn-Sham states\s*=\s*" +
-                        r"(?P<x_qe_nks>" +
+                        r"(?P<x_qe_nbnd>" +
                         RE_FORTRAN_INT + r")\s*"
                     ),
                     repeats=False,
