@@ -2,6 +2,13 @@ package eu.nomad_lab.parsers
 
 import org.specs2.mutable.Specification
 
+/**
+ * pw.x output Test files:
+ * parsers/quantum-espresso/test/examples/PWSCF/benchmark.out.r11920.inp=dft1.in
+ * parsers/quantum-espresso/test/examples/PWSCF/scf-ncpp.ref.1193929391
+ *
+ */
+
 object QuantumEspressoParserSpec extends Specification {
   "QuantumEspressoParserTest" >> {
     "test with json-events" >> {
