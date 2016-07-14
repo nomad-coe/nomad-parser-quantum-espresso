@@ -26,6 +26,7 @@ object QuantumEspressoParser extends SimpleExternalParserGenerator(
   cmd = Seq(DefaultPythonInterpreter.pythonExe(), "${envDir}/parsers/quantum-espresso/parser/parser-quantum-espresso/parser_quantum_espresso.py",
     "--uri", "${mainFileUri}", "${mainFilePath}"),
   resList = Seq(
+    "parser-quantum-espresso/QuantumEspressoCommon.py",
     "parser-quantum-espresso/parser_quantum_espresso.py",
     "parser-quantum-espresso/setup_paths.py",
     "nomad_meta_info/public.nomadmetainfo.json",
