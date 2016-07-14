@@ -183,16 +183,6 @@ mainFileDescription = SM(
     ],
 )
 
-# loading metadata from
-# nomad-meta-info/meta_info/nomad_meta_info/quantum_espresso.nomadmetainfo.json
-metaInfoPath = os.path.normpath(
-    os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "../../../../nomad-meta-info/meta_info/nomad_meta_info/" +
-        "quantum_espresso.nomadmetainfo.json"))
-metaInfoEnv, warnings = loadJsonFile(
-    filePath=metaInfoPath, dependencyLoader=None,
-    extraArgsHandling=InfoKindEl.ADD_EXTRA_ARGS, uri=None)
 
 parserInfo = {
   "name": "parser_quantum_espresso",
@@ -261,6 +251,6 @@ class QuantumEspressoParserContext(object):
 cachingLevelForMetaName = {}
 
 if __name__ == "__main__":
-    mainFunction(mainFileDescription, metaInfoEnv, parserInfo,
+    mainFunction(mainFileDescription, QeC.META_INFO_ENV, parserInfo,
                  cachingLevelForMetaName=cachingLevelForMetaName,
                  superContext=QuantumEspressoParserContext())

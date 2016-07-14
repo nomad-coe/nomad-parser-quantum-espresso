@@ -35,18 +35,6 @@ LIST_COVERAGE_IGNORE = [
 RE_COVERAGE_IGNORE = re.compile(r"^(?:" +
     r"|".join(LIST_COVERAGE_IGNORE) + r")$")
 
-def get_metaInfo(filePath):
-    """Loads metadata.
-
-    Args:
-        filePath: Location of metadata.
-
-    Returns:
-        metadata which is an object of the class InfoKindEnv in nomadcore.local_meta_info.py.
-    """
-    metaInfoEnv, warnings = loadJsonFile(filePath = filePath, dependencyLoader = None, extraArgsHandling = InfoKindEl.ADD_EXTRA_ARGS, uri = None)
-    return metaInfoEnv
-
 
 def re_vec(name, units='', split="\s*"):
     """generator for 3-component vector regex"""
@@ -92,3 +80,26 @@ RE_RUN_START=(
 
 # older espresso versions have start date on separate line
 RE_RUN_DATE=r"\s*Today is\s*(?P<x_qe_time_run_date_start>.+?)\s*$"
+
+
+def get_metaInfo(filePath):
+    """Loads metadata.
+
+    Args:
+        filePath: Location of metadata.
+
+    Returns:
+        metadata which is an object of the class InfoKindEnv in nomadcore.local_meta_info.py.
+    """
+    metaInfoEnv, warnings = loadJsonFile(filePath = filePath, dependencyLoader = None, extraArgsHandling = InfoKindEl.ADD_EXTRA_ARGS, uri = None)
+    return metaInfoEnv
+
+# loading metadata from
+# nomad-meta-info/meta_info/nomad_meta_info/quantum_espresso.nomadmetainfo.json
+metaInfoPath = os.path.normpath(
+    os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../../../../nomad-meta-info/meta_info/nomad_meta_info/" +
+        "quantum_espresso.nomadmetainfo.json"))
+
+META_INFO_ENV = get_metaInfo(metaInfoPath)
