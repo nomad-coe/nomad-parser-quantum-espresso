@@ -6,31 +6,19 @@ import sys
 import json
 import re
 import logging
-import calendar
 import nomadcore.unit_conversion.unit_conversion as unit_conversion
 import math
 import numpy as np
+import QuantumEspressoCommon as QeC
 
 
 LOGGER = logging.getLogger(__name__)
 
-RE_FORTRAN_FLOAT = r"[+-]?\d+(?:\.\d+)?(?:[eEdD][+-]?\d+)?"
-RE_FORTRAN_INT = r"[+-]?\d+"
-
-
-def re_vec(name, units=''):
-    """generator for 3-component vector (space separated) regex"""
-    if units:
-        units = '__' + units
-    res = (r'(?P<' + name + r'_x' + units + '>' + RE_FORTRAN_FLOAT + r')\s*' +
-           r'(?P<' + name + r'_y' + units + '>' + RE_FORTRAN_FLOAT + r')\s*' +
-           r'(?P<' + name + r'_z' + units + '>' + RE_FORTRAN_FLOAT + r')')
-    return res
-
 
 def adHoc_alat(parser):
     line = parser.fIn.readline()
-    match = re.match(r"[^=]+=\s*(" + RE_FORTRAN_FLOAT + r")\s*a\.u\.", line)
+    match = re.match(r"[^=]+=\s*(" + QeC.RE_FORTRAN_FLOAT + r")\s*a\.u\.",
+                     line)
     if match:
         alat_au = float(match.group(1))
     else:
@@ -48,12 +36,7 @@ mainFileDescription = SM(
     subMatchers=[
         SM(
             name='newRun',
-            startReStr=(
-                r"\s*Program\s+(?P<x_qe_program_name>\S+)\s+v\." +
-                r"(?P<program_version>\S+(?:\s+\(svn\s+rev\.\s+\d+\s*\))?)" +
-                r"\s+starts" +
-                r"(?:(?:\s+on\s+(?P<x_qe_time_run_date_start>.+?)?)\s*$|"
-                r"(?:\s*\.\.\.)\s*$)"),
+            startReStr=QeC.RE_RUN_START,
             repeats=True,
             required=True,
             forwardMatch=False,
@@ -63,9 +46,7 @@ mainFileDescription = SM(
             subMatchers=[
                 SM(
                     name='run_date',
-                    startReStr=(
-                        r"\s*Today is\s*(?P<x_qe_time_run_date_start>.+?)\s*$"
-                    ),
+                    startReStr=QeC.RE_RUN_DATE,
                     repeats=False,
                     required=False,
                     forwardMatch=False,
@@ -75,7 +56,7 @@ mainFileDescription = SM(
                     startReStr=(
                         r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*" +
                         r"(?P<x_qe_alat__bohr>" +
-                        RE_FORTRAN_FLOAT + r")\s*a\.u\."
+                        QeC.RE_FORTRAN_FLOAT + r")\s*a\.u\."
                     ),
                     repeats=False,
                     required=True,
@@ -87,7 +68,7 @@ mainFileDescription = SM(
                     startReStr=(
                         r"\s*number of atoms/cell\s*=\s*" +
                         r"(?P<x_qe_nat>" +
-                        RE_FORTRAN_INT + r")\s*"
+                        QeC.RE_FORTRAN_INT + r")\s*"
                     ),
                     repeats=False,
                     required=True,
@@ -98,7 +79,7 @@ mainFileDescription = SM(
                     startReStr=(
                         r"\s*number of atomic types\s*=\s*" +
                         r"(?P<x_qe_nsp>" +
-                        RE_FORTRAN_INT + r")\s*"
+                        QeC.RE_FORTRAN_INT + r")\s*"
                     ),
                     repeats=False,
                     required=True,
@@ -109,7 +90,7 @@ mainFileDescription = SM(
                     startReStr=(
                         r"\s*number of Kohn-Sham states\s*=\s*" +
                         r"(?P<x_qe_nbnd>" +
-                        RE_FORTRAN_INT + r")\s*"
+                        QeC.RE_FORTRAN_INT + r")\s*"
                     ),
                     repeats=False,
                     required=True,
@@ -120,7 +101,7 @@ mainFileDescription = SM(
                     startReStr=(
                         r"\s*kinetic-energy cutoff\s*=\s*" +
                         r"(?P<basis_set_planewave_cutoff__rydberg>" +
-                        RE_FORTRAN_FLOAT + r")\s*Ry\s*"
+                        QeC.RE_FORTRAN_FLOAT + r")\s*Ry\s*"
                     ),
                     repeats=False,
                     required=True,
@@ -131,7 +112,7 @@ mainFileDescription = SM(
                     startReStr=(
                         r"\s*charge density cutoff\s*=\s*" +
                         r"(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" +
-                        RE_FORTRAN_FLOAT + r")\s*Ry\s*"
+                        QeC.RE_FORTRAN_FLOAT + r")\s*Ry\s*"
                     ),
                     repeats=False,
                     required=True,
@@ -145,17 +126,17 @@ mainFileDescription = SM(
                         SM(
                             name='cell_a1',
                             startReStr=r"\s*a\(1\)\s*=\s*\(\s*" +
-                                re_vec('x_qe_a1', 'usrAlat'),
+                                QeC.re_vec('x_qe_a1', 'usrAlat'),
                         ),
                         SM(
                             name='cell_a2',
                             startReStr=r"\s*a\(2\)\s*=\s*\(\s*" +
-                                re_vec('x_qe_a2', 'usrAlat'),
+                                QeC.re_vec('x_qe_a2', 'usrAlat'),
                         ),
                         SM(
                             name='cell_a3',
                             startReStr=r"\s*a\(3\)\s*=\s*\(\s*" +
-                                re_vec('x_qe_a3', 'usrAlat'),
+                                QeC.re_vec('x_qe_a3', 'usrAlat'),
                         ),
                     ],
                 ),
@@ -167,17 +148,17 @@ mainFileDescription = SM(
                         SM(
                             name='cell_b1',
                             startReStr=r"\s*b\(1\)\s*=\s*\(\s*" +
-                                re_vec('x_qe_b1', 'usrTpiba'),
+                                QeC.re_vec('x_qe_b1', 'usrTpiba'),
                         ),
                         SM(
                             name='cell_b2',
                             startReStr=r"\s*b\(2\)\s*=\s*\(\s*" +
-                                re_vec('x_qe_b2', 'usrTpiba'),
+                                QeC.re_vec('x_qe_b2', 'usrTpiba'),
                         ),
                         SM(
                             name='cell_b3',
                             startReStr=r"\s*b\(3\)\s*=\s*\(\s*" +
-                                re_vec('x_qe_b3', 'usrTpiba'),
+                                QeC.re_vec('x_qe_b3', 'usrTpiba'),
                         ),
                     ],
                 ),
@@ -223,18 +204,7 @@ class QuantumEspressoParserContext(object):
     """main place to keep the parser status, open ancillary files,..."""
     def __init__(self):
         self.scfIterNr = 0
-        coverageIgnoreList = [
-           r"\s*",
-           r"\s*Ultrasoft \(Vanderbilt\) Pseudopotentials\s*",
-           r"\s*This program is part of the open-source Quantum ESPRESSO suite",
-           r"\s*for quantum simulation of materials; please cite",
-           r"\s*\"P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 \(2009\);\s*",
-           r"\s*URL http://www.quantum-espresso.org\",\s*",
-           r"\s*in publications or presentations arising from this work. More details at",
-           r"\s*http://www.quantum-espresso.org/quote",
-        ]
-        self.coverageIgnore = re.compile(r"^(?:" +
-            r"|".join(coverageIgnoreList) + r")$")
+        self.coverageIgnore = QeC.RE_COVERAGE_IGNORE
 
     def initialize_values(self):
         """allows to reset values if the same superContext is used to parse
@@ -263,7 +233,7 @@ class QuantumEspressoParserContext(object):
     def onClose_section_run(self, backend, gIndex, section):
         LOGGER.info("closing section run")
         string_run_start = section['x_qe_time_run_date_start'][-1]
-        epoch = espresso_date_to_epoch(string_run_start)
+        epoch = QeC.espresso_date_to_epoch(string_run_start)
         backend.addValue('time_run_date_start', epoch)
 
     def onClose_section_scf_iteration(self, backend, gIndex, section):
@@ -285,22 +255,6 @@ class QuantumEspressoParserContext(object):
             [section['x_qe_b3_x'], section['x_qe_b3_y'], section['x_qe_b3_z']],
         ]))
 
-MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ]
-MONTH_NUMBER = { MONTHS[num]: num for num in range(0,12) }
-
-def espresso_date_to_epoch(espresso_date):
-    match = re.match(
-        r"(\d+)\s*([A-Za-z]+)\s*(\d+)\s+at\s+(\d+):\s*(\d+):\s*(\d+)",
-        espresso_date)
-    if match:
-        month = MONTH_NUMBER[match.group(2)]
-        epoch = calendar.timegm(
-            (int(match.group(3)), int(month), int(match.group(1)),
-             int(match.group(4)), int(match.group(5)), int(match.group(6))))
-        return(epoch)
-    else:
-        raise RuntimeError("unparsable date: %s", espresso_date)
 
 
 # which values to cache or forward (mapping meta name -> CachingLevel)
