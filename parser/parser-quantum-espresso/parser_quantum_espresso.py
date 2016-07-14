@@ -15,6 +15,12 @@ import QuantumEspressoCommon as QeC
 LOGGER = logging.getLogger(__name__)
 
 
+parserInfo = {
+  "name": "parser_quantum_espresso",
+  "version": "0.0.1"
+}
+
+
 def adHoc_alat(parser):
     line = parser.fIn.readline()
     match = re.match(r"[^=]+=\s*(" + QeC.RE_FORTRAN_FLOAT + r")\s*a\.u\.",
@@ -182,12 +188,6 @@ mainFileDescription = SM(
         )
     ],
 )
-
-
-parserInfo = {
-  "name": "parser_quantum_espresso",
-  "version": "1.0"
-}
 
 
 class QuantumEspressoParserContext(object):
