@@ -48,7 +48,7 @@ mainFileDescription = SM(
             forwardMatch=False,
             fixedStartValues={'program_name': 'Quantum Espresso',
                               'program_basis_set_type': 'plane waves'},
-            sections=['section_run', 'section_basis_set_cell_dependent', 'section_system'],
+            sections=['section_run'],
             subMatchers=[
                 SM(
                     name='run_date',
