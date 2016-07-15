@@ -199,7 +199,8 @@ class QuantumEspressoParserContext(object):
     def initialize_values(self):
         """allows to reset values if the same superContext is used to parse
         different files"""
-        pass
+        self.secMethodIndex = None
+        self.secSystemDescriptionIndex = None
 
     def startedParsing(self, path, parser):
         """called when parsing starts"""
@@ -207,6 +208,14 @@ class QuantumEspressoParserContext(object):
         # allows to reset values if the same superContext is used to parse
         # different files
         self.initialize_values()
+
+    def onOpen_section_method(
+            self, backend, gIndex, section):
+        self.secMethodIndex = gIndex
+
+    def onOpen_section_system(
+            self, backend, gIndex, section):
+        self.secSystemIndex = gIndex
 
     # just examples, you probably want to remove the following two triggers
 
@@ -219,6 +228,10 @@ class QuantumEspressoParserContext(object):
             "closing section_single_configuration_calculation gIndex %d %s",
             gIndex, section.simpleValues)
         self.scfIterNr = 0
+        backend.addValue('single_configuration_to_calculation_method_ref',
+                         self.secMethodIndex)
+        backend.addValue('single_configuration_calculation_to_system_ref',
+                         self.secSystemIndex)
 
     def onClose_section_run(self, backend, gIndex, section):
         LOGGER.info("closing section run")
