@@ -58,131 +58,159 @@ mainFileDescription = SM(
                     forwardMatch=False,
                 ),
                 SM(
-                    name='alat',
-                    startReStr=(
-                        r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*" +
-                        r"(?P<x_qe_alat__bohr>" +
-                        QeC.RE_FORTRAN_FLOAT + r")\s*a\.u\."
-                    ),
-                    repeats=False,
-                    required=True,
-                    forwardMatch=True,
-                    adHoc=adHoc_alat,
-                ),
-                SM(
-                    name='nat',
-                    startReStr=(
-                        r"\s*number of atoms/cell\s*=\s*" +
-                        r"(?P<x_qe_nat>" +
-                        QeC.RE_FORTRAN_INT + r")\s*"
-                    ),
-                    repeats=False,
-                    required=True,
-                    forwardMatch=False,
-                ),
-                SM(
-                    name='nsp',
-                    startReStr=(
-                        r"\s*number of atomic types\s*=\s*" +
-                        r"(?P<x_qe_nsp>" +
-                        QeC.RE_FORTRAN_INT + r")\s*"
-                    ),
-                    repeats=False,
-                    required=True,
-                    forwardMatch=False,
-                ),
-                SM(
-                    name='nbnd',
-                    startReStr=(
-                        r"\s*number of Kohn-Sham states\s*=\s*" +
-                        r"(?P<x_qe_nbnd>" +
-                        QeC.RE_FORTRAN_INT + r")\s*"
-                    ),
-                    repeats=False,
-                    required=True,
-                    forwardMatch=False,
-                ),
-                SM(
-                    name='ecutwfc',
-                    startReStr=(
-                        r"\s*kinetic-energy cutoff\s*=\s*" +
-                        r"(?P<basis_set_planewave_cutoff__rydberg>" +
-                        QeC.RE_FORTRAN_FLOAT + r")\s*Ry\s*"
-                    ),
-                    repeats=False,
-                    required=True,
-                    forwardMatch=False,
-                ),
-                SM(
-                    name='ecut_density',
-                    startReStr=(
-                        r"\s*charge density cutoff\s*=\s*" +
-                        r"(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" +
-                        QeC.RE_FORTRAN_FLOAT + r")\s*Ry\s*"
-                    ),
-                    repeats=False,
-                    required=True,
-                    forwardMatch=False,
-                ),
-                SM(
-                    name='simulation_cell',
-                    startReStr=r"\s*crystal axes: \(cart. coord.",
-                    endReStr=r"^\s*$", # empty line ends bravais matrix
+                    name='header',
+                    startReStr=r".*(?:\s|\()lmax(?:x\))?\s*=",
+                    sections = ['section_basis_set_cell_dependent',
+                                'section_method',
+                                'section_system'],
                     subMatchers=[
                         SM(
-                            name='cell_a1',
-                            startReStr=r"\s*a\(1\)\s*=\s*\(\s*" +
-                                QeC.re_vec('x_qe_a1', 'usrAlat'),
+                            name='alat',
+                            startReStr=(
+                                r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*" +
+                                r"(?P<x_qe_alat__bohr>" +
+                                QeC.RE_FORTRAN_FLOAT + r")\s*a\.u\."
+                            ),
+                            repeats=False,
+                            required=True,
+                            forwardMatch=True,
+                            adHoc=adHoc_alat,
                         ),
                         SM(
-                            name='cell_a2',
-                            startReStr=r"\s*a\(2\)\s*=\s*\(\s*" +
-                                QeC.re_vec('x_qe_a2', 'usrAlat'),
+                            name='nat',
+                            startReStr=(
+                                r"\s*number of atoms/cell\s*=\s*" +
+                                r"(?P<x_qe_nat>" +
+                                QeC.RE_FORTRAN_INT + r")\s*"
+                            ),
+                            repeats=False,
+                            required=True,
+                            forwardMatch=False,
                         ),
                         SM(
-                            name='cell_a3',
-                            startReStr=r"\s*a\(3\)\s*=\s*\(\s*" +
-                                QeC.re_vec('x_qe_a3', 'usrAlat'),
+                            name='nsp',
+                            startReStr=(
+                                r"\s*number of atomic types\s*=\s*" +
+                                r"(?P<x_qe_nsp>" +
+                                QeC.RE_FORTRAN_INT + r")\s*"
+                            ),
+                            repeats=False,
+                            required=True,
+                            forwardMatch=False,
+                        ),
+                        SM(
+                            name='nbnd',
+                            startReStr=(
+                                r"\s*number of Kohn-Sham states\s*=\s*" +
+                                r"(?P<x_qe_nbnd>" +
+                                QeC.RE_FORTRAN_INT + r")\s*"
+                            ),
+                            repeats=False,
+                            required=True,
+                            forwardMatch=False,
+                        ),
+                        SM(
+                            name='ecutwfc',
+                            startReStr=(
+                                r"\s*kinetic-energy cutoff\s*=\s*" +
+                                r"(?P<basis_set_planewave_cutoff__rydberg>" +
+                                QeC.RE_FORTRAN_FLOAT + r")\s*Ry\s*"
+                            ),
+                            repeats=False,
+                            required=True,
+                            forwardMatch=False,
+                        ),
+                        SM(
+                            name='ecut_density',
+                            startReStr=(
+                                r"\s*charge density cutoff\s*=\s*" +
+                                r"(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" +
+                                QeC.RE_FORTRAN_FLOAT + r")\s*Ry\s*"
+                            ),
+                            repeats=False,
+                            required=True,
+                            forwardMatch=False,
+                        ),
+                        SM(
+                            name='simulation_cell',
+                            startReStr=r"\s*crystal axes: \(cart. coord.",
+                            endReStr=r"^\s*$", # empty line ends bravais matrix
+                            subMatchers=[
+                                SM(
+                                    name='cell_a1',
+                                    startReStr=r"\s*a\(1\)\s*=\s*\(\s*" +
+                                        QeC.re_vec('x_qe_a1', 'usrAlat'),
+                                ),
+                                SM(
+                                    name='cell_a2',
+                                    startReStr=r"\s*a\(2\)\s*=\s*\(\s*" +
+                                        QeC.re_vec('x_qe_a2', 'usrAlat'),
+                                ),
+                                SM(
+                                    name='cell_a3',
+                                    startReStr=r"\s*a\(3\)\s*=\s*\(\s*" +
+                                        QeC.re_vec('x_qe_a3', 'usrAlat'),
+                                ),
+                            ],
+                        ),
+                        SM(
+                            name='reciprocal_cell',
+                            startReStr=r"\s*reciprocal axes: \(cart. coord. in units 2 pi/(?:alat|a_0)\)",
+                            endReStr=r"^\s*$", # empty line ends reciprocal matrix
+                            subMatchers=[
+                                SM(
+                                    name='cell_b1',
+                                    startReStr=r"\s*b\(1\)\s*=\s*\(\s*" +
+                                        QeC.re_vec('x_qe_b1', 'usrTpiba'),
+                                ),
+                                SM(
+                                    name='cell_b2',
+                                    startReStr=r"\s*b\(2\)\s*=\s*\(\s*" +
+                                        QeC.re_vec('x_qe_b2', 'usrTpiba'),
+                                ),
+                                SM(
+                                    name='cell_b3',
+                                    startReStr=r"\s*b\(3\)\s*=\s*\(\s*" +
+                                        QeC.re_vec('x_qe_b3', 'usrTpiba'),
+                                ),
+                            ],
+                        ),
+                        SM(
+                            name='pseudopotentials',
+                            startReStr=r"\s*PseudoPot\.\s*#\s*1",
+                            endReStr=r"\s*\d+\s*Sym\.Ops\.",
+                            # subMatchers=[
+                            #     SM(
+                            #         name='pseudopotential',
+                            #         startReStr=r"\s*PseudoPot\.\s*#\s*\d+",
+                            #         adHoc=adHoc
+                            forwardMatch=True,
+                        ),
+                        SM(
+                            name='nsymm',
+                            startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.",
+                            endReStr=r"\s*Cartesian Axes",
                         ),
                     ],
-                ),
+                ), # header
                 SM(
-                    name='reciprocal_cell',
-                    startReStr=r"\s*reciprocal axes: \(cart. coord. in units 2 pi/(?:alat|a_0)\)",
-                    endReStr=r"^\s*$", # empty line ends reciprocal matrix
+                    name='self_consistent_calculation',
+                    startReStr=r"\s*Self-consistent Calculation",
+                    sections = ['section_single_configuration_calculation'],
                     subMatchers=[
                         SM(
-                            name='cell_b1',
-                            startReStr=r"\s*b\(1\)\s*=\s*\(\s*" +
-                                QeC.re_vec('x_qe_b1', 'usrTpiba'),
-                        ),
-                        SM(
-                            name='cell_b2',
-                            startReStr=r"\s*b\(2\)\s*=\s*\(\s*" +
-                                QeC.re_vec('x_qe_b2', 'usrTpiba'),
-                        ),
-                        SM(
-                            name='cell_b3',
-                            startReStr=r"\s*b\(3\)\s*=\s*\(\s*" +
-                                QeC.re_vec('x_qe_b3', 'usrTpiba'),
+                            name='iteration',
+                            startReStr=r'\s*iteration\s*#',
+                            sections=['section_scf_iteration'],
+                            repeats=True,
+                            subMatchers=[
+                                SM(
+                                    name='e_total',
+                                    startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>\S+)',
+                                ),
+                            ],
                         ),
                     ],
-                ),
-                SM(
-                    name='pseudopotentials',
-                    startReStr=r"\s*PseudoPot\.\s*#\s*1",
-                    endReStr=r"\s*\d+\s*Sym\.Ops\.",
-                    # subMatchers=[
-                    #     SM(
-                    #         name='pseudopotential',
-                    #         startReStr=r"\s*PseudoPot\.\s*#\s*\d+",
-                    #         adHoc=adHoc
-                    forwardMatch=True,
-                ),
-                SM(
-                    name='nsymm',
-                    startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.",
-                    endReStr=r"\s*Cartesian Axes",
                 ),
             ],
         )
