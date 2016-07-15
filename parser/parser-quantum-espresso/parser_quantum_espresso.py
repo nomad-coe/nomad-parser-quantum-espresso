@@ -45,7 +45,6 @@ mainFileDescription = SM(
             startReStr=QeC.RE_RUN_START,
             repeats=True,
             required=True,
-            forwardMatch=False,
             fixedStartValues={'program_name': 'Quantum Espresso',
                               'program_basis_set_type': 'plane waves'},
             sections=['section_run'],
@@ -53,9 +52,6 @@ mainFileDescription = SM(
                 SM(
                     name='run_date',
                     startReStr=QeC.RE_RUN_DATE,
-                    repeats=False,
-                    required=False,
-                    forwardMatch=False,
                 ),
                 SM(
                     name='header',
@@ -71,7 +67,6 @@ mainFileDescription = SM(
                                 r"(?P<x_qe_alat__bohr>" +
                                 QeC.RE_FORTRAN_FLOAT + r")\s*a\.u\."
                             ),
-                            repeats=False,
                             required=True,
                             forwardMatch=True,
                             adHoc=adHoc_alat,
@@ -83,9 +78,7 @@ mainFileDescription = SM(
                                 r"(?P<x_qe_nat>" +
                                 QeC.RE_FORTRAN_INT + r")\s*"
                             ),
-                            repeats=False,
                             required=True,
-                            forwardMatch=False,
                         ),
                         SM(
                             name='nsp',
@@ -94,9 +87,7 @@ mainFileDescription = SM(
                                 r"(?P<x_qe_nsp>" +
                                 QeC.RE_FORTRAN_INT + r")\s*"
                             ),
-                            repeats=False,
                             required=True,
-                            forwardMatch=False,
                         ),
                         SM(
                             name='nbnd',
@@ -105,9 +96,7 @@ mainFileDescription = SM(
                                 r"(?P<x_qe_nbnd>" +
                                 QeC.RE_FORTRAN_INT + r")\s*"
                             ),
-                            repeats=False,
                             required=True,
-                            forwardMatch=False,
                         ),
                         SM(
                             name='ecutwfc',
@@ -116,9 +105,7 @@ mainFileDescription = SM(
                                 r"(?P<basis_set_planewave_cutoff__rydberg>" +
                                 QeC.RE_FORTRAN_FLOAT + r")\s*Ry\s*"
                             ),
-                            repeats=False,
                             required=True,
-                            forwardMatch=False,
                         ),
                         SM(
                             name='ecut_density',
@@ -127,9 +114,7 @@ mainFileDescription = SM(
                                 r"(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" +
                                 QeC.RE_FORTRAN_FLOAT + r")\s*Ry\s*"
                             ),
-                            repeats=False,
                             required=True,
-                            forwardMatch=False,
                         ),
                         SM(
                             name='simulation_cell',
