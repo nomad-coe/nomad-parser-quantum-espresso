@@ -209,6 +209,14 @@ class QuantumEspressoParserContext(object):
         # different files
         self.initialize_values()
 
+    def onClose_section_basis_set_cell_dependent(
+            self, backend, gIndex, section):
+        pwc_ry = unit_conversion.convert_unit(
+            section['basis_set_planewave_cutoff'][-1],
+            'J', 'rydberg')
+        backend.addValue('basis_set_cell_dependent_name', 'PW_%.1f' % (pwc_ry))
+        backend.addValue('basis_set_cell_dependent_kind', 'plane_waves')
+
     def onOpen_section_method(
             self, backend, gIndex, section):
         self.secMethodIndex = gIndex
