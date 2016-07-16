@@ -278,6 +278,6 @@ class QuantumEspressoParserContext(object):
 cachingLevelForMetaName = {}
 
 if __name__ == "__main__":
-    mainFunction(mainFileDescription, QeC.META_INFO_ENV, parserInfo,
+    mainFunction(mainFileDescription, QeC.META_INFO, parserInfo,
                  cachingLevelForMetaName=cachingLevelForMetaName,
                  superContext=QuantumEspressoParserContext())
