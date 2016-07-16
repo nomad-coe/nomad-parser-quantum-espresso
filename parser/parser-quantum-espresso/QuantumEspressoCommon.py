@@ -28,8 +28,7 @@ LIST_COVERAGE_IGNORE = [
    r"\s*http://www.quantum-espresso.org/quote",
    r"\s*Current dimensions of program \S+ are:",
 ]
-RE_COVERAGE_IGNORE = re.compile(r"^(?:" +
-    r"|".join(LIST_COVERAGE_IGNORE) + r")$")
+RE_COVERAGE_IGNORE = re.compile(r"^(?:" + r"|".join(LIST_COVERAGE_IGNORE) + r")$")
 
 
 def re_vec(name, units='', split="\s*"):
