@@ -32,7 +32,88 @@ def adHoc_alat(parser):
     unit_conversion.register_userdefined_quantity(
         'usrTpiba', '1/bohr', 2*math.pi/alat_au)
 
-
+RUN_SUBMATCHERS=[
+    SM(name='header',
+       startReStr=r".*(?:\s|\()lmax(?:x\))?\s*=",
+       sections = ['section_basis_set_cell_dependent', 'section_method', 'section_system'],
+       subMatchers=[
+           SM(name='alat', required=True, forwardMatch=True,
+              startReStr=r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*(?P<x_qe_alat__bohr>\S+)\s*a\.u\.",
+              adHoc=adHoc_alat,
+           ),
+           SM(name='nat', required=True,
+              startReStr=r"\s*number of atoms/cell\s*=\s*(?P<x_qe_nat>\S+)",
+           ),
+           SM(name='nsp', required=True,
+              startReStr=r"\s*number of atomic types\s*=\s*(?P<x_qe_nsp>\S+)",
+           ),
+           SM(name='nbnd', required=True,
+               startReStr=r"\s*number of Kohn-Sham states\s*=\s*(?P<x_qe_nbnd>\S+)"
+           ),
+           SM(name='ecutwfc', required=True,
+              startReStr=r"\s*kinetic-energy cutoff\s*=\s*(?P<basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
+           ),
+           SM(name='ecut_density', required=True,
+              startReStr=r"\s*charge density cutoff\s*=\s*(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
+           ),
+           SM(name='simulation_cell',
+              startReStr=r"\s*crystal axes: \(cart. coord.",
+              subMatchers=[
+                  SM(name='cell_a1',
+                     startReStr=r"\s*a\(1\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_a1', 'usrAlat'),
+                  ),
+                  SM(name='cell_a2',
+                     startReStr=r"\s*a\(2\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_a2', 'usrAlat'),
+                  ),
+                  SM(name='cell_a3',
+                     startReStr=r"\s*a\(3\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_a3', 'usrAlat'),
+                  ),
+              ],
+           ),
+           SM(name='reciprocal_cell',
+              startReStr=r"\s*reciprocal axes: \(cart. coord. in units 2 pi/(?:alat|a_0)\)",
+              subMatchers=[
+                  SM(name='cell_b1',
+                     startReStr=r"\s*b\(1\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_b1', 'usrTpiba'),
+                  ),
+                  SM(name='cell_b2',
+                     startReStr=r"\s*b\(2\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_b2', 'usrTpiba'),
+                  ),
+                  SM(name='cell_b3',
+                     startReStr=r"\s*b\(3\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_b3', 'usrTpiba'),
+                  ),
+              ],
+           ),
+           SM(name='pseudopotentials', forwardMatch=True,
+              startReStr=r"\s*PseudoPot\.\s*#\s*1",
+              # subMatchers=[
+              #     SM(
+              #         name='pseudopotential',
+              #         startReStr=r"\s*PseudoPot\.\s*#\s*\d+",
+              #         adHoc=adHoc
+           ),
+           SM(name='nsymm',
+              startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.",
+           ),
+       ],
+    ), # header
+    SM(name='self_consistent_calculation',
+       startReStr=r"\s*Self-consistent Calculation",
+       sections = ['section_single_configuration_calculation'],
+       subMatchers=[
+           SM(name='iteration',
+              startReStr=r'\s*iteration\s*#',
+              sections=['section_scf_iteration'],
+              repeats=True,
+              subMatchers=[
+                  SM(name='e_total',
+                     startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>\S+)',
+                  ),
+              ],
+           ),
+       ],
+    ),
+]
 # description of the input
 mainFileDescription = SM(
     name='root',
@@ -52,145 +133,8 @@ mainFileDescription = SM(
                     name='run_date',
                     startReStr=QeC.RE_RUN_DATE,
                 ),
-                SM(
-                    name='header',
-                    startReStr=r".*(?:\s|\()lmax(?:x\))?\s*=",
-                    sections = ['section_basis_set_cell_dependent',
-                                'section_method',
-                                'section_system'],
-                    subMatchers=[
-                        SM(
-                            name='alat',
-                            startReStr=(
-                                r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*" +
-                                r"(?P<x_qe_alat__bohr>\S+)\s*a\.u\."
-                            ),
-                            required=True,
-                            forwardMatch=True,
-                            adHoc=adHoc_alat,
-                        ),
-                        SM(
-                            name='nat',
-                            startReStr=(
-                                r"\s*number of atoms/cell\s*=\s*" +
-                                r"(?P<x_qe_nat>\S+)"
-                            ),
-                            required=True,
-                        ),
-                        SM(
-                            name='nsp',
-                            startReStr=(
-                                r"\s*number of atomic types\s*=\s*" +
-                                r"(?P<x_qe_nsp>\S+)"
-                            ),
-                            required=True,
-                        ),
-                        SM(
-                            name='nbnd',
-                            startReStr=(
-                                r"\s*number of Kohn-Sham states\s*=\s*" +
-                                r"(?P<x_qe_nbnd>\S+)"
-                            ),
-                            required=True,
-                        ),
-                        SM(
-                            name='ecutwfc',
-                            startReStr=(
-                                r"\s*kinetic-energy cutoff\s*=\s*" +
-                                r"(?P<basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
-                            ),
-                            required=True,
-                        ),
-                        SM(
-                            name='ecut_density',
-                            startReStr=(
-                                r"\s*charge density cutoff\s*=\s*" +
-                                r"(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
-                            ),
-                            required=True,
-                        ),
-                        SM(
-                            name='simulation_cell',
-                            startReStr=r"\s*crystal axes: \(cart. coord.",
-                            endReStr=r"^\s*$", # empty line ends bravais matrix
-                            subMatchers=[
-                                SM(
-                                    name='cell_a1',
-                                    startReStr=r"\s*a\(1\)\s*=\s*\(\s*" +
-                                        QeC.re_vec('x_qe_a1', 'usrAlat'),
-                                ),
-                                SM(
-                                    name='cell_a2',
-                                    startReStr=r"\s*a\(2\)\s*=\s*\(\s*" +
-                                        QeC.re_vec('x_qe_a2', 'usrAlat'),
-                                ),
-                                SM(
-                                    name='cell_a3',
-                                    startReStr=r"\s*a\(3\)\s*=\s*\(\s*" +
-                                        QeC.re_vec('x_qe_a3', 'usrAlat'),
-                                ),
-                            ],
-                        ),
-                        SM(
-                            name='reciprocal_cell',
-                            startReStr=r"\s*reciprocal axes: \(cart. coord. in units 2 pi/(?:alat|a_0)\)",
-                            endReStr=r"^\s*$", # empty line ends reciprocal matrix
-                            subMatchers=[
-                                SM(
-                                    name='cell_b1',
-                                    startReStr=r"\s*b\(1\)\s*=\s*\(\s*" +
-                                        QeC.re_vec('x_qe_b1', 'usrTpiba'),
-                                ),
-                                SM(
-                                    name='cell_b2',
-                                    startReStr=r"\s*b\(2\)\s*=\s*\(\s*" +
-                                        QeC.re_vec('x_qe_b2', 'usrTpiba'),
-                                ),
-                                SM(
-                                    name='cell_b3',
-                                    startReStr=r"\s*b\(3\)\s*=\s*\(\s*" +
-                                        QeC.re_vec('x_qe_b3', 'usrTpiba'),
-                                ),
-                            ],
-                        ),
-                        SM(
-                            name='pseudopotentials',
-                            startReStr=r"\s*PseudoPot\.\s*#\s*1",
-                            endReStr=r"\s*\d+\s*Sym\.Ops\.",
-                            # subMatchers=[
-                            #     SM(
-                            #         name='pseudopotential',
-                            #         startReStr=r"\s*PseudoPot\.\s*#\s*\d+",
-                            #         adHoc=adHoc
-                            forwardMatch=True,
-                        ),
-                        SM(
-                            name='nsymm',
-                            startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.",
-                            endReStr=r"\s*Cartesian Axes",
-                        ),
-                    ],
-                ), # header
-                SM(
-                    name='self_consistent_calculation',
-                    startReStr=r"\s*Self-consistent Calculation",
-                    sections = ['section_single_configuration_calculation'],
-                    subMatchers=[
-                        SM(
-                            name='iteration',
-                            startReStr=r'\s*iteration\s*#',
-                            sections=['section_scf_iteration'],
-                            repeats=True,
-                            subMatchers=[
-                                SM(
-                                    name='e_total',
-                                    startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>\S+)',
-                                ),
-                            ],
-                        ),
-                    ],
-                ),
-            ],
+
+            ] + RUN_SUBMATCHERS,
         )
     ],
 )
