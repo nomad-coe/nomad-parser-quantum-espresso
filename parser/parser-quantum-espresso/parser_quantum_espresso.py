@@ -23,8 +23,7 @@ parserInfo = {
 
 def adHoc_alat(parser):
     line = parser.fIn.readline()
-    match = re.match(r"[^=]+=\s*(" + QeC.RE_FORTRAN_FLOAT + r")\s*a\.u\.",
-                     line)
+    match = re.match(r"[^=]+=\s*(\S+)\s*a\.u\.", line)
     if match:
         alat_au = float(match.group(1))
     else:
@@ -64,8 +63,7 @@ mainFileDescription = SM(
                             name='alat',
                             startReStr=(
                                 r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*" +
-                                r"(?P<x_qe_alat__bohr>" +
-                                QeC.RE_FORTRAN_FLOAT + r")\s*a\.u\."
+                                r"(?P<x_qe_alat__bohr>\S+)\s*a\.u\."
                             ),
                             required=True,
                             forwardMatch=True,
@@ -75,8 +73,7 @@ mainFileDescription = SM(
                             name='nat',
                             startReStr=(
                                 r"\s*number of atoms/cell\s*=\s*" +
-                                r"(?P<x_qe_nat>" +
-                                QeC.RE_FORTRAN_INT + r")\s*"
+                                r"(?P<x_qe_nat>\S+)"
                             ),
                             required=True,
                         ),
@@ -84,8 +81,7 @@ mainFileDescription = SM(
                             name='nsp',
                             startReStr=(
                                 r"\s*number of atomic types\s*=\s*" +
-                                r"(?P<x_qe_nsp>" +
-                                QeC.RE_FORTRAN_INT + r")\s*"
+                                r"(?P<x_qe_nsp>\S+)"
                             ),
                             required=True,
                         ),
@@ -93,8 +89,7 @@ mainFileDescription = SM(
                             name='nbnd',
                             startReStr=(
                                 r"\s*number of Kohn-Sham states\s*=\s*" +
-                                r"(?P<x_qe_nbnd>" +
-                                QeC.RE_FORTRAN_INT + r")\s*"
+                                r"(?P<x_qe_nbnd>\S+)"
                             ),
                             required=True,
                         ),
@@ -102,8 +97,7 @@ mainFileDescription = SM(
                             name='ecutwfc',
                             startReStr=(
                                 r"\s*kinetic-energy cutoff\s*=\s*" +
-                                r"(?P<basis_set_planewave_cutoff__rydberg>" +
-                                QeC.RE_FORTRAN_FLOAT + r")\s*Ry\s*"
+                                r"(?P<basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
                             ),
                             required=True,
                         ),
@@ -111,8 +105,7 @@ mainFileDescription = SM(
                             name='ecut_density',
                             startReStr=(
                                 r"\s*charge density cutoff\s*=\s*" +
-                                r"(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" +
-                                QeC.RE_FORTRAN_FLOAT + r")\s*Ry\s*"
+                                r"(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
                             ),
                             required=True,
                         ),

@@ -16,10 +16,6 @@ from nomadcore.unit_conversion.unit_conversion import convert_unit
 LOGGER = logging.getLogger(__name__)
 
 
-# constants
-RE_FORTRAN_FLOAT = r"[+-]?\d+(?:\.\d+)?(?:[eEdD][+-]?\d+)?"
-RE_FORTRAN_INT = r"[+-]?\d+"
-
 #   common prosa in espresso output
 LIST_COVERAGE_IGNORE = [
    r"\s*",
@@ -41,11 +37,9 @@ def re_vec(name, units='', split="\s*"):
     if units:
         units = '__' + units
     res = (
-        r'(?P<' + name + r'_x' + units + '>' + RE_FORTRAN_FLOAT + r')' +
-        split +
-        r'(?P<' + name + r'_y' + units + '>' + RE_FORTRAN_FLOAT + r')' +
-        split +
-        r'(?P<' + name + r'_z' + units + '>' + RE_FORTRAN_FLOAT + r')'
+        r'(?P<' + name + r'_x' + units + '>\S+)' + split +
+        r'(?P<' + name + r'_y' + units + '>\S+)' + split +
+        r'(?P<' + name + r'_z' + units + '>\S+)'
         )
     return res
 
