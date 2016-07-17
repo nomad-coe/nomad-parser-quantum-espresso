@@ -74,6 +74,12 @@ class ParserQuantumEspresso(object):
         ]
         self.coverageIgnore = None
 
+    def main(self):
+        self.coverageIgnore = re.compile(r"^(?:" + r"|".join(self.coverageIgnoreList) + r")$")
+        mainFunction(self.mainFileDescription(), META_INFO, self.parserInfo,
+                    cachingLevelForMetaName=self.cachingLevelForMetaName,
+                    superContext=self)
+
     def mainFileDescription(self):
         # assemble matchers and submatchers
         result = SM(
@@ -109,12 +115,6 @@ class ParserQuantumEspresso(object):
 
     def run_submatchers(self):
         return []
-
-    def main(self):
-        self.coverageIgnore = re.compile(r"^(?:" + r"|".join(self.coverageIgnoreList) + r")$")
-        mainFunction(self.mainFileDescription(), META_INFO, self.parserInfo,
-                    cachingLevelForMetaName=self.cachingLevelForMetaName,
-                    superContext=self)
 
     def strValueTransform_strQeDate(self, espresso_date):
         match = re.match(
