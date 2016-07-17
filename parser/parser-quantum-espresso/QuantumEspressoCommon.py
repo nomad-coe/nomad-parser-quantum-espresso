@@ -74,7 +74,7 @@ class ParserQuantumEspresso(object):
         ]
         self.coverageIgnore = None
 
-    def main(self):
+    def parse(self):
         self.coverageIgnore = re.compile(r"^(?:" + r"|".join(self.coverageIgnoreList) + r")$")
         mainFunction(self.mainFileDescription(), META_INFO, self.parserInfo,
                     cachingLevelForMetaName=self.cachingLevelForMetaName,
@@ -129,7 +129,6 @@ class ParserQuantumEspresso(object):
         else:
             raise RuntimeError("unparsable date: %s", espresso_date)
     strValueTransform_strQeDate.units = 's'
-
 
     def onClose_section_run(self, backend, gIndex, section):
         LOGGER.info("closing section run")

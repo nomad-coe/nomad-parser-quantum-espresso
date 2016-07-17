@@ -185,4 +185,4 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
 if __name__ == "__main__":
     parser = QuantumEspressoParserPWSCF()
-    parser.main()
+    parser.parse()
