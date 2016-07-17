@@ -7,28 +7,15 @@ import numpy as np
 import logging
 from nomadcore.local_meta_info import loadJsonFile, InfoKindEl
 from nomadcore.unit_conversion.unit_conversion import convert_unit
+from nomadcore.simple_parser import mainFunction, SimpleMatcher as SM, CachingLevel
 
 ############################################################
 # This file contains functions and constants that are needed
 # by more than one parser.
 ############################################################
 
+
 LOGGER = logging.getLogger(__name__)
-
-
-#   common prosa in espresso output
-LIST_COVERAGE_IGNORE = [
-   r"\s*",
-   r"\s*Ultrasoft \(Vanderbilt\) Pseudopotentials\s*",
-   r"\s*This program is part of the open-source Quantum ESPRESSO suite",
-   r"\s*for quantum simulation of materials; please cite",
-   r"\s*\"P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 \(2009\);\s*",
-   r"\s*URL http://www.quantum-espresso.org\",\s*",
-   r"\s*in publications or presentations arising from this work. More details at",
-   r"\s*http://www.quantum-espresso.org/quote",
-   r"\s*Current dimensions of program \S+ are:",
-]
-RE_COVERAGE_IGNORE = re.compile(r"^(?:" + r"|".join(LIST_COVERAGE_IGNORE) + r")$")
 
 
 def re_vec(name, units='', split="\s*"):
@@ -60,20 +47,6 @@ def espresso_date_to_epoch(espresso_date):
     else:
         raise RuntimeError("unparsable date: %s", espresso_date)
 
-RE_RUN_START=(
-    # program name, e.g. PWSCF, DOS
-    r"\s*Program\s+(?P<x_qe_program_name>\S+)\s+v\." +
-    # version
-    r"(?P<program_version>\S+(?:\s+\(svn\s+rev\.\s+\d+\s*\))?)" +
-    r"\s+starts" +
-    # newer espresso: "on $date", older "..."
-    r"(?:(?:\s+on\s+(?P<x_qe_time_run_date_start>.+?)?)\s*$|" + 
-    r"(?:\s*\.\.\.)\s*$)"
-    )
-
-# older espresso versions have start date on separate line
-RE_RUN_DATE=r"\s*Today is\s*(?P<x_qe_time_run_date_start>.+?)\s*$"
-
 
 # loading metadata from
 # nomad-meta-info/meta_info/nomad_meta_info/quantum_espresso.nomadmetainfo.json
@@ -84,3 +57,74 @@ META_INFO = loadJsonFile(
     dependencyLoader=None,
     extraArgsHandling=InfoKindEl.ADD_EXTRA_ARGS,
     uri=None)[0]
+
+PARSER_INFO_DEFAULT = {
+  "name": "parser_quantum_espresso",
+  "version": "0.0.1"
+}
+
+class ParserQuantumEspresso(object):
+    """Base class for all Quantum Espresso parsers"""
+    def __init__(self,cachingLevelForMetaName=None, coverageIgnoreList=None):
+        self.qe_program_name = None
+        self.parserInfo = PARSER_INFO_DEFAULT.copy()
+        self.cachingLevelForMetaName = {}
+        for name in META_INFO.infoKinds:
+            # set all temporaries to caching-only
+            if name.startswith('x_qe_t_'):
+                self.cachingLevelForMetaName[name] = CachingLevel.Cache
+        # common prosa in espresso output
+        self.coverageIgnoreList = [
+            r"\s*",
+            r"\s*Ultrasoft \(Vanderbilt\) Pseudopotentials\s*",
+            r"\s*This program is part of the open-source Quantum ESPRESSO suite",
+            r"\s*for quantum simulation of materials; please cite",
+            r"\s*\"P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 \(2009\);\s*",
+            r"\s*URL http://www.quantum-espresso.org\",\s*",
+            r"\s*in publications or presentations arising from this work. More details at",
+            r"\s*http://www.quantum-espresso.org/quote",
+            r"\s*Current dimensions of program \S+ are:",
+        ]
+        self.coverageIgnore = None
+
+    def mainFileDescription(self):
+        # assemble matchers and submatchers
+        result = SM(
+            name='root',
+            weak=True,
+            startReStr="",
+            subMatchers=[
+                SM(name='newRun', repeats=True, required=True,
+                   startReStr=(
+                       # program name, e.g. PWSCF, DOS
+                       r"\s*Program\s+(?P<x_qe_program_name>\S+)\s+v\." +
+                       # version
+                       r"(?P<program_version>\S+(?:\s+\(svn\s+rev\.\s+\d+\s*\))?)" +
+                       r"\s+starts" +
+                       # newer espresso: "on $date"
+                       r"(?:(?:\s+on\s+(?P<x_qe_time_run_date_start>.+?)?)\s*$|" +
+                       # older espresso has just "..." and date on new line
+                       r"(?:\s*\.\.\.)\s*$)"
+                   ),
+                   fixedStartValues={'program_name': 'Quantum Espresso',
+                                     'program_basis_set_type': 'plane waves'},
+                   sections=['section_run'],
+                   subMatchers=([
+                       # older espresso versions have start date on separate line
+                       SM(name='run_date',
+                          startReStr=r"\s*Today is\s*(?P<x_qe_time_run_date_start>.+?)\s*$"
+                       ),
+                   ] + self.run_submatchers()),
+                )
+            ]
+        )
+        return result
+
+    def run_submatchers(self):
+        return []
+
+    def main(self):
+        self.coverageIgnore = re.compile(r"^(?:" + r"|".join(self.coverageIgnoreList) + r")$")
+        mainFunction(self.mainFileDescription(), META_INFO, self.parserInfo,
+                    cachingLevelForMetaName=self.cachingLevelForMetaName,
+                    superContext=self)
