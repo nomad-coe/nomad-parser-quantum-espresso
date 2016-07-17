@@ -66,12 +66,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addValue('single_configuration_calculation_to_system_ref',
                          self.secSystemIndex)
 
-    def onClose_section_run(self, backend, gIndex, section):
-        LOGGER.info("closing section run")
-        string_run_start = section['x_qe_time_run_date_start'][-1]
-        epoch = QeC.espresso_date_to_epoch(string_run_start)
-        backend.addValue('time_run_date_start', epoch)
-
     def onClose_section_scf_iteration(self, backend, gIndex, section):
         """trigger called when section_scf_iteration is closed"""
         LOGGER.info(

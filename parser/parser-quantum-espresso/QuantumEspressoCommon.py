@@ -30,24 +30,6 @@ def re_vec(name, units='', split="\s*"):
     return res
 
 
-MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ]
-MONTH_NUMBER = { MONTHS[num]: num for num in range(0,12) }
-
-def espresso_date_to_epoch(espresso_date):
-    match = re.match(
-        r"(\d+)\s*([A-Za-z]+)\s*(\d+)\s+at\s+(\d+):\s*(\d+):\s*(\d+)",
-        espresso_date)
-    if match:
-        month = MONTH_NUMBER[match.group(2)]
-        epoch = calendar.timegm(
-            (int(match.group(3)), int(month), int(match.group(1)),
-             int(match.group(4)), int(match.group(5)), int(match.group(6))))
-        return(epoch)
-    else:
-        raise RuntimeError("unparsable date: %s", espresso_date)
-
-
 # loading metadata from
 # nomad-meta-info/meta_info/nomad_meta_info/quantum_espresso.nomadmetainfo.json
 META_INFO = loadJsonFile(
@@ -62,6 +44,11 @@ PARSER_INFO_DEFAULT = {
   "name": "parser_quantum_espresso",
   "version": "0.0.1"
 }
+
+# constants for date conversion
+MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ]
+MONTH_NUMBER = { MONTHS[num]: num for num in range(0,12) }
 
 class ParserQuantumEspresso(object):
     """Base class for all Quantum Espresso parsers"""
@@ -128,3 +115,24 @@ class ParserQuantumEspresso(object):
         mainFunction(self.mainFileDescription(), META_INFO, self.parserInfo,
                     cachingLevelForMetaName=self.cachingLevelForMetaName,
                     superContext=self)
+
+    def strValueTransform_strQeDate(self, espresso_date):
+        match = re.match(
+            r"(\d+)\s*([A-Za-z]+)\s*(\d+)\s+at\s+(\d+):\s*(\d+):\s*(\d+)",
+            espresso_date)
+        if match:
+            month = MONTH_NUMBER[match.group(2)]
+            epoch = calendar.timegm(
+                (int(match.group(3)), int(month), int(match.group(1)),
+                 int(match.group(4)), int(match.group(5)), int(match.group(6))))
+            return(epoch)
+        else:
+            raise RuntimeError("unparsable date: %s", espresso_date)
+    strValueTransform_strQeDate.units = 's'
+
+
+    def onClose_section_run(self, backend, gIndex, section):
+        LOGGER.info("closing section run")
+        string_run_start = section['x_qe_time_run_date_start'][-1]
+        epoch = self.strValueTransform_strQeDate(string_run_start)
+        backend.addValue('time_run_date_start', epoch)
