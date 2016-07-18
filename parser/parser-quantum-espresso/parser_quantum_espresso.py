@@ -127,6 +127,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             'usrTpiba', '1/bohr', 2*math.pi/alat_au)
 
     def run_submatchers(self):
+        """submatchers of section_run"""
         return [
             SM(name='header',
                startReStr=r".*(?:\s|\()lmax(?:x\))?\s*=",
