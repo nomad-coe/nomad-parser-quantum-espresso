@@ -20,6 +20,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def __init__(self):
         QeC.ParserQuantumEspresso.__init__(self)
         self.scfIterNr = 0
+        self.tmp = {}
 
     def initialize_values(self):
         """allows to reset values if the same superContext is used to parse
@@ -84,6 +85,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             [section['x_qe_t_b2_x'], section['x_qe_t_b2_y'], section['x_qe_t_b2_z']],
             [section['x_qe_t_b3_x'], section['x_qe_t_b3_y'], section['x_qe_t_b3_z']],
         ]))
+
+    def appendToTmp(self, tmpname, value):
+        self.tmp[tmpname] += value
 
     def adHoc_alat(self, parser):
         line = parser.fIn.readline()
