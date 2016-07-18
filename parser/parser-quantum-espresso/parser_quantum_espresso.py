@@ -10,6 +10,8 @@ import nomadcore.unit_conversion.unit_conversion as unit_conversion
 import math
 import numpy as np
 import QuantumEspressoCommon as QeC
+from nomadcore.parser_backend import valueForStrValue
+from QuantumEspressoCommon import RE_f, RE_i
 
 
 LOGGER = logging.getLogger(__name__)
@@ -67,12 +69,26 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addValue('single_configuration_calculation_to_system_ref',
                          self.secSystemIndex)
 
+    def onOpen_section_eigenvalues(self, backend, gIndex, section):
+        self.tmp['k_point'] = []
+        self.tmp['k_energies'] = []
+
     def onClose_section_scf_iteration(self, backend, gIndex, section):
         """trigger called when section_scf_iteration is closed"""
         LOGGER.info(
             "closing section_scf_iteration bla gIndex %d %s",
             gIndex, section.simpleValues)
         self.scfIterNr += 1
+
+    def onClose_section_eigenvalues(self, backend, gIndex, section):
+        if len(self.tmp['k_point']) > 0:
+            backend.addArrayValues('eigenvalues_values', np.array([
+                self.tmp['k_energies']
+            ]))
+            backend.addArrayValues('eigenvalues_kpoints', np.array(
+                self.tmp['k_point']
+            ))
+            LOGGER.error("k_points need to be transformed to crystal coordinates...")
 
     def onClose_section_system(self, backend, gIndex, section):
         backend.addArrayValues('simulation_cell', np.array([
@@ -85,6 +101,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             [section['x_qe_t_b2_x'], section['x_qe_t_b2_y'], section['x_qe_t_b2_z']],
             [section['x_qe_t_b3_x'], section['x_qe_t_b3_y'], section['x_qe_t_b3_z']],
         ]))
+
+    def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
+        self.tmp['this_k_energies'] = ''
+
+    def onClose_x_qe_t_section_kbands(self, backend, gIndex, section):
+        ek_split = []
+        for energy in re.split(r'\s+', self.tmp['this_k_energies']):
+            ek_split += [unit_conversion.convert_unit(valueForStrValue(energy, 'f'),'eV')]
+        self.tmp['k_energies'].append(ek_split)
+        self.tmp['k_point'].append([section['x_qe_t_k_x'], section['x_qe_t_k_y'], section['x_qe_t_k_z']])
 
     def appendToTmp(self, tmpname, value):
         self.tmp[tmpname] += value
@@ -175,13 +201,29 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       sections=['section_scf_iteration'],
                       repeats=True,
                       subMatchers=[
-                          SM(name='bands', repeats=True,
-                              startReStr=r'\s*k\s*=(?:\s+(?P<x_qe_k>[^ \(]+))+',
-                          ),
                           SM(name='e_total',
                              startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>\S+)',
                           ),
                       ],
+                   ),
+                   SM(name='scf_result', repeats=False,
+                       startReStr=r'\s*End of self-consistent calculation',
+                       sections=['section_eigenvalues'],
+                       subMatchers=[
+                          SM(name='bands', repeats=True,
+                              sections=['x_qe_t_section_kbands'],
+                              startReStr=r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba') + r'\s*\(\s*(?P<x_qe_t_k_pw>\d+)\s*PWs', # (?:\s+(?P<x_qe_k>[^ \(]+))+',
+                              subMatchers=[
+                                  SM(name='kbnd', repeats=True,
+                                      startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+)',
+                                      adHoc=lambda p: self.appendToTmp('this_k_energies', p.lastMatch['x_qe_t_k_point_energies']),
+                                  ),
+                              ],
+                          ),
+                          SM(name='e_total',
+                             startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total>\S+)',
+                          ),
+                       ],
                    ),
                ],
             ),
