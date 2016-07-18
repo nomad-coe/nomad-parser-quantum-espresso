@@ -197,10 +197,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                startReStr=r"\s*Self-consistent Calculation",
                sections = ['section_single_configuration_calculation'],
                subMatchers=[
-                   SM(name='iteration',
+                   SM(name='iteration', repeats=True,
                       startReStr=r'\s*iteration\s*#',
                       sections=['section_scf_iteration'],
-                      repeats=True,
                       subMatchers=[
                           SM(name='e_total',
                              startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>\S+)',
