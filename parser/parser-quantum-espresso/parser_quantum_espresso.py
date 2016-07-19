@@ -48,10 +48,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def onOpen_section_method(
             self, backend, gIndex, section):
         self.secMethodIndex = gIndex
+        self.cache_t_pseudopotential = {}
 
     def onOpen_section_system(
             self, backend, gIndex, section):
         self.secSystemIndex = gIndex
+
+    def onClose_x_qe_t_section_pseudopotential(
+            self, backend, gIndex, section):
+        self.cache_t_pseudopotential[section['x_qe_t_pp_label'][0]] = section
 
     # just examples, you probably want to remove the following two triggers
 
@@ -194,13 +199,21 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
-                   SM(name='pseudopotentials', forwardMatch=True,
-                      startReStr=r"\s*PseudoPot\.\s*#\s*1",
-                      # subMatchers=[
-                      #     SM(
-                      #         name='pseudopotential',
-                      #         startReStr=r"\s*PseudoPot\.\s*#\s*\d+",
-                      #         adHoc=adHoc
+                   SM(name='pseudopotential', repeats=True,
+                      startReStr=(r"\s*PseudoPot\.\s*#\s*(?P<x_qe_t_pp_idx>\d+) for (?P<x_qe_t_pp_label>\S+) read from file" +
+                                  r"(?:|\s*(?P<x_qe_t_pp_filename>\S+))\s*"),
+                      sections=['x_qe_t_section_pseudopotential'],
+                      subMatchers=[
+                          SM(name='new_pp_filename',
+                             startReStr=r"^\s*(?P<x_qe_t_pp_filename>\S+)\s*$",
+                          ),
+                          SM(name='pp_md5',
+                             startReStr=r"\s*MD5 check sum:\s*(?P<x_qe_t_pp_md5sum>\S+)",
+                          ),
+                          SM(name='pp_type_val',
+                             startReStr=r"\s*Pseudo is\s*(?P<x_qe_t_pp_type>.*?),\s*Zval\s*=\s*(?P<x_qe_t_pp_valence>" + RE_f + ")",
+                          ),
+                      ],
                    ),
                    SM(name='nsymm',
                       startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.",
