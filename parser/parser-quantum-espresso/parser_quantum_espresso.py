@@ -84,11 +84,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         if len(self.tmp['k_point']) > 0:
             backend.addArrayValues('eigenvalues_values', np.array([
                 self.tmp['k_energies']
-            ]))
-            backend.addArrayValues('eigenvalues_kpoints', np.array(
-                self.tmp['k_point']
-            ))
-            LOGGER.error("k_points need to be transformed to crystal coordinates...")
+            ], dtype=np.float64))
+            # k-points are in cartesian, but metaInfo specifies crystal
+            k_point_cartesian = np.array(self.tmp['k_point'], dtype=np.float64)
+            k_point_crystal = self.bmat_inv.dot(k_point_cartesian.T).T
+            backend.addArrayValues('eigenvalues_kpoints', k_point_crystal)
 
     def onClose_section_system(self, backend, gIndex, section):
         # store direct lattice matrix for transformation crystal -> cartesian
@@ -124,7 +124,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         for energy in re.split(r'\s+', self.tmp['this_k_energies'].strip()):
             ek_split += [unit_conversion.convert_unit(valueForStrValue(energy, 'f'),'eV')]
         self.tmp['k_energies'].append(ek_split)
-        self.tmp['k_point'].append([section['x_qe_t_k_x'], section['x_qe_t_k_y'], section['x_qe_t_k_z']])
+        self.tmp['k_point'].append([section['x_qe_t_k_x'][0], section['x_qe_t_k_y'][0], section['x_qe_t_k_z'][0]])
 
     def appendToTmp(self, tmpname, value):
         self.tmp[tmpname] += value
