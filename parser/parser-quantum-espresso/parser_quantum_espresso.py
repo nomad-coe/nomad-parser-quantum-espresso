@@ -58,6 +58,18 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             self, backend, gIndex, section):
         self.cache_t_pseudopotential[section['x_qe_t_pp_label'][0]] = section
 
+    def onClose_section_method_atom_kind(
+            self, backend, gIndex, section):
+        pp_label = section['x_qe_pp_label'][0]
+        pp = self.cache_t_pseudopotential[pp_label]
+        for key, value in pp.simpleValues.items():
+            if key == 'x_qe_t_pp_label' or key == 'x_qe_pp_valence':
+                continue
+            target = re.sub(r'^x_qe_t_',r'x_qe_',key)
+            if target == key:
+                raise RuntimeError('found non-temporary key in pseudopotential cache: "%s"' % (key))
+            backend.addValue(target, value[0])
+
     # just examples, you probably want to remove the following two triggers
 
     def onClose_section_single_configuration_calculation(
@@ -212,6 +224,17 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name='pp_type_val',
                              startReStr=r"\s*Pseudo is\s*(?P<x_qe_t_pp_type>.*?),\s*Zval\s*=\s*(?P<x_qe_t_pp_valence>" + RE_f + ")",
+                          ),
+                      ],
+                   ),
+                   SM(name='pp_atom_kind_map',
+                      startReStr=r"\s*atomic species\s+valence\s+mass\s+pseudopotential",
+                      subMatchers=[
+                          SM(name='atom_kind', repeats=True,
+                             startReStr=r"\s*(?P<method_atom_kind_label>\S+)\s+(?P<x_qe_pp_valence>" + RE_f + r")" +
+                                        r"\s+(?P<x_qe_kind_mass>" + RE_f + r")\s+(?P<x_qe_pp_label>[^\s\(]+)" +
+                                        r"\(\s*(?P<x_qe_pp_weight>" + RE_f + r")\s*\)",
+                             sections=['section_method_atom_kind'],
                           ),
                       ],
                    ),
