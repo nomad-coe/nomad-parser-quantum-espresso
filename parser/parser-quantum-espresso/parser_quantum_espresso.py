@@ -68,7 +68,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             target = re.sub(r'^x_qe_t_',r'x_qe_',key)
             if target == key:
                 raise RuntimeError('found non-temporary key in pseudopotential cache: "%s"' % (key))
-            backend.addValue(target, value[0])
+            backend.addValue(target, value[-1])
 
     # just examples, you probably want to remove the following two triggers
 
