@@ -91,16 +91,30 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             LOGGER.error("k_points need to be transformed to crystal coordinates...")
 
     def onClose_section_system(self, backend, gIndex, section):
-        backend.addArrayValues('simulation_cell', np.array([
-            [section['x_qe_t_a1_x'], section['x_qe_t_a1_y'], section['x_qe_t_a1_z']],
-            [section['x_qe_t_a2_x'], section['x_qe_t_a2_y'], section['x_qe_t_a2_z']],
-            [section['x_qe_t_a3_x'], section['x_qe_t_a3_y'], section['x_qe_t_a3_z']],
-        ]))
-        backend.addArrayValues('x_qe_reciprocal_cell', np.array([
-            [section['x_qe_t_b1_x'], section['x_qe_t_b1_y'], section['x_qe_t_b1_z']],
-            [section['x_qe_t_b2_x'], section['x_qe_t_b2_y'], section['x_qe_t_b2_z']],
-            [section['x_qe_t_b3_x'], section['x_qe_t_b3_y'], section['x_qe_t_b3_z']],
-        ]))
+        # store direct lattice matrix for transformation crystal -> cartesian
+        self.amat = np.array([
+            [section['x_qe_t_a1_x'][0], section['x_qe_t_a1_y'][0], section['x_qe_t_a1_z'][0]],
+            [section['x_qe_t_a2_x'][0], section['x_qe_t_a2_y'][0], section['x_qe_t_a2_z'][0]],
+            [section['x_qe_t_a3_x'][0], section['x_qe_t_a3_y'][0], section['x_qe_t_a3_z'][0]],
+        ], dtype=np.float64)
+        # store inverse for transformation cartesian -> crystal
+        try:
+            self.amat_inv = np.linalg.inv(self.amat)
+        except np.linalg.linalg.LinAlgError:
+            raise RuntimeError("error inverting bravais matrix " + str(self.amat))
+        # store reciprocal lattice matrix for transformation crystal -> cartesian
+        self.bmat = np.array([
+            [section['x_qe_t_b1_x'][0], section['x_qe_t_b1_y'][0], section['x_qe_t_b1_z'][0]],
+            [section['x_qe_t_b2_x'][0], section['x_qe_t_b2_y'][0], section['x_qe_t_b2_z'][0]],
+            [section['x_qe_t_b3_x'][0], section['x_qe_t_b3_y'][0], section['x_qe_t_b3_z'][0]],
+        ], dtype=np.float64)
+        # store inverse for transformation cartesian -> crystal
+        try:
+            self.bmat_inv = np.linalg.inv(self.bmat)
+        except np.linalg.linalg.LinAlgError:
+            raise RuntimeError("error inverting reciprocal cell matrix")
+        backend.addArrayValues('simulation_cell', self.amat)
+        backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
 
     def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
         self.tmp['this_k_energies'] = ''
