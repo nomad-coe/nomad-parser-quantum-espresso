@@ -132,6 +132,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             raise RuntimeError("error inverting reciprocal cell matrix")
         backend.addArrayValues('simulation_cell', self.amat)
         backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
+        # atom positions
+        atpos_cart = np.array([
+            section['x_qe_t_atpos_x'], section['x_qe_t_atpos_y'], section['x_qe_t_atpos_z']
+        ], dtype=np.float64).T
+        backend.addArrayValues('atom_positions',atpos_cart)
+        LOGGER.error("AL: %s", str(section['x_qe_t_atom_labels']))
+        backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
+        backend.addArrayValues('x_qe_atom_idx',np.array(section['x_qe_t_atom_idx']))
 
     def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
         self.tmp['this_k_energies'] = ''
@@ -240,6 +248,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                    SM(name='nsymm',
                       startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.",
+                   ),
+                   SM(name='atom_pos_cart_list',
+                      startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)",
+                      subMatchers=[
+                          SM(name='atom_pos_cart', repeats=True,
+                             startReStr=(r"\s*(?P<x_qe_t_atom_idx>\S+)\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*\d+\)\s*"
+                                         r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat')),
+                          ),
+                      ],
                    ),
                ],
             ), # header
