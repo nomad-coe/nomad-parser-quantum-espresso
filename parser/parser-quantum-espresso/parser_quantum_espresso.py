@@ -107,7 +107,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def onClose_x_qe_t_section_kbands(self, backend, gIndex, section):
         ek_split = []
-        for energy in re.split(r'\s+', self.tmp['this_k_energies']):
+        for energy in re.split(r'\s+', self.tmp['this_k_energies'].strip()):
             ek_split += [unit_conversion.convert_unit(valueForStrValue(energy, 'f'),'eV')]
         self.tmp['k_energies'].append(ek_split)
         self.tmp['k_point'].append([section['x_qe_t_k_x'], section['x_qe_t_k_y'], section['x_qe_t_k_z']])
@@ -214,9 +214,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                               sections=['x_qe_t_section_kbands'],
                               startReStr=r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba') + r'\s*\(\s*(?P<x_qe_t_k_pw>\d+)\s*PWs', # (?:\s+(?P<x_qe_k>[^ \(]+))+',
                               subMatchers=[
-                                  SM(name='kbnd', repeats=True,
-                                      startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+)',
-                                      adHoc=lambda p: self.appendToTmp('this_k_energies', p.lastMatch['x_qe_t_k_point_energies']),
+                                  SM(name='kbnd', repeats=True,                 forwardMatch=True, #until merge of p.lastMatch
+                                      startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
+                                      adHoc=lambda p: self.appendToTmp('this_k_energies', " " + p.fIn.readline().strip()), #p.lastMatch['x_qe_t_k_point_energies']),
                                   ),
                               ],
                           ),
