@@ -23,5 +23,11 @@ object QuantumEspressoParserSpec extends Specification {
     "test2 (pw.x 4.0) with json" >> {
       ParserRun.parse(QuantumEspressoParser, "parsers/quantum-espresso/test/examples/PWSCF/scf-ncpp.ref.1193929391", "json") must_== ParseResult.ParseSuccess
     }
+    "test3 (pw.x 5.2.1, binary, USPP) with json-events" >> {
+      ParserRun.parse(QuantumEspressoParser, "parsers/quantum-espresso/test/examples/PWSCF/benchmark.out.r11920.inp=uspp1.in.1451158822", "json-events") must_== ParseResult.ParseSuccess
+    }
+    "test3 (pw.x 5.2.1, binary, USPP) with json" >> {
+      ParserRun.parse(QuantumEspressoParser, "parsers/quantum-espresso/test/examples/PWSCF/benchmark.out.r11920.inp=uspp1.in.1451158822", "json") must_== ParseResult.ParseSuccess
+    }
   }
 }
