@@ -137,7 +137,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             section['x_qe_t_atpos_x'], section['x_qe_t_atpos_y'], section['x_qe_t_atpos_z']
         ], dtype=np.float64).T
         backend.addArrayValues('atom_positions',atpos_cart)
-        LOGGER.error("AL: %s", str(section['x_qe_t_atom_labels']))
         backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
         backend.addArrayValues('x_qe_atom_idx',np.array(section['x_qe_t_atom_idx']))
 
