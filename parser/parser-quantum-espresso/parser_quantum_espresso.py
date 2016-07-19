@@ -171,6 +171,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                startReStr=r".*(?:\s|\()lmax(?:x\))?\s*=",
                sections = ['section_basis_set_cell_dependent', 'section_method', 'section_system'],
                subMatchers=[
+                   SM(name='enforced_XC',
+                      startReStr=r"\s*IMPORTANT: XC functional enforced from input",
+                      subMatchers=[
+                          SM(name='xc_functional_enforced', required=True,
+                             startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_enforced>\S+)\s*\("
+                          ),
+                      ],
+                   ),
                    SM(name='alat', required=True, forwardMatch=True,
                       startReStr=r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*(?P<x_qe_alat__bohr>\S+)\s*a\.u\.",
                       adHoc=self.adHoc_alat,
@@ -189,6 +197,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                    SM(name='ecut_density', required=True,
                       startReStr=r"\s*charge density cutoff\s*=\s*(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
+                   ),
+                   SM(name='xc_functional', required=True,
+                      startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional>\S+)\s*\("
                    ),
                    SM(name='simulation_cell',
                       startReStr=r"\s*crystal axes: \(cart. coord.",
