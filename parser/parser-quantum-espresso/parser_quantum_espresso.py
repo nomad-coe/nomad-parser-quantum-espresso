@@ -175,7 +175,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*IMPORTANT: XC functional enforced from input",
                       subMatchers=[
                           SM(name='xc_functional_enforced', required=True,
-                             startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_enforced>\S+)\s*\("
+                             startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname_enforced>\S+)\s*\("
                           ),
                       ],
                    ),
@@ -184,13 +184,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       adHoc=self.adHoc_alat,
                    ),
                    SM(name='nat', required=True,
-                      startReStr=r"\s*number of atoms/cell\s*=\s*(?P<x_qe_nat>\S+)",
+                      startReStr=r"\s*number of atoms/cell\s*=\s*(?P<number_of_atoms>\d+)",
                    ),
                    SM(name='nsp', required=True,
-                      startReStr=r"\s*number of atomic types\s*=\s*(?P<x_qe_nsp>\S+)",
+                      startReStr=r"\s*number of atomic types\s*=\s*(?P<x_qe_number_of_species>\S+)",
                    ),
                    SM(name='nbnd', required=True,
-                       startReStr=r"\s*number of Kohn-Sham states\s*=\s*(?P<x_qe_nbnd>\S+)"
+                       startReStr=r"\s*number of Kohn-Sham states\s*=\s*(?P<x_qe_number_of_states>\S+)"
                    ),
                    SM(name='ecutwfc', required=True,
                       startReStr=r"\s*kinetic-energy cutoff\s*=\s*(?P<basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
@@ -199,7 +199,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*charge density cutoff\s*=\s*(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
                    ),
                    SM(name='xc_functional', required=True,
-                      startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional>\S+)\s*\("
+                      startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>\S+)\s*\(\s*"
                    ),
                    SM(name='simulation_cell',
                       startReStr=r"\s*crystal axes: \(cart. coord.",
