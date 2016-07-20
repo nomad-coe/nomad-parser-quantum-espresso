@@ -20,7 +20,7 @@ LOGGER = logging.getLogger(__name__)
 # fortran float, alternate too-long-for-field fortran marker
 RE_f = r"(?:[+-]?\d+(?:\.\d+)?(?:[eEdD][+-]?\d+)?|\*+)"
 # fortran int, alternate too-long-for-field fortran marker
-RE_i = r"(?[+-]?\d+|\*+"
+RE_i = r"(?:[+-]?\d+|\*+)"
 
 def re_vec(name, units='', split="\s+"):
     """generator for 3-component vector regex"""
