@@ -68,6 +68,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 raise RuntimeError('found non-temporary key in pseudopotential cache: "%s"' % (key))
             backend.addValue(target, value[-1])
 
+    def onClose_section_method(
+            self, backend, gIndex, section):
+        if section['x_qe_t_xc_functional_shortname_enforced'] is not None:
+            backend.addValue('x_qe_xc_functional_user_enforced', True)
+
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
         """trigger called when section_single_configuration_calculation
@@ -147,7 +152,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*IMPORTANT: XC functional enforced from input",
                       subMatchers=[
                           SM(name='xc_functional_enforced', required=True,
-                             startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname_enforced>\S+)\s*\("
+                             startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_t_xc_functional_shortname_enforced>\S+)"
                           ),
                       ],
                    ),
