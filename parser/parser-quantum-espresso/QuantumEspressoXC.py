@@ -1,3 +1,10 @@
+import logging
+import re
+
+
+LOGGER = logging.getLogger(__name__)
+
+
 # origin: espresso-5.4.0/Modules/funct.f90
 # Any nonconflicting combination of the following keywords is acceptable:
 # 
