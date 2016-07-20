@@ -150,15 +150,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.tmp[tmpname] += value
 
     def adHoc_alat(self, parser):
-        line = parser.fIn.readline()
-        match = re.match(r"[^=]+=\s*(\S+)\s*a\.u\.", line)
-        if match:
-            alat_au = float(match.group(1))
-        else:
-            raise RuntimeError("This should never happen: %s", line)
-        unit_conversion.register_userdefined_quantity('usrAlat', 'bohr', alat_au)
-        unit_conversion.register_userdefined_quantity(
-            'usrTpiba', '1/bohr', 2*math.pi/alat_au)
+        alat = parser.lastMatch['x_qe_alat']
+        unit_conversion.register_userdefined_quantity('usrAlat', 'm', alat)
+        unit_conversion.register_userdefined_quantity('usrTpiba', '1/m', 2*math.pi/alat)
 
     def run_submatchers(self):
         """submatchers of section_run"""
@@ -175,8 +169,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
-                   SM(name='alat', required=True, forwardMatch=True,
-                      startReStr=r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*(?P<x_qe_alat__bohr>\S+)\s*a\.u\.",
+                   SM(name='alat', required=True,
+                      startReStr=r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*(?P<x_qe_alat__bohr>" + RE_f + r")\s*a\.u\.",
                       adHoc=self.adHoc_alat,
                    ),
                    SM(name='nat', required=True,
@@ -275,9 +269,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                               sections=['x_qe_t_section_kbands'],
                               startReStr=r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba') + r'\s*\(\s*(?P<x_qe_t_k_pw>\d+)\s*PWs', # (?:\s+(?P<x_qe_k>[^ \(]+))+',
                               subMatchers=[
-                                  SM(name='kbnd', repeats=True,                 forwardMatch=True, #until merge of p.lastMatch
+                                  SM(name='kbnd', repeats=True,
                                       startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
-                                      adHoc=lambda p: self.appendToTmp('this_k_energies', " " + p.fIn.readline().strip()), #p.lastMatch['x_qe_t_k_point_energies']),
+                                      adHoc=lambda p: self.appendToTmp('this_k_energies', " " + p.lastMatch['x_qe_t_k_point_energies']),
                                   ),
                               ],
                           ),
