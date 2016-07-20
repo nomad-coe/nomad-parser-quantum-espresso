@@ -21,20 +21,18 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     """main place to keep the parser status, open ancillary files,..."""
     def __init__(self):
         QeC.ParserQuantumEspresso.__init__(self)
-        self.scfIterNr = 0
-        self.tmp = {}
 
     def initialize_values(self):
         """allows to reset values if the same superContext is used to parse
         different files"""
         self.secMethodIndex = None
         self.secSystemDescriptionIndex = None
+        self.tmp = {}
 
     def startedParsing(self, path, parser):
         """called when parsing starts"""
         self.parser = parser
-        # allows to reset values if the same superContext is used to parse
-        # different files
+        # reset values if same superContext is used to parse different files
         self.initialize_values()
 
     def onClose_section_basis_set_cell_dependent(
@@ -70,32 +68,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 raise RuntimeError('found non-temporary key in pseudopotential cache: "%s"' % (key))
             backend.addValue(target, value[-1])
 
-    # just examples, you probably want to remove the following two triggers
-
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
         """trigger called when section_single_configuration_calculation
         is closed"""
-        # backend.addValue("", self.scfIterNr)
-        LOGGER.info(
-            "closing section_single_configuration_calculation gIndex %d %s",
-            gIndex, section.simpleValues)
-        self.scfIterNr = 0
-        backend.addValue('single_configuration_to_calculation_method_ref',
-                         self.secMethodIndex)
-        backend.addValue('single_configuration_calculation_to_system_ref',
-                         self.secSystemIndex)
+        backend.addValue('single_configuration_to_calculation_method_ref', self.secMethodIndex)
+        backend.addValue('single_configuration_calculation_to_system_ref', self.secSystemIndex)
 
     def onOpen_section_eigenvalues(self, backend, gIndex, section):
         self.tmp['k_point'] = []
         self.tmp['k_energies'] = []
-
-    def onClose_section_scf_iteration(self, backend, gIndex, section):
-        """trigger called when section_scf_iteration is closed"""
-        LOGGER.info(
-            "closing section_scf_iteration bla gIndex %d %s",
-            gIndex, section.simpleValues)
-        self.scfIterNr += 1
 
     def onClose_section_eigenvalues(self, backend, gIndex, section):
         if len(self.tmp['k_point']) > 0:
