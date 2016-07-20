@@ -99,7 +99,7 @@ class ParserQuantumEspresso(object):
                        r"(?P<program_version>\S+(?:\s+\(svn\s+rev\.\s+\d+\s*\))?)" +
                        r"\s+starts" +
                        # newer espresso: "on $date"
-                       r"(?:(?:\s+on\s+(?P<x_qe_t_time_run_date_start>.+?)?)\s*$|" +
+                       r"(?:(?:\s+on\s+(?P<time_run_date_start__strQeDate>.+?)?)\s*$|" +
                        # older espresso has just "..." and date on new line
                        r"(?:\s*\.\.\.)\s*$)"
                    ),
@@ -109,7 +109,7 @@ class ParserQuantumEspresso(object):
                    subMatchers=([
                        # older espresso versions have start date on separate line
                        SM(name='run_date',
-                          startReStr=r"\s*Today is\s*(?P<x_qe_t_time_run_date_start>.+?)\s*$"
+                          startReStr=r"\s*Today is\s*(?P<time_run_date_start__strQeDate>.+?)\s*$"
                        ),
                    ] + self.run_submatchers()),
                 )
@@ -133,9 +133,3 @@ class ParserQuantumEspresso(object):
         else:
             raise RuntimeError("unparsable date: %s", espresso_date)
     strValueTransform_strQeDate.units = 's'
-
-    def onClose_section_run(self, backend, gIndex, section):
-        LOGGER.info("closing section run")
-        string_run_start = section['x_qe_t_time_run_date_start'][-1]
-        epoch = self.strValueTransform_strQeDate(string_run_start)
-        backend.addValue('time_run_date_start', epoch)
