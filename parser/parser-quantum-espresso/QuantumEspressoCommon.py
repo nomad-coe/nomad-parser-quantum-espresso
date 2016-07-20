@@ -27,9 +27,9 @@ def re_vec(name, units='', split="\s+"):
     if units:
         units = '__' + units
     res = (
-        r'(?P<' + name + r'_x' + units + '>\S+)' + split +
-        r'(?P<' + name + r'_y' + units + '>\S+)' + split +
-        r'(?P<' + name + r'_z' + units + '>\S+)'
+        r'(?P<' + name + r'_x' + units + r'>' + RE_f + r')' + split +
+        r'(?P<' + name + r'_y' + units + r'>' + RE_f + r')' + split +
+        r'(?P<' + name + r'_z' + units + r'>' + RE_f + r')'
         )
     return res
 

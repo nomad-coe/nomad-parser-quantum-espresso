@@ -177,16 +177,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*number of atoms/cell\s*=\s*(?P<number_of_atoms>\d+)",
                    ),
                    SM(name='nsp', required=True,
-                      startReStr=r"\s*number of atomic types\s*=\s*(?P<x_qe_number_of_species>\S+)",
+                      startReStr=r"\s*number of atomic types\s*=\s*(?P<x_qe_number_of_species>" + RE_i + r")",
                    ),
                    SM(name='nbnd', required=True,
-                       startReStr=r"\s*number of Kohn-Sham states\s*=\s*(?P<x_qe_number_of_states>\S+)"
+                       startReStr=r"\s*number of Kohn-Sham states\s*=\s*(?P<x_qe_number_of_states>" + RE_i + r")"
                    ),
                    SM(name='ecutwfc', required=True,
-                      startReStr=r"\s*kinetic-energy cutoff\s*=\s*(?P<basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
+                      startReStr=r"\s*kinetic-energy cutoff\s*=\s*(?P<basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry"
                    ),
                    SM(name='ecut_density', required=True,
-                      startReStr=r"\s*charge density cutoff\s*=\s*(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>\S+)\s*Ry"
+                      startReStr=r"\s*charge density cutoff\s*=\s*(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry"
                    ),
                    SM(name='xc_functional', required=True,
                       startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>\S+)\s*\(\s*"
@@ -208,7 +208,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='pseudopotential', repeats=True,
-                      startReStr=(r"\s*PseudoPot\.\s*#\s*(?P<x_qe_t_pp_idx>\d+) for (?P<x_qe_t_pp_label>\S+) read from file" +
+                      startReStr=(r"\s*PseudoPot\.\s*#\s*(?P<x_qe_t_pp_idx>" + RE_i + r") for (?P<x_qe_t_pp_label>\S+) read from file" +
                                   r"(?::|\s*(?P<x_qe_t_pp_filename>\S+))\s*"),
                       sections=['x_qe_t_section_pseudopotential'],
                       subMatchers=[
@@ -219,7 +219,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*MD5 check sum:\s*(?P<x_qe_t_pp_md5sum>\S+)",
                           ),
                           SM(name='pp_type_val',
-                             startReStr=r"\s*Pseudo is\s*(?P<x_qe_t_pp_type>.*?),\s*Zval\s*=\s*(?P<x_qe_t_pp_valence>" + RE_f + ")",
+                             startReStr=r"\s*Pseudo is\s*(?P<x_qe_t_pp_type>.*?),\s*Zval\s*=\s*(?P<x_qe_t_pp_valence>" + RE_f + r")",
                           ),
                       ],
                    ),
@@ -241,8 +241,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)",
                       subMatchers=[
                           SM(name='atom_pos_cart', repeats=True,
-                             startReStr=(r"\s*(?P<x_qe_t_atom_idx>\S+)\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*\d+\)\s*"
-                                         r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat')),
+                             startReStr=(
+                                 r"\s*(?P<x_qe_t_atom_idx>" + RE_i + r")" +
+                                 r"\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*" + RE_i + "\)\s*"
+                                 r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat')),
                           ),
                       ],
                    ),
@@ -257,7 +259,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       sections=['section_scf_iteration'],
                       subMatchers=[
                           SM(name='e_total',
-                             startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>\S+)',
+                             startReStr=r"\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>" + RE_f + r")",
                           ),
                       ],
                    ),
@@ -267,7 +269,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                        subMatchers=[
                           SM(name='bands', repeats=True,
                               sections=['x_qe_t_section_kbands'],
-                              startReStr=r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba') + r'\s*\(\s*(?P<x_qe_t_k_pw>\d+)\s*PWs', # (?:\s+(?P<x_qe_k>[^ \(]+))+',
+                              startReStr=r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba') + r'\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i + ')\s*PWs',
                               subMatchers=[
                                   SM(name='kbnd', repeats=True,
                                       startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
@@ -276,7 +278,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                               ],
                           ),
                           SM(name='e_total',
-                             startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total>\S+)',
+                             startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total>' + RE_f + ')',
                           ),
                        ],
                    ),
