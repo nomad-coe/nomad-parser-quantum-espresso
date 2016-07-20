@@ -110,10 +110,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def onClose_section_system(self, backend, gIndex, section):
         # store direct lattice matrix for transformation crystal -> cartesian
         self.amat = np.array([
-            [section['x_qe_t_a1_x'][0], section['x_qe_t_a1_y'][0], section['x_qe_t_a1_z'][0]],
-            [section['x_qe_t_a2_x'][0], section['x_qe_t_a2_y'][0], section['x_qe_t_a2_z'][0]],
-            [section['x_qe_t_a3_x'][0], section['x_qe_t_a3_y'][0], section['x_qe_t_a3_z'][0]],
-        ], dtype=np.float64)
+            section['x_qe_t_vec_a_x'], section['x_qe_t_vec_a_y'], section['x_qe_t_vec_a_z'],
+        ], dtype=np.float64).T
         # store inverse for transformation cartesian -> crystal
         try:
             self.amat_inv = np.linalg.inv(self.amat)
@@ -121,10 +119,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             raise RuntimeError("error inverting bravais matrix " + str(self.amat))
         # store reciprocal lattice matrix for transformation crystal -> cartesian
         self.bmat = np.array([
-            [section['x_qe_t_b1_x'][0], section['x_qe_t_b1_y'][0], section['x_qe_t_b1_z'][0]],
-            [section['x_qe_t_b2_x'][0], section['x_qe_t_b2_y'][0], section['x_qe_t_b2_z'][0]],
-            [section['x_qe_t_b3_x'][0], section['x_qe_t_b3_y'][0], section['x_qe_t_b3_z'][0]],
-        ], dtype=np.float64)
+            section['x_qe_t_vec_b_x'], section['x_qe_t_vec_b_y'], section['x_qe_t_vec_b_z'],
+        ], dtype=np.float64).T
         # store inverse for transformation cartesian -> crystal
         try:
             self.bmat_inv = np.linalg.inv(self.bmat)
@@ -204,28 +200,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='simulation_cell',
                       startReStr=r"\s*crystal axes: \(cart. coord.",
                       subMatchers=[
-                          SM(name='cell_a1',
-                             startReStr=r"\s*a\(1\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_a1', 'usrAlat'),
-                          ),
-                          SM(name='cell_a2',
-                             startReStr=r"\s*a\(2\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_a2', 'usrAlat'),
-                          ),
-                          SM(name='cell_a3',
-                             startReStr=r"\s*a\(3\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_a3', 'usrAlat'),
+                          SM(name='cell_vec_a', repeats=True,
+                             startReStr=r"\s*a\(\d\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_vec_a', 'usrAlat'),
                           ),
                       ],
                    ),
                    SM(name='reciprocal_cell',
                       startReStr=r"\s*reciprocal axes: \(cart. coord. in units 2 pi/(?:alat|a_0)\)",
                       subMatchers=[
-                          SM(name='cell_b1',
-                             startReStr=r"\s*b\(1\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_b1', 'usrTpiba'),
-                          ),
-                          SM(name='cell_b2',
-                             startReStr=r"\s*b\(2\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_b2', 'usrTpiba'),
-                          ),
-                          SM(name='cell_b3',
-                             startReStr=r"\s*b\(3\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_b3', 'usrTpiba'),
+                          SM(name='cell_vec_b', repeats=True,
+                             startReStr=r"\s*b\(\d\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_vec_b', 'usrTpiba'),
                           ),
                       ],
                    ),
