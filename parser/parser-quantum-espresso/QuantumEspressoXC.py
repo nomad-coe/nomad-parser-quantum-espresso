@@ -156,3 +156,32 @@ LOGGER = logging.getLogger(__name__)
 # These two modifications accounts only for a 1e-5 Ha difference for a 
 # single He atom. Info by Fabien Bruneval
 
+def parse_qe_xc_num(xc_functional_num):
+    """parse Quantum Espresso XC number/index notation
+    :returns: list with 6 integer elements (components of QE XC functionals)"""
+    xf_num_split_i = []
+    xf_num_split = re.split(r'\s+',xc_functional_num.strip())
+    if len(xf_num_split) > 6:
+        raise RuntimeError("unsupported number of XC components: %d" % (len(xf_num_split)))
+    elif len(xf_num_split) == 6:
+        # trivial case: we got 6 components from simply splitting
+        xf_num_split_i = [ int(x) for x in xf_num_split ]
+    elif len(xf_num_split) == 1 and len(xc_functional_num)==4:
+        # old 4-component form without space separator
+        xf_num_split_i = [ int(x) for x in re.findall('(\d)', xc_functional_num) ]
+    elif len(xc_functional_num)==10:
+        # intermediate versions used 2-digit, 5 component form, occasionally missing spaces
+        xf_num_split_i = [ int(x) for x in re.findall('([ \d]\d)',xc_functional_num) ]
+    else:
+        raise RuntimeError("unparsable input: '%s'", xc_functional_num)
+    if len(xf_num_split_i)<1:
+        raise RuntimeError("this should not happen")
+    # zero-pad up to 6 elements
+    xf_num_split_i += [ 0 ] * (6 - len(xf_num_split_i))
+    return xf_num_split_i
+
+
+def translate_qe_xc_num(xc_functional_num):
+    xf_num_split_i = parse_qe_xc_num(xc_functional_num)
+    LOGGER.info('num <- input: %s <- %s',  str(xf_num_split_i), xc_functional_num)
+
