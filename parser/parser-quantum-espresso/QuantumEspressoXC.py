@@ -549,7 +549,54 @@ VAN_DER_WAALS = [
     },
 ]
 
+
 # origin: espresso-5.4.0/Modules/funct.f90
+#  "dft" is the exchange-correlation functional label, described either
+#  by short names listed below, or by a series of keywords (everything
+#  is case-insensitive). "dft_shortname" contains one of the short names
+#  listed below (deduced from from "dft" as read from input or PP files)
+#
+#  short name       complete name       Short description
+#     "pz"    = "sla+pz"            = Perdew-Zunger LDA
+#     "bp"    = "b88+p86"           = Becke-Perdew grad.corr.
+#     "pw91"  = "sla+pw+ggx+ggc"    = PW91 (aka GGA)
+#     "blyp"  = "sla+b88+lyp+blyp"  = BLYP
+#     "pbe"   = "sla+pw+pbx+pbc"    = PBE
+#     "revpbe"= "sla+pw+rpb+pbc"    = revPBE (Zhang-Yang)
+#     "pw86pbe" = "sla+pw+pw86+pbc" = PW86 exchange + PBE correlation
+#     "b86bpbe" = "sla+pw+b86b+pbc" = B86b exchange + PBE correlation
+#     "pbesol"= "sla+pw+psx+psc"    = PBEsol
+#     "q2d"   = "sla+pw+q2dx+q2dc"  = PBEQ2D
+#     "hcth"  = "nox+noc+hcth+hcth" = HCTH/120
+#     "olyp"  = "nox+lyp+optx+blyp" = OLYP
+#     "wc"    = "sla+pw+wcx+pbc"    = Wu-Cohen
+#     "sogga" = "sla+pw+sox+pbec"   = SOGGA
+#     "optbk88"="sla+pw+obk8+p86"   = optB88
+#     "optb86b"="sla+pw+ob86+p86"   = optB86
+#     "ev93"  = "sla+pw+evx+nogc"   = Engel-Vosko
+#     "tpss"  = "sla+pw+tpss+tpss"  = TPSS Meta-GGA
+#     "m06l"  = "nox+noc+m6lx+m6lc" = M06L Meta-GGA
+#     "tb09"  = "sla+pw+tb09+tb09"  = TB09 Meta-GGA
+#     "pbe0"  = "pb0x+pw+pb0x+pbc"  = PBE0
+#     "hse"   = "sla+pw+hse+pbc"    = Heyd-Scuseria-Ernzerhof (HSE 06, see note below)
+#     "b3lyp" = "b3lp+b3lp+b3lp+b3lp"= B3LYP
+#     "b3lypv1r"    = "b3lp+b3lpv1r+b3lp+b3lp"= B3LYP-VWN1-RPA
+#     "x3lyp" = "x3lp+x3lp+x3lp+x3lp"= X3LYP
+#     "vwn-rpa"     = "sla+vwn-rpa" = VWN LDA using vwn1-rpa parametriz
+#     "gaupbe"= "sla+pw+gaup+pbc"   = Gau-PBE (also "gaup")
+#     "vdw-df"       ="sla+pw+rpb +vdw1"   = vdW-DF1
+#     "vdw-df2"      ="sla+pw+rw86+vdw2"   = vdW-DF2
+#     "vdw-df-x"     ="sla+pw+????+vdwx"   = vdW-DF-x, reserved Thonhauser, not implemented
+#     "vdw-df-y"     ="sla+pw+????+vdwy"   = vdW-DF-y, reserved Thonhauser, not implemented
+#     "vdw-df-z"     ="sla+pw+????+vdwz"   = vdW-DF-z, reserved Thonhauser, not implemented
+#     "vdw-df-c09"   ="sla+pw+c09x+vdw1"   = vdW-DF-C09
+#     "vdw-df2-c09"  ="sla+pw+c09x+vdw2"   = vdW-DF2-C09
+#     "vdw-df-cx"    ="sla+pw+cx13+vdW1"   = vdW-DF-cx
+#     "vdw-df-obk8"  ="sla+pw+obk8+vdw1"   = vdW-DF-obk8 (optB88-vdW)
+#     "vdw-df-ob86"  ="sla+pw+ob86+vdw1"   = vdW-DF-ob86 (optB86b-vdW)
+#     "vdw-df2-b86r" ="sla+pw+b86r+vdw2"   = vdW-DF2-B86R (rev-vdw-df2)
+#     "rvv10" = "sla+pw+rw86+pbc+vv10"     = rVV10
+#
 # Note: as a rule, all keywords should be unique, and should be different
 # from the short name, but there are a few exceptions.
 # 
