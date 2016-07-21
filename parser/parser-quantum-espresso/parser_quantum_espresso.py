@@ -70,8 +70,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def onClose_section_method(
             self, backend, gIndex, section):
+        # set flag if we deal with user-enforced XC functional
         if section['x_qe_t_xc_functional_shortname_enforced'] is not None:
             backend.addValue('x_qe_xc_functional_user_enforced', True)
+        # translate XC functional to section_xc_functionals
+        xc_functional_num = section['x_qe_t_xc_functional_num'][-1]
 
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
