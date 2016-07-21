@@ -45,12 +45,21 @@ def translate_qe_xc_num(xc_functional_num):
     LOGGER.debug('num <- input: %s <- %s',  str(xf_num), xc_functional_num)
     xc_data = []
     for component_i in range(6):
-        this_xf = xf_num[component_i]
+        this_xf_num = xf_num[component_i]
+        if this_xf_num == 0:
+            # 0 means unset component
+            continue
         component_max = len(XC_COMPONENT[component_i])-1
-        if this_xf > component_max:
+        this_component = None
+        if this_xf_num > component_max:
             LOGGER.error(
                 "%s[%d] beyond limit of %d",
-                XC_COMPONENT_NAME[component_i], this_xf, component_max)
+                XC_COMPONENT_NAME[component_i], this_xf_num, component_max)
+        else:
+            this_component=XC_COMPONENT[component_i][this_xf_num]
+        if this_component is None:
+            raise RuntimeError("Undefined XC component %s[%d]" % (
+                XC_COMPONENT_NAME[component_i], this_xf_num))
     return xc_data
 
 
