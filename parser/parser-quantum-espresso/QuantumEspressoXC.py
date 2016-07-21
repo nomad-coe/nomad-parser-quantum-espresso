@@ -276,6 +276,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      6,
     },
+    None, # igcx=7 is not defined according to funct.f90
     {
         'XC_functional_name': "GGA_X_PBE",
         'XC_functional_weight': 0.75,
@@ -327,6 +328,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      14,
     },
+    None, # igcx=15 is not defined according to funct.f90
     {
         'XC_functional_name': "GGA_X_C09X",
         'x_qe_xc_name':       "c09x",
@@ -341,6 +343,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      17,
     },
+    None, # igcx=18 is not defined according to funct.f90
     {
         'XC_functional_name': "GGA_X_Q2D",
         'x_qe_xc_name':       "q2dx",
@@ -451,6 +454,7 @@ CORRELATION_GRADIENT_CORRECTION = [
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      5,
     },
+    None, # igcc=6 is not defined according to funct.f90
     {
         'XC_functional_name': "GGA_C_LYP",
         'XC_functional_weight': 0.81,
@@ -473,6 +477,8 @@ CORRELATION_GRADIENT_CORRECTION = [
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      9,
     },
+    None, # igcc=10 is not defined according to funct.f90
+    None, # igcc=11 is not defined according to funct.f90
     {
         'XC_functional_name': "GGA_C_Q2D",
         'x_qe_xc_name':       "q2dc",
