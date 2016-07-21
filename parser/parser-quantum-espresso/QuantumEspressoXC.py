@@ -158,7 +158,13 @@ LOGGER = logging.getLogger(__name__)
 
 def parse_qe_xc_num(xc_functional_num):
     """parse Quantum Espresso XC number/index notation
-    :returns: list with 6 integer elements (components of QE XC functionals)"""
+    :returns: list with 6 integer elements (components of QE XC functionals)
+              [iexch, icorr, igcx, igcc, imeta, inlc]
+                iexch, icorr - density exchange/correlation
+                igcx, igcc   - gradient correction exchange/correlation
+                imeta        - meta-GGA
+                inlc         - non-local term of Van der Waals functionals
+    """
     xf_num_split_i = []
     xf_num_split = re.split(r'\s+',xc_functional_num.strip())
     if len(xf_num_split) > 6:
