@@ -89,7 +89,7 @@ EXCHANGE = [
         'x_qe_xc_index':      3,
     },
     {
-        'XC_functional_name': 'x_qe_LDA_X_OEP',
+        'XC_functional_name': 'x_qe_OEP_X',
         'x_qe_xc_name':       'oep',
         'x_qe_xc_comment':    'Optimized Effective Potential',
         'x_qe_xc_index_name': 'iexch',
