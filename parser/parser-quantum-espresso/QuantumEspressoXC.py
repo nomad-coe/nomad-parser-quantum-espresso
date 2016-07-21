@@ -103,16 +103,26 @@ EXCHANGE = [
         'x_qe_xc_index':      5,
     },
     {
-        'XC_functional_name': ['HF_X', 'LDA_X'],
-        'XC_functional_weight': [0.25, 0.75],
+        'x_qe_t_xc_terms': [{
+            'XC_functional_name': 'HF_X',
+            'XC_functional_weight': 0.25,
+        }, {
+            'XC_functional_name': 'LDA_X',
+            'XC_functional_weight': 0.75,
+        }],
         'x_qe_xc_name':       "pb0x",
         'x_qe_xc_comment':    'PBE0 (Slater*0.75+HF*0.25)',
         'x_qe_xc_index_name': 'iexch',
         'x_qe_xc_index':      6,
     },
     {
-        'XC_functional_name': ['HF_X', 'LDA_X'],
-        'XC_functional_weight': [0.20, 0.8],
+        'x_qe_t_xc_terms': [{
+            'XC_functional_name': 'HF_X',
+            'XC_functional_weight': 0.20,
+        }, {
+            'XC_functional_name': 'LDA_X',
+            'XC_functional_weight': 0.8,
+        }],
         'x_qe_xc_name':       "b3lp",
         'x_qe_xc_comment':    "B3LYP(Slater*0.80+HF*0.20)",
         'x_qe_xc_index_name': "iexch",
@@ -126,8 +136,13 @@ EXCHANGE = [
         'x_qe_xc_index':      8,
     },
     {
-        'XC_functional_name': ['HF_X', 'LDA_X'],
-        'XC_functional_weight': [0.218, 0.782],
+        'x_qe_t_xc_terms': [{
+            'XC_functional_name': 'HF_X',
+            'XC_functional_weight': 0.218,
+        }, {
+            'XC_functional_name': 'LDA_X',
+            'XC_functional_weight': 0.782,
+        }],
         'x_qe_xc_name':       "x3lp",
         'x_qe_xc_comment':    "X3LYP(Slater*0.782+HF*0.218)",
         'x_qe_xc_index_name': "iexch",
@@ -216,24 +231,39 @@ CORRELATION = [
         'x_qe_xc_index':      11,
     },
     {
-        'XC_functional_name': ['LDA_C_VWN', 'LDA_C_LYP'],
-        'XC_functional_weight': [0.19, 0.81],
+        'x_qe_t_xc_terms': [{
+            'XC_functional_name': 'LDA_C_VWN',
+            'XC_functional_weight': 0.19,
+        }, {
+            'XC_functional_name': 'LDA_C_LYP',
+            'XC_functional_weight': 0.81,
+        }],
         'x_qe_xc_name':       "b3lp",
         'x_qe_xc_comment':    "B3LYP (0.19*vwn+0.81*lyp)",
         'x_qe_xc_index_name': "icorr",
         'x_qe_xc_index':      12,
     },
     {
-        'XC_functional_name': ['LDA_C_LDA_C_VWN_RPA', 'LDA_C_LYP'],
-        'XC_functional_weight': [0.19, 0.81],
+        'x_qe_t_xc_terms': [{
+            'XC_functional_name': 'LDA_C_LDA_C_VWN_RPA',
+            'XC_functional_weight': 0.19,
+        }, {
+            'XC_functional_name': 'LDA_C_LYP',
+            'XC_functional_weight': 0.81,
+        }],
         'x_qe_xc_name':       "b3lpv1r",
         'x_qe_xc_comment':    "B3LYP-VWN-1-RPA (0.19*vwn_rpa+0.81*lyp)",
         'x_qe_xc_index_name': "icorr",
         'x_qe_xc_index':      13,
     },
     {
-        'XC_functional_name': ['LDA_C_LDA_C_VWN_RPA', 'LDA_C_LYP'],
-        'XC_functional_weight': [0.129, 0.871],
+        'x_qe_t_xc_terms': [{
+            'XC_functional_name': 'LDA_C_LDA_C_VWN_RPA',
+            'XC_functional_weight': 0.129,
+        }, {
+            'XC_functional_name': 'LDA_C_LYP',
+            'XC_functional_weight': 0.871,
+        }],
         'x_qe_xc_name':       "x3lp",
         'x_qe_xc_comment':    "X3LYP (0.129*vwn_rpa+0.871*lyp)",
         'x_qe_xc_index_name': "icorr",
@@ -441,8 +471,13 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_index':      27,
     },
     {
-        'XC_functional_name': ["GGA_X_B88", "GGA_X_PW91"],
-        'XC_functional_weight': [0.542, 0.167],
+        'x_qe_t_xc_terms': [{
+            'XC_functional_name': "GGA_X_B88",
+            'XC_functional_weight': 0.542,
+        }, {
+            'XC_functional_name': "GGA_X_PW91",
+            'XC_functional_weight': 0.167,
+        }],
         'x_qe_xc_name':       "x3lp",
         'x_qe_xc_comment':    "X3LYP (Becke88*0.542 + Perdew-Wang91*0.167)",
         'x_qe_xc_index_name': "igcx",
@@ -558,22 +593,34 @@ CORRELATION_GRADIENT_CORRECTION = [
 META_GGA= [
     None,
     {
-        'XC_functional_name': ["MGGA_X_TPSS", "MGGA_C_TPSS"],
+        'x_qe_t_xc_terms': [{
+            'XC_functional_name': "MGGA_X_TPSS",
+        }, {
+            'XC_functional_name': "MGGA_C_TPSS",
+        }],
         'x_qe_xc_name':       "tpss",
         'x_qe_xc_comment':    "TPSS Meta-GGA",
         'x_qe_xc_index_name': "imeta",
         'x_qe_xc_index':      1,
     },
     {
-        'XC_functional_name': ["MGGA_X_M06_L", "MGGA_C_M06_L"],
+        'x_qe_t_xc_terms': [{
+            'XC_functional_name': "MGGA_X_M06_L",
+        }, {
+            'XC_functional_name': "MGGA_C_M06_L",
+        }],
         'x_qe_xc_name':       "m6lx",
         'x_qe_xc_comment':    "M06L Meta-GGA",
         'x_qe_xc_index_name': "imeta",
         'x_qe_xc_index':      2,
     },
     {
-        # confirmed by looking into functionals.f90
-        'XC_functional_name': ["MGGA_X_TB09", "MGGA_C_TPSS],
+        'x_qe_t_xc_terms': [{
+            'XC_functional_name': "MGGA_X_TB09",
+        }, {
+            # confirmed by looking into functionals.f90
+            'XC_functional_name': "MGGA_C_TPSS",
+        }],
         'x_qe_xc_name':       "tb09",
         'x_qe_xc_comment':    "TB09 Meta-GGA",
         'x_qe_xc_index_name': "imeta",
