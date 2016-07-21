@@ -18,7 +18,11 @@ def process_line(line):
     if m is None:
         LOGGER.error("unrecognized line:",lr)
         return None
-    qe_xc=translate_qe_xc_num(m.group(1))
+    qe_xc = None
+    try:
+        qe_xc=translate_qe_xc_num(m.group(1))
+    except RuntimeError as e:
+        print("Error: %s" % (str(e)))
     if qe_xc is None:
         print("None")
     else:
