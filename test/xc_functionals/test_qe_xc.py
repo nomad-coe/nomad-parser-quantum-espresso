@@ -13,15 +13,16 @@ PP = pprint.PrettyPrinter(indent=2, width=190)
 
 def process_line(line):
     lr = line.rstrip()
+    print("qe_xc: %s" % (lr))
     m = re.match(r".*\(([^\)]+)\)",lr)
     if m is None:
-        LOGGER.error("unrecognized line: %s",lr)
+        LOGGER.error("unrecognized line:",lr)
         return None
     qe_xc=translate_qe_xc_num(m.group(1))
     if qe_xc is None:
-        print("qe_xc: %s\nNone" % (lr))
+        print("None")
     else:
-        print(("qe_xc: %s\n" % (lr)) + PP.pprint(qe_xc))
+        print(PP.pprint(qe_xc))
 
 
 if __name__ == '__main__':
