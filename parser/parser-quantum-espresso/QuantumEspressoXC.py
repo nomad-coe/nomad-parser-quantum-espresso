@@ -41,8 +41,17 @@ def parse_qe_xc_num(xc_functional_num):
 
 
 def translate_qe_xc_num(xc_functional_num):
-    xf_num_split_i = parse_qe_xc_num(xc_functional_num)
-    LOGGER.debug('num <- input: %s <- %s',  str(xf_num_split_i), xc_functional_num)
+    xf_num = parse_qe_xc_num(xc_functional_num)
+    LOGGER.debug('num <- input: %s <- %s',  str(xf_num), xc_functional_num)
+    xc_data = []
+    for component_i in range(6):
+        this_xf = xf_num[component_i]
+        component_max = len(XC_COMPONENT[component_i])-1
+        if this_xf > component_max:
+            LOGGER.error(
+                "%s[%d] beyond limit of %d",
+                XC_COMPONENT_NAME[component_i], this_xf, component_max)
+    return xc_data
 
 
 # origin: espresso-5.4.0/Modules/funct.f90
@@ -551,6 +560,26 @@ VAN_DER_WAALS = [
         'x_qe_xc_index_name': "inlc",
         'x_qe_xc_index':      6,
     },
+]
+
+
+XC_COMPONENT = [
+    EXCHANGE,
+    CORRELATION,
+    EXCHANGE_GRADIENT_CORRECTION,
+    CORRELATION_GRADIENT_CORRECTION,
+    META_GGA,
+    VAN_DER_WAALS,
+]
+
+
+XC_COMPONENT_NAME = [
+    'EXCHANGE',
+    'CORRELATION',
+    'EXCHANGE_GRADIENT_CORRECTION',
+    'CORRELATION_GRADIENT_CORRECTION',
+    'META_GGA',
+    'VAN_DER_WAALS',
 ]
 
 
