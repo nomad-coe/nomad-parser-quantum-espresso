@@ -285,7 +285,15 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      6,
     },
-    None, # igcx=7 is not defined according to funct.f90
+    {
+        # igcx=7 is not defined in 5.4's funct.f90
+        #        definition taken from 5.0, which did not have separate imeta
+        'XC_functional_name': "MGGA_X_TPSS",
+        'x_qe_xc_name':       "tpss",
+        'x_qe_xc_comment':    "TPSS Meta-GGA (Espresso-version < 5.1)",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      7,
+    },
     {
         'XC_functional_name': "GGA_X_PBE",
         'XC_functional_weight': 0.75,
@@ -337,7 +345,15 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      14,
     },
-    None, # igcx=15 is not defined according to funct.f90
+    {
+        # igcx=15 is not defined in 5.4's funct.f90
+        #        definition taken from 5.0, which did not have separate imeta
+        'XC_functional_name': "MGGA_X_TB09",
+        'x_qe_xc_name':       "tb09",
+        'x_qe_xc_comment':    "TB09 Meta-GGA (Espresso-version < 5.1)",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      15,
+    },
     {
         'XC_functional_name': "GGA_X_C09X",
         'x_qe_xc_name':       "c09x",
@@ -352,7 +368,15 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      17,
     },
-    None, # igcx=18 is not defined according to funct.f90
+    {
+        # igcx=18 is not defined in 5.4's funct.f90
+        #        definition taken from 5.0, which did not have separate imeta
+        'XC_functional_name': "MGGA_X_M06_L",
+        'x_qe_xc_name':       "m6lx",
+        'x_qe_xc_comment':    "M06L Meta-GGA (Espresso-version < 5.1)",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      18,
+    },
     {
         'XC_functional_name': "GGA_X_Q2D",
         'x_qe_xc_name':       "q2dx",
@@ -463,7 +487,15 @@ CORRELATION_GRADIENT_CORRECTION = [
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      5,
     },
-    None, # igcc=6 is not defined according to funct.f90
+    {
+        # igcc=6 is not defined in 5.4's funct.f90
+        #        definition taken from 5.0, which did not have separate imeta
+        'XC_functional_name': "MGGA_C_TPSS",
+        'x_qe_xc_name':       "tpss",
+        'x_qe_xc_comment':    "TPSS Meta-GGA (Espresso-version < 5.1)",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      6,
+    },
     {
         'XC_functional_name': "GGA_C_LYP",
         'XC_functional_weight': 0.81,
@@ -486,8 +518,24 @@ CORRELATION_GRADIENT_CORRECTION = [
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      9,
     },
-    None, # igcc=10 is not defined according to funct.f90
-    None, # igcc=11 is not defined according to funct.f90
+    {
+        # igcc=10 is not defined in 5.4's funct.f90
+        #        definition taken from 5.0, which did not have separate imeta
+        'XC_functional_name': "x_qe_MGGA_C_TB09",
+        'x_qe_xc_name':       "tb09",
+        'x_qe_xc_comment':    "TB09 Meta-GGA (Espresso-version < 5.1)",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      10,
+    },
+    {
+        # igcc=11 is not defined in 5.4's funct.f90
+        #        definition taken from 5.0, which did not have separate imeta
+        'XC_functional_name': "MGGA_C_M06_L",
+        'x_qe_xc_name':       "m6lx",
+        'x_qe_xc_comment':    "M06L Meta-GGA (Espresso-version < 5.1)",
+        'x_qe_xc_index_name': "imeta",
+        'x_qe_xc_index':      2,
+    },
     {
         'XC_functional_name': "GGA_C_Q2D",
         'x_qe_xc_name':       "q2dc",
