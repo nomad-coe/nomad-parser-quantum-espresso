@@ -521,7 +521,8 @@ CORRELATION_GRADIENT_CORRECTION = [
     {
         # igcc=10 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
-        'XC_functional_name': "x_qe_MGGA_C_TB09",
+        #        functionals.f90 tells that correlation is taken from tpss
+        'XC_functional_name': "MGGA_C_TPSS",
         'x_qe_xc_name':       "tb09",
         'x_qe_xc_comment':    "TB09 Meta-GGA (Espresso-version < 5.1)",
         'x_qe_xc_index_name': "igcc",
@@ -571,7 +572,8 @@ META_GGA= [
         'x_qe_xc_index':      2,
     },
     {
-        'XC_functional_name': ["MGGA_X_TB09", "x_qe_MGGA_C_TB09"],
+        # confirmed by looking into functionals.f90
+        'XC_functional_name': ["MGGA_X_TB09", "MGGA_C_TPSS],
         'x_qe_xc_name':       "tb09",
         'x_qe_xc_comment':    "TB09 Meta-GGA",
         'x_qe_xc_index_name': "imeta",
