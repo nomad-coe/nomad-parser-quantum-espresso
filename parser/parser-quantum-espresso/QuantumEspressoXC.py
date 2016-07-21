@@ -49,14 +49,17 @@ def translate_qe_xc_num(xc_functional_num):
 EXCHANGE = [
     None,
     {
+        'XC_functional_name': 'LDA_X',
         'x_qe_xc_name':       'sla',
         'x_qe_xc_comment':    'Slater (alpha=2/3)',
         'x_qe_xc_index_name': 'iexch',
         'x_qe_xc_index':      1,
     },
     {
-        'x_qe_xc_name':       'sl1'
-        'x_qe_xc_comment':    'Slater (alpha=1.0)'
+        'XC_functional_name': 'LDA_X',
+        'XC_functional_parameters': { 'alpha': 1.0 },
+        'x_qe_xc_name':       'sl1',
+        'x_qe_xc_comment':    'Slater (alpha=1.0)',
         'x_qe_xc_index_name': 'iexch',
         'x_qe_xc_index':      2,
     },
@@ -73,18 +76,23 @@ EXCHANGE = [
         'x_qe_xc_index':      4,
     },
     {
+        'XC_functional_name': 'HF_X',
         'x_qe_xc_name':       'hf',
         'x_qe_xc_comment':    'Hartree-Fock',
         'x_qe_xc_index_name': 'iexch',
         'x_qe_xc_index':      5,
     },
     {
+        'XC_functional_name': ['HF_X', 'LDA_X'],
+        'XC_functional_weight': [0.25, 0.75],
         'x_qe_xc_name':       "pb0x",
         'x_qe_xc_comment':    'PBE0 (Slater*0.75+HF*0.25)',
         'x_qe_xc_index_name': 'iexch',
         'x_qe_xc_index':      6,
     },
     {
+        'XC_functional_name': ['HF_X', 'LDA_X'],
+        'XC_functional_weight': [0.20, 0.8],
         'x_qe_xc_name':       "b3lp",
         'x_qe_xc_comment':    "B3LYP(Slater*0.80+HF*0.20)",
         'x_qe_xc_index_name': "iexch",
@@ -97,6 +105,8 @@ EXCHANGE = [
         'x_qe_xc_index':      8,
     },
     {
+        'XC_functional_name': ['HF_X', 'LDA_X'],
+        'XC_functional_weight': [0.218, 0.782],
         'x_qe_xc_name':       "x3lp",
         'x_qe_xc_comment':    "X3LYP(Slater*0.782+HF*0.218)",
         'x_qe_xc_index_name': "iexch",
@@ -108,238 +118,282 @@ EXCHANGE = [
 CORRELATION = [
     None,
     {
-        'x_qe_xc_name':       "pz"
-        'x_qe_xc_comment':    "Perdew-Zunger"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      1
+        'XC_functional_name': 'LDA_C_PZ',
+        'x_qe_xc_name':       "pz",
+        'x_qe_xc_comment':    "Perdew-Zunger",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      1,
     },
     {
-        'x_qe_xc_name':       "vwn"
-        'x_qe_xc_comment':    "Vosko-Wilk-Nusair"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      2
+        'XC_functional_name': 'LDA_C_VWN',
+        'x_qe_xc_name':       "vwn",
+        'x_qe_xc_comment':    "Vosko-Wilk-Nusair",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      2,
     },
     {
-        'x_qe_xc_name':       "lyp"
+        'XC_functional_name': 'LDA_C_LYP',
+        'x_qe_xc_name':       "lyp",
         'x_qe_xc_comment':    "Lee-Yang-Parr",
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      3
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      3,
     },
     {
-        'x_qe_xc_name':       "pw"
-        'x_qe_xc_comment':    "Perdew-Wang"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      4
+        'XC_functional_name': "LDA_C_PW",
+        'x_qe_xc_name':       "pw",
+        'x_qe_xc_comment':    "Perdew-Wang",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      4,
     },
     {
-        'x_qe_xc_name':       "wig"
-        'x_qe_xc_comment':    "Wigner"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      5
+        'XC_functional_name': 'LDA_C_WIGNER',
+        'x_qe_xc_name':       "wig",
+        'x_qe_xc_comment':    "Wigner",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      5,
     },
     {
-        'x_qe_xc_name':       "hl"
-        'x_qe_xc_comment':    "Hedin-Lunqvist"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      6
+        'XC_functional_name': 'LDA_C_HL',
+        'x_qe_xc_name':       "hl",
+        'x_qe_xc_comment':    "Hedin-Lunqvist",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      6,
     },
     {
-        'x_qe_xc_name':       "obz"
-        'x_qe_xc_comment':    "Ortiz-Ballone form for PZ"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      7
+        'XC_functional_name': 'LDA_C_OB_PZ',
+        'x_qe_xc_name':       "obz",
+        'x_qe_xc_comment':    "Ortiz-Ballone form for PZ",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      7,
     },
     {
-        'x_qe_xc_name':       "obw"
-        'x_qe_xc_comment':    "Ortiz-Ballone form for PW"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      8
+        'XC_functional_name': 'LDA_C_OB_PW',
+        'x_qe_xc_name':       "obw",
+        'x_qe_xc_comment':    "Ortiz-Ballone form for PW",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      8,
     },
     {
-        'x_qe_xc_name':       "gl"
-        'x_qe_xc_comment':    "Gunnarson-Lunqvist"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      9
+        'XC_functional_name': 'LDA_C_GL',
+        'x_qe_xc_name':       "gl",
+        'x_qe_xc_comment':    "Gunnarson-Lunqvist",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      9,
     },
     {
-        'x_qe_xc_name':       "kzk"
-        'x_qe_xc_comment':    "Finite-size corrections"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      10
+        'x_qe_xc_name':       "kzk",
+        'x_qe_xc_comment':    "Finite-size corrections",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      10,
     },
     {
-        'x_qe_xc_name':       "vwn-rpa"
-        'x_qe_xc_comment':    "Vosko-Wilk-Nusair, alt param"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      11
+        'XC_functional_name': 'LDA_C_VWN_1',
+        'x_qe_xc_name':       "vwn-rpa",
+        'x_qe_xc_comment':    "Vosko-Wilk-Nusair, alt param",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      11,
     },
     {
-        'x_qe_xc_name':       "b3lp"
-        'x_qe_xc_comment':    "B3LYP (0.19*vwn+0.81*lyp)"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      12
+        'XC_functional_name': ['LDA_C_VWN', 'LDA_C_LYP'],
+        'XC_functional_weight': [0.19, 0.81],
+        'x_qe_xc_name':       "b3lp",
+        'x_qe_xc_comment':    "B3LYP (0.19*vwn+0.81*lyp)",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      12,
     },
     {
-        'x_qe_xc_name':       "b3lpv1r"
-        'x_qe_xc_comment':    "B3LYP-VWN-1-RPA (0.19*vwn_rpa+0.81*lyp)"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      13
+        'XC_functional_name': ['LDA_C_LDA_C_VWN_RPA', 'LDA_C_LYP'],
+        'XC_functional_weight': [0.19, 0.81],
+        'x_qe_xc_name':       "b3lpv1r",
+        'x_qe_xc_comment':    "B3LYP-VWN-1-RPA (0.19*vwn_rpa+0.81*lyp)",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      13,
     },
     {
-        'x_qe_xc_name':       "x3lp"
-        'x_qe_xc_comment':    "X3LYP (0.129*vwn_rpa+0.871*lyp)"
-        'x_qe_xc_index_name': "icorr"
-        'x_qe_xc_index':      14
+        'XC_functional_name': ['LDA_C_LDA_C_VWN_RPA', 'LDA_C_LYP'],
+        'XC_functional_weight': [0.129, 0.871],
+        'x_qe_xc_name':       "x3lp",
+        'x_qe_xc_comment':    "X3LYP (0.129*vwn_rpa+0.871*lyp)",
+        'x_qe_xc_index_name': "icorr",
+        'x_qe_xc_index':      14,
     },
 ]
 
 EXCHANGE_GRADIENT_CORRECTION = [
     None,
     {
+        'XC_functional_name': "GGA_X_B88",
         'x_qe_xc_name':       "b88",
         'x_qe_xc_comment':    "Becke88 (beta=0.0042)",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      1,
     },
     {
+        'XC_functional_name': "GGA_X_PW91",
         'x_qe_xc_name':       "ggx",
         'x_qe_xc_comment':    "Perdew-Wang 91",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      2,
     },
     {
+        'XC_functional_name': "GGA_X_PBE",
         'x_qe_xc_name':       "pbx",
         'x_qe_xc_comment':    "Perdew-Burke-Ernzenhof exch",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      3,
     },
     {
+        'XC_functional_name': "GGA_X_PBE_R'",
         'x_qe_xc_name':       "rpb",
         'x_qe_xc_comment':    "revised PBE by Zhang-Yang",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      4,
     },
     {
+        'XC_functional_name': "x_qe_GGA_X_HCTH_93",
         'x_qe_xc_name':       "hcth",
         'x_qe_xc_comment':    "Cambridge exch, Handy et al",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      5,
     },
     {
+        'XC_functional_name': "GGA_X_OPTX",
         'x_qe_xc_name':       "optx",
         'x_qe_xc_comment':    "Handy's exchange functional",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      6,
     },
     {
+        'XC_functional_name': "GGA_X_PBE",
+        'XC_functional_weight': 0.75,
         'x_qe_xc_name':       "pb0x",
         'x_qe_xc_comment':    "PBE0 (PBE exchange*0.75)",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      8,
     },
     {
+        'XC_functional_name': "GGA_X_B88",
+        'XC_functional_weight': 0.72,
         'x_qe_xc_name':       "b3lp",
         'x_qe_xc_comment':    "B3LYP (Becke88*0.72)",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      9,
     },
     {
+        'XC_functional_name': "x_qe_GGA_X_PBESOL",
         'x_qe_xc_name':       "psx",
         'x_qe_xc_comment':    "PBEsol exchange",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      10,
     },
     {
+        'XC_functional_name': "GGA_X_WC",
         'x_qe_xc_name':       "wcx",
         'x_qe_xc_comment':    "Wu-Cohen",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      11,
     },
     {
+        'XC_functional_name': "x_qe_GGA_X_HSE06",
         'x_qe_xc_name':       "hse",
         'x_qe_xc_comment':    "HSE screened exchange",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      12,
     },
     {
+        'XC_functional_name': "GGA_X_RPW86",
         'x_qe_xc_name':       "rw86",
         'x_qe_xc_comment':    "revised PW86",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      13,
     },
     {
+        'XC_functional_name': "GGA_X_PBE",
         'x_qe_xc_name':       "pbe",
         'x_qe_xc_comment':    "same as PBX, back-comp.",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      14,
     },
     {
+        'XC_functional_name': "GGA_X_C09X",
         'x_qe_xc_name':       "c09x",
         'x_qe_xc_comment':    "Cooper 09",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      16,
     },
     {
+        'XC_functional_name': "GGA_X_SOGGA",
         'x_qe_xc_name':       "sox",
         'x_qe_xc_comment':    "sogga",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      17,
     },
     {
+        'XC_functional_name': "GGA_X_Q2D",
         'x_qe_xc_name':       "q2dx",
         'x_qe_xc_comment':    "Q2D exchange grad corr",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      19,
     },
     {
+        'XC_functional_name': "x_qe_GGA_X_GAUP",
         'x_qe_xc_name':       "gaup",
         'x_qe_xc_comment':    "Gau-PBE hybrid exchange",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      20,
     },
     {
+        'XC_functional_name': "GGA_X_PW86",
         'x_qe_xc_name':       "pw86",
         'x_qe_xc_comment':    "Perdew-Wang (1986) exchange",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      "21",
     },
     {
+        'XC_functional_name': "GGA_X_B86_MGC",
         'x_qe_xc_name':       "b86b",
         'x_qe_xc_comment':    "Becke (1986) exchange",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      22,
     },
     {
+        'XC_functional_name': "GGA_X_OPTB88_VDW",
         'x_qe_xc_name':       "obk8",
         'x_qe_xc_comment':    "optB88  exchange",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      23,
     },
     {
+        'XC_functional_name': "x_qe_GGA_X_OPTB86_VDW",
         'x_qe_xc_name':       "ob86",
         'x_qe_xc_comment':    "optB86b exchange",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      24,
     },
     {
+        'XC_functional_name': "GGA_X_EV93",
         'x_qe_xc_name':       "evx",
         'x_qe_xc_comment':    "Engel-Vosko exchange",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      25,
     },
     {
+        'XC_functional_name': "GGA_X_B86_R",
         'x_qe_xc_name':       "b86r",
         'x_qe_xc_comment':    "revised Becke (b86b)",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      26,
     },
     {
+        'XC_functional_name': "GGA_X_LV_RPW86",
         'x_qe_xc_name':       "cx13",
         'x_qe_xc_comment':    "consistent exchange",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      27,
     },
     {
+        'XC_functional_name': ["GGA_X_B88", "GGA_X_PW91"],
+        'XC_functional_weight': [0.542, 0.167],
         'x_qe_xc_name':       "x3lp",
         'x_qe_xc_comment':    "X3LYP (Becke88*0.542 + Perdew-Wang91*0.167)",
         'x_qe_xc_index_name': "igcx",
@@ -350,60 +404,72 @@ EXCHANGE_GRADIENT_CORRECTION = [
 CORRELATION_GRADIENT_CORRECTION = [
     None,
     {
+        'XC_functional_name': "GGA_C_P86",
         'x_qe_xc_name':       "p86",
         'x_qe_xc_comment':    "Perdew86",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      1,
     },
     {
+        'XC_functional_name': "GGA_C_PW91",
         'x_qe_xc_name':       "ggc",
         'x_qe_xc_comment':    "Perdew-Wang 91 corr.",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      2,
     },
     {
+        'XC_functional_name': "GGA_C_LYP",
         'x_qe_xc_name':       "blyp",
         'x_qe_xc_comment':    "Lee-Yang-Parr",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      3,
     },
     {
+        'XC_functional_name': "GGA_C_PBE",
         'x_qe_xc_name':       "pbc",
         'x_qe_xc_comment':    "Perdew-Burke-Ernzenhof corr",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      4,
     },
     {
+        'XC_functional_name': "x_qe_GGA_C_HCTH_93",
         'x_qe_xc_name':       "hcth",
         'x_qe_xc_comment':    "Cambridge corr, Handy et al",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      5,
     },
     {
+        'XC_functional_name': "GGA_C_LYP",
+        'XC_functional_weight': 0.81,
         'x_qe_xc_name':       "b3lp",
         'x_qe_xc_comment':    "B3LYP (Lee-Yang-Parr*0.81)",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      7,
     },
     {
+        'XC_functional_name': "x_qe_GGA_C_PBESOL",
         'x_qe_xc_name':       "psc",
         'x_qe_xc_comment':    "PBEsol corr",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      8,
     },
     {
+        'XC_functional_name': "x_qe_GGA_C_PBE",
         'x_qe_xc_name':       "pbe",
         'x_qe_xc_comment':    "same as PBX, back-comp.",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      9,
     },
     {
+        'XC_functional_name': "GGA_C_Q2D",
         'x_qe_xc_name':       "q2dc",
         'x_qe_xc_comment':    "Q2D correlation grad corr",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      12,
     },
     {
+        'XC_functional_name': "GGA_C_LYP",
+        'XC_functional_weight': 0.871,
         'x_qe_xc_name':       "x3lp",
         'x_qe_xc_comment':    "X3LYP (Lee-Yang-Parr*0.871)",
         'x_qe_xc_index_name': "igcc",
@@ -415,19 +481,22 @@ CORRELATION_GRADIENT_CORRECTION = [
 META_GGA= [
     None,
     {
+        'XC_functional_name': "MGGA_X_TPSS",
         'x_qe_xc_name':       "tpss",
         'x_qe_xc_comment':    "TPSS Meta-GGA",
         'x_qe_xc_index_name': "imeta",
         'x_qe_xc_index':      1,
     },
     {
+        'XC_functional_name': "MGGA_X_M06",
         'x_qe_xc_name':       "m6lx",
         'x_qe_xc_comment':    "M06L Meta-GGA",
         'x_qe_xc_index_name': "imeta",
         'x_qe_xc_index':      2,
     },
     {
-        'x_qe_xc_name':       "tb09"
+        'XC_functional_name': "MGGA_X_TB09",
+        'x_qe_xc_name':       "tb09",
         'x_qe_xc_comment':    "TB09 Meta-GGA",
         'x_qe_xc_index_name': "imeta",
         'x_qe_xc_index':      3,
@@ -437,36 +506,42 @@ META_GGA= [
 VAN_DER_WAALS = [
     None,
     {
+        'XC_functional_name': "x_qe_VDW_DF1",
         'x_qe_xc_name':       "vdw1",
         'x_qe_xc_comment':    "vdW-DF1",
         'x_qe_xc_index_name': "inlc",
         'x_qe_xc_index':      1,
     },
     {
+        'XC_functional_name': "x_qe_VDW_DF2",
         'x_qe_xc_name':       "vdw2",
         'x_qe_xc_comment':    "vdW-DF2",
         'x_qe_xc_index_name': "inlc",
         'x_qe_xc_index':      2,
     },
     {
+        'XC_functional_name': "x_qe_VDW_RVV10",
         'x_qe_xc_name':       "vv10",
         'x_qe_xc_comment':    "rVV10",
         'x_qe_xc_index_name': "inlc",
         'x_qe_xc_index':      3,
     },
     {
+        'XC_functional_name': "x_qe_VDW_DFX",
         'x_qe_xc_name':       "vdwx",
         'x_qe_xc_comment':    "vdW-DF-x (reserved Thonhauser, not implemented)",
         'x_qe_xc_index_name': "inlc",
         'x_qe_xc_index':      4,
     },
     {
+        'XC_functional_name': "x_qe_VDW_DFY",
         'x_qe_xc_name':       "vdwy",
-        'x_qe_xc_comment':    "vdW-DF-y (reserved Thonhauser, not implemented)"
+        'x_qe_xc_comment':    "vdW-DF-y (reserved Thonhauser, not implemented)",
         'x_qe_xc_index_name': "inlc",
         'x_qe_xc_index':      5,
     },
     {
+        'XC_functional_name': "x_qe_VDW_DFZ",
         'x_qe_xc_name':       "vdwz",
         'x_qe_xc_comment':    "vdW-DF-z (reserved Thonhauser, not implemented)",
         'x_qe_xc_index_name': "inlc",
