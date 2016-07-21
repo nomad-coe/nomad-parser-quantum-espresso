@@ -64,12 +64,14 @@ EXCHANGE = [
         'x_qe_xc_index':      2,
     },
     {
+        'XC_functional_name': 'x_qe_LDA_X_RELATIVISTIC',
         'x_qe_xc_name':       'rxc',
         'x_qe_xc_comment':    'Relativistic Slater',
         'x_qe_xc_index_name': 'iexch',
         'x_qe_xc_index':      3,
     },
     {
+        'XC_functional_name': 'x_qe_LDA_X_OEP',
         'x_qe_xc_name':       'oep',
         'x_qe_xc_comment':    'Optimized Effective Potential',
         'x_qe_xc_index_name': 'iexch',
@@ -99,6 +101,7 @@ EXCHANGE = [
         'x_qe_xc_index':      7,
     },
     {
+        'XC_functional_name': "x_qe_LDA_X_KZK",
         'x_qe_xc_name':       "kzk",
         'x_qe_xc_comment':    "Finite-size corrections",
         'x_qe_xc_index_name': "iexch",
@@ -181,13 +184,14 @@ CORRELATION = [
         'x_qe_xc_index':      9,
     },
     {
+        'XC_functional_name': "x_qe_LDA_C_KZK",
         'x_qe_xc_name':       "kzk",
         'x_qe_xc_comment':    "Finite-size corrections",
         'x_qe_xc_index_name': "icorr",
         'x_qe_xc_index':      10,
     },
     {
-        'XC_functional_name': 'LDA_C_VWN_1',
+        'XC_functional_name': 'LDA_C_VWN_RPA',
         'x_qe_xc_name':       "vwn-rpa",
         'x_qe_xc_comment':    "Vosko-Wilk-Nusair, alt param",
         'x_qe_xc_index_name': "icorr",
@@ -250,9 +254,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_index':      4,
     },
     {
-        'XC_functional_name': "x_qe_GGA_X_HCTH_93",
+        'XC_functional_name': "GGA_XC_HCTH_120",
         'x_qe_xc_name':       "hcth",
-        'x_qe_xc_comment':    "Cambridge exch, Handy et al",
+        'x_qe_xc_comment':    "Cambridge exch, Handy et al, HCTH/120",
         'x_qe_xc_index_name': "igcx",
         'x_qe_xc_index':      5,
     },
@@ -280,7 +284,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_index':      9,
     },
     {
-        'XC_functional_name': "x_qe_GGA_X_PBESOL",
+        'XC_functional_name': "GGA_X_PBE_SOL",
         'x_qe_xc_name':       "psx",
         'x_qe_xc_comment':    "PBEsol exchange",
         'x_qe_xc_index_name': "igcx",
@@ -294,7 +298,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_index':      11,
     },
     {
-        'XC_functional_name': "x_qe_GGA_X_HSE06",
+        'XC_functional_name': "HYB_GGA_XC_HSE06",
         'x_qe_xc_name':       "hse",
         'x_qe_xc_comment':    "HSE screened exchange",
         'x_qe_xc_index_name': "igcx",
@@ -432,9 +436,9 @@ CORRELATION_GRADIENT_CORRECTION = [
         'x_qe_xc_index':      4,
     },
     {
-        'XC_functional_name': "x_qe_GGA_C_HCTH_93",
+        'XC_functional_name': "GGA_XC_HCTH_120",
         'x_qe_xc_name':       "hcth",
-        'x_qe_xc_comment':    "Cambridge corr, Handy et al",
+        'x_qe_xc_comment':    "Cambridge exch, Handy et al, HCTH/120",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      5,
     },
@@ -447,14 +451,14 @@ CORRELATION_GRADIENT_CORRECTION = [
         'x_qe_xc_index':      7,
     },
     {
-        'XC_functional_name': "x_qe_GGA_C_PBESOL",
+        'XC_functional_name': "GGA_C_PBE_SOL",
         'x_qe_xc_name':       "psc",
         'x_qe_xc_comment':    "PBEsol corr",
         'x_qe_xc_index_name': "igcc",
         'x_qe_xc_index':      8,
     },
     {
-        'XC_functional_name': "x_qe_GGA_C_PBE",
+        'XC_functional_name': "GGA_C_PBE",
         'x_qe_xc_name':       "pbe",
         'x_qe_xc_comment':    "same as PBX, back-comp.",
         'x_qe_xc_index_name': "igcc",
