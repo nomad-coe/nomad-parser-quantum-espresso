@@ -5,93 +5,476 @@ import re
 LOGGER = logging.getLogger(__name__)
 
 
+def parse_qe_xc_num(xc_functional_num):
+    """parse Quantum Espresso XC number/index notation
+    :returns: list with 6 integer elements (components of QE XC functionals)
+              [iexch, icorr, igcx, igcc, imeta, inlc]
+                iexch, icorr - density exchange/correlation
+                igcx, igcc   - gradient correction exchange/correlation
+                imeta        - meta-GGA
+                inlc         - non-local term of Van der Waals functionals
+    """
+    xf_num_split_i = []
+    xf_num_split = re.split(r'\s+',xc_functional_num.strip())
+    if len(xf_num_split) > 6:
+        # tested versions of espresso <=5.4.0 have 6 elements
+        raise RuntimeError("unsupported number of XC components: %d" % (len(xf_num_split)))
+    elif len(xf_num_split) == 6:
+        # trivial case: we got 6 components from simply splitting
+        xf_num_split_i = [ int(x) for x in xf_num_split ]
+    elif len(xf_num_split) == 1 and len(xc_functional_num)==4:
+        # old 4-component form without space separator
+        xf_num_split_i = [ int(x) for x in re.findall('(\d)', xc_functional_num) ]
+    elif len(xc_functional_num)==10:
+        # intermediate versions used 2-digit, 5 component form, occasionally missing spaces
+        # examples:
+        # ( 1 4 4 0 1)
+        # ( 0 413 0 2)  <- missing space
+        xf_num_split_i = [ int(x) for x in re.findall('([ \d]\d)',xc_functional_num) ]
+    else:
+        raise RuntimeError("unparsable input: '%s'", xc_functional_num)
+    if len(xf_num_split_i)<1:
+        raise RuntimeError("this should not happen")
+    # zero-pad up to 6 elements
+    xf_num_split_i += [ 0 ] * (6 - len(xf_num_split_i))
+    return xf_num_split_i
+
+
+def translate_qe_xc_num(xc_functional_num):
+    xf_num_split_i = parse_qe_xc_num(xc_functional_num)
+    LOGGER.debug('num <- input: %s <- %s',  str(xf_num_split_i), xc_functional_num)
+
+
 # origin: espresso-5.4.0/Modules/funct.f90
-# Any nonconflicting combination of the following keywords is acceptable:
-# 
-# Exchange:    "nox"    none                           iexch=0
-#              "sla"    Slater (alpha=2/3)             iexch=1 (default)
-#              "sl1"    Slater (alpha=1.0)             iexch=2
-#              "rxc"    Relativistic Slater            iexch=3
-#              "oep"    Optimized Effective Potential  iexch=4
-#              "hf"     Hartree-Fock                   iexch=5
-#              "pb0x"   PBE0 (Slater*0.75+HF*0.25)     iexch=6
-#              "b3lp"   B3LYP(Slater*0.80+HF*0.20)     iexch=7
-#              "kzk"    Finite-size corrections        iexch=8
-#              "x3lp"   X3LYP(Slater*0.782+HF*0.218)   iexch=9
-# 
-# Correlation: "noc"    none                           icorr=0
-#              "pz"     Perdew-Zunger                  icorr=1 (default)
-#              "vwn"    Vosko-Wilk-Nusair              icorr=2
-#              "lyp"    Lee-Yang-Parr                  icorr=3
-#              "pw"     Perdew-Wang                    icorr=4
-#              "wig"    Wigner                         icorr=5
-#              "hl"     Hedin-Lunqvist                 icorr=6
-#              "obz"    Ortiz-Ballone form for PZ      icorr=7
-#              "obw"    Ortiz-Ballone form for PW      icorr=8
-#              "gl"     Gunnarson-Lunqvist             icorr=9
-#              "kzk"    Finite-size corrections        icorr=10
-#              "vwn-rpa" Vosko-Wilk-Nusair, alt param  icorr=11
-#              "b3lp"   B3LYP (0.19*vwn+0.81*lyp)      icorr=12
-#              "b3lpv1r"  B3LYP-VWN-1-RPA 
-#                         (0.19*vwn_rpa+0.81*lyp)      icorr=13
-#              "x3lp"   X3LYP (0.129*vwn_rpa+0.871*lyp)icorr=14
-# 
-# Gradient Correction on Exchange:
-#              "nogx"   none                           igcx =0 (default)
-#              "b88"    Becke88 (beta=0.0042)          igcx =1
-#              "ggx"    Perdew-Wang 91                 igcx =2
-#              "pbx"    Perdew-Burke-Ernzenhof exch    igcx =3
-#              "rpb"    revised PBE by Zhang-Yang      igcx =4
-#              "hcth"   Cambridge exch, Handy et al    igcx =5
-#              "optx"   Handy's exchange functional    igcx =6
-#              "pb0x"   PBE0 (PBE exchange*0.75)       igcx =8
-#              "b3lp"   B3LYP (Becke88*0.72)           igcx =9
-#              "psx"    PBEsol exchange                igcx =10
-#              "wcx"    Wu-Cohen                       igcx =11
-#              "hse"    HSE screened exchange          igcx =12
-#              "rw86"   revised PW86                   igcx =13
-#              "pbe"    same as PBX, back-comp.        igcx =14
-#              "c09x"   Cooper 09                      igcx =16
-#              "sox"    sogga                          igcx =17
-#              "q2dx"   Q2D exchange grad corr         igcx =19
-#              "gaup"   Gau-PBE hybrid exchange        igcx =20
-#              "pw86"   Perdew-Wang (1986) exchange    igcx =21
-#              "b86b"   Becke (1986) exchange          igcx =22
-#              "obk8"   optB88  exchange               igcx =23
-#              "ob86"   optB86b exchange               igcx =24
-#              "evx"    Engel-Vosko exchange           igcx =25
-#              "b86r"   revised Becke (b86b)           igcx =26
-#              "cx13"   consistent exchange            igcx =27
-#              "x3lp"   X3LYP (Becke88*0.542 +
-#                              Perdew-Wang91*0.167)    igcx =28
-# 
-# Gradient Correction on Correlation:
-#              "nogc"   none                           igcc =0 (default)
-#              "p86"    Perdew86                       igcc =1
-#              "ggc"    Perdew-Wang 91 corr.           igcc =2
-#              "blyp"   Lee-Yang-Parr                  igcc =3
-#              "pbc"    Perdew-Burke-Ernzenhof corr    igcc =4
-#              "hcth"   Cambridge corr, Handy et al    igcc =5
-#              "b3lp"   B3LYP (Lee-Yang-Parr*0.81)     igcc =7
-#              "psc"    PBEsol corr                    igcc =8
-#              "pbe"    same as PBX, back-comp.        igcc =9
-#              "q2dc"   Q2D correlation grad corr      igcc =12
-#              "x3lp"   X3LYP (Lee-Yang-Parr*0.871)    igcc =13
-# 
-# Meta-GGA functionals
-#              "tpss"   TPSS Meta-GGA                  imeta=1
-#              "m6lx"   M06L Meta-GGA                  imeta=2
-#              "tb09"   TB09 Meta-GGA                  imeta=3
-# 
-# Van der Waals functionals (nonlocal term only)
-#              "nonlc"  none                           inlc =0 (default)
-#              "vdw1"   vdW-DF1                        inlc =1
-#              "vdw2"   vdW-DF2                        inlc =2
-#              "vv10"   rVV10                          inlc =3
-#              "vdwx"   vdW-DF-x                       inlc =4, reserved Thonhauser, not implemented
-#              "vdwy"   vdW-DF-y                       inlc =5, reserved Thonhauser, not implemented
-#              "vdwz"   vdW-DF-z                       inlc =6, reserved Thonhauser, not implemented
-# 
+EXCHANGE = [
+    None,
+    {
+        'x_qe_xc_name':       'sla',
+        'x_qe_xc_comment':    'Slater (alpha=2/3)',
+        'x_qe_xc_index_name': 'iexch',
+        'x_qe_xc_index':      1,
+    },
+    {
+        'x_qe_xc_name':       'sl1'
+        'x_qe_xc_comment':    'Slater (alpha=1.0)'
+        'x_qe_xc_index_name': 'iexch',
+        'x_qe_xc_index':      2,
+    },
+    {
+        'x_qe_xc_name':       'rxc',
+        'x_qe_xc_comment':    'Relativistic Slater',
+        'x_qe_xc_index_name': 'iexch',
+        'x_qe_xc_index':      3,
+    },
+    {
+        'x_qe_xc_name':       'oep',
+        'x_qe_xc_comment':    'Optimized Effective Potential',
+        'x_qe_xc_index_name': 'iexch',
+        'x_qe_xc_index':      4,
+    },
+    {
+        'x_qe_xc_name':       'hf',
+        'x_qe_xc_comment':    'Hartree-Fock',
+        'x_qe_xc_index_name': 'iexch',
+        'x_qe_xc_index':      5,
+    },
+    {
+        'x_qe_xc_name':       "pb0x",
+        'x_qe_xc_comment':    'PBE0 (Slater*0.75+HF*0.25)',
+        'x_qe_xc_index_name': 'iexch',
+        'x_qe_xc_index':      6,
+    },
+    {
+        'x_qe_xc_name':       "b3lp",
+        'x_qe_xc_comment':    "B3LYP(Slater*0.80+HF*0.20)",
+        'x_qe_xc_index_name': "iexch",
+        'x_qe_xc_index':      7,
+    },
+    {
+        'x_qe_xc_name':       "kzk",
+        'x_qe_xc_comment':    "Finite-size corrections",
+        'x_qe_xc_index_name': "iexch",
+        'x_qe_xc_index':      8,
+    },
+    {
+        'x_qe_xc_name':       "x3lp",
+        'x_qe_xc_comment':    "X3LYP(Slater*0.782+HF*0.218)",
+        'x_qe_xc_index_name': "iexch",
+        'x_qe_xc_index':      9,
+    },
+]
+
+
+CORRELATION = [
+    None,
+    {
+        'x_qe_xc_name':       "pz"
+        'x_qe_xc_comment':    "Perdew-Zunger"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      1
+    },
+    {
+        'x_qe_xc_name':       "vwn"
+        'x_qe_xc_comment':    "Vosko-Wilk-Nusair"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      2
+    },
+    {
+        'x_qe_xc_name':       "lyp"
+        'x_qe_xc_comment':    "Lee-Yang-Parr",
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      3
+    },
+    {
+        'x_qe_xc_name':       "pw"
+        'x_qe_xc_comment':    "Perdew-Wang"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      4
+    },
+    {
+        'x_qe_xc_name':       "wig"
+        'x_qe_xc_comment':    "Wigner"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      5
+    },
+    {
+        'x_qe_xc_name':       "hl"
+        'x_qe_xc_comment':    "Hedin-Lunqvist"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      6
+    },
+    {
+        'x_qe_xc_name':       "obz"
+        'x_qe_xc_comment':    "Ortiz-Ballone form for PZ"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      7
+    },
+    {
+        'x_qe_xc_name':       "obw"
+        'x_qe_xc_comment':    "Ortiz-Ballone form for PW"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      8
+    },
+    {
+        'x_qe_xc_name':       "gl"
+        'x_qe_xc_comment':    "Gunnarson-Lunqvist"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      9
+    },
+    {
+        'x_qe_xc_name':       "kzk"
+        'x_qe_xc_comment':    "Finite-size corrections"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      10
+    },
+    {
+        'x_qe_xc_name':       "vwn-rpa"
+        'x_qe_xc_comment':    "Vosko-Wilk-Nusair, alt param"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      11
+    },
+    {
+        'x_qe_xc_name':       "b3lp"
+        'x_qe_xc_comment':    "B3LYP (0.19*vwn+0.81*lyp)"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      12
+    },
+    {
+        'x_qe_xc_name':       "b3lpv1r"
+        'x_qe_xc_comment':    "B3LYP-VWN-1-RPA (0.19*vwn_rpa+0.81*lyp)"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      13
+    },
+    {
+        'x_qe_xc_name':       "x3lp"
+        'x_qe_xc_comment':    "X3LYP (0.129*vwn_rpa+0.871*lyp)"
+        'x_qe_xc_index_name': "icorr"
+        'x_qe_xc_index':      14
+    },
+]
+
+EXCHANGE_GRADIENT_CORRECTION = [
+    None,
+    {
+        'x_qe_xc_name':       "b88",
+        'x_qe_xc_comment':    "Becke88 (beta=0.0042)",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      1,
+    },
+    {
+        'x_qe_xc_name':       "ggx",
+        'x_qe_xc_comment':    "Perdew-Wang 91",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      2,
+    },
+    {
+        'x_qe_xc_name':       "pbx",
+        'x_qe_xc_comment':    "Perdew-Burke-Ernzenhof exch",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      3,
+    },
+    {
+        'x_qe_xc_name':       "rpb",
+        'x_qe_xc_comment':    "revised PBE by Zhang-Yang",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      4,
+    },
+    {
+        'x_qe_xc_name':       "hcth",
+        'x_qe_xc_comment':    "Cambridge exch, Handy et al",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      5,
+    },
+    {
+        'x_qe_xc_name':       "optx",
+        'x_qe_xc_comment':    "Handy's exchange functional",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      6,
+    },
+    {
+        'x_qe_xc_name':       "pb0x",
+        'x_qe_xc_comment':    "PBE0 (PBE exchange*0.75)",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      8,
+    },
+    {
+        'x_qe_xc_name':       "b3lp",
+        'x_qe_xc_comment':    "B3LYP (Becke88*0.72)",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      9,
+    },
+    {
+        'x_qe_xc_name':       "psx",
+        'x_qe_xc_comment':    "PBEsol exchange",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      10,
+    },
+    {
+        'x_qe_xc_name':       "wcx",
+        'x_qe_xc_comment':    "Wu-Cohen",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      11,
+    },
+    {
+        'x_qe_xc_name':       "hse",
+        'x_qe_xc_comment':    "HSE screened exchange",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      12,
+    },
+    {
+        'x_qe_xc_name':       "rw86",
+        'x_qe_xc_comment':    "revised PW86",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      13,
+    },
+    {
+        'x_qe_xc_name':       "pbe",
+        'x_qe_xc_comment':    "same as PBX, back-comp.",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      14,
+    },
+    {
+        'x_qe_xc_name':       "c09x",
+        'x_qe_xc_comment':    "Cooper 09",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      16,
+    },
+    {
+        'x_qe_xc_name':       "sox",
+        'x_qe_xc_comment':    "sogga",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      17,
+    },
+    {
+        'x_qe_xc_name':       "q2dx",
+        'x_qe_xc_comment':    "Q2D exchange grad corr",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      19,
+    },
+    {
+        'x_qe_xc_name':       "gaup",
+        'x_qe_xc_comment':    "Gau-PBE hybrid exchange",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      20,
+    },
+    {
+        'x_qe_xc_name':       "pw86",
+        'x_qe_xc_comment':    "Perdew-Wang (1986) exchange",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      "21",
+    },
+    {
+        'x_qe_xc_name':       "b86b",
+        'x_qe_xc_comment':    "Becke (1986) exchange",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      22,
+    },
+    {
+        'x_qe_xc_name':       "obk8",
+        'x_qe_xc_comment':    "optB88  exchange",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      23,
+    },
+    {
+        'x_qe_xc_name':       "ob86",
+        'x_qe_xc_comment':    "optB86b exchange",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      24,
+    },
+    {
+        'x_qe_xc_name':       "evx",
+        'x_qe_xc_comment':    "Engel-Vosko exchange",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      25,
+    },
+    {
+        'x_qe_xc_name':       "b86r",
+        'x_qe_xc_comment':    "revised Becke (b86b)",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      26,
+    },
+    {
+        'x_qe_xc_name':       "cx13",
+        'x_qe_xc_comment':    "consistent exchange",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      27,
+    },
+    {
+        'x_qe_xc_name':       "x3lp",
+        'x_qe_xc_comment':    "X3LYP (Becke88*0.542 + Perdew-Wang91*0.167)",
+        'x_qe_xc_index_name': "igcx",
+        'x_qe_xc_index':      28,
+    },
+]
+
+CORRELATION_GRADIENT_CORRECTION = [
+    None,
+    {
+        'x_qe_xc_name':       "p86",
+        'x_qe_xc_comment':    "Perdew86",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      1,
+    },
+    {
+        'x_qe_xc_name':       "ggc",
+        'x_qe_xc_comment':    "Perdew-Wang 91 corr.",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      2,
+    },
+    {
+        'x_qe_xc_name':       "blyp",
+        'x_qe_xc_comment':    "Lee-Yang-Parr",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      3,
+    },
+    {
+        'x_qe_xc_name':       "pbc",
+        'x_qe_xc_comment':    "Perdew-Burke-Ernzenhof corr",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      4,
+    },
+    {
+        'x_qe_xc_name':       "hcth",
+        'x_qe_xc_comment':    "Cambridge corr, Handy et al",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      5,
+    },
+    {
+        'x_qe_xc_name':       "b3lp",
+        'x_qe_xc_comment':    "B3LYP (Lee-Yang-Parr*0.81)",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      7,
+    },
+    {
+        'x_qe_xc_name':       "psc",
+        'x_qe_xc_comment':    "PBEsol corr",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      8,
+    },
+    {
+        'x_qe_xc_name':       "pbe",
+        'x_qe_xc_comment':    "same as PBX, back-comp.",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      9,
+    },
+    {
+        'x_qe_xc_name':       "q2dc",
+        'x_qe_xc_comment':    "Q2D correlation grad corr",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      12,
+    },
+    {
+        'x_qe_xc_name':       "x3lp",
+        'x_qe_xc_comment':    "X3LYP (Lee-Yang-Parr*0.871)",
+        'x_qe_xc_index_name': "igcc",
+        'x_qe_xc_index':      13,
+    },
+]
+
+
+META_GGA= [
+    None,
+    {
+        'x_qe_xc_name':       "tpss",
+        'x_qe_xc_comment':    "TPSS Meta-GGA",
+        'x_qe_xc_index_name': "imeta",
+        'x_qe_xc_index':      1,
+    },
+    {
+        'x_qe_xc_name':       "m6lx",
+        'x_qe_xc_comment':    "M06L Meta-GGA",
+        'x_qe_xc_index_name': "imeta",
+        'x_qe_xc_index':      2,
+    },
+    {
+        'x_qe_xc_name':       "tb09"
+        'x_qe_xc_comment':    "TB09 Meta-GGA",
+        'x_qe_xc_index_name': "imeta",
+        'x_qe_xc_index':      3,
+    },
+]
+
+VAN_DER_WAALS = [
+    None,
+    {
+        'x_qe_xc_name':       "vdw1",
+        'x_qe_xc_comment':    "vdW-DF1",
+        'x_qe_xc_index_name': "inlc",
+        'x_qe_xc_index':      1,
+    },
+    {
+        'x_qe_xc_name':       "vdw2",
+        'x_qe_xc_comment':    "vdW-DF2",
+        'x_qe_xc_index_name': "inlc",
+        'x_qe_xc_index':      2,
+    },
+    {
+        'x_qe_xc_name':       "vv10",
+        'x_qe_xc_comment':    "rVV10",
+        'x_qe_xc_index_name': "inlc",
+        'x_qe_xc_index':      3,
+    },
+    {
+        'x_qe_xc_name':       "vdwx",
+        'x_qe_xc_comment':    "vdW-DF-x (reserved Thonhauser, not implemented)",
+        'x_qe_xc_index_name': "inlc",
+        'x_qe_xc_index':      4,
+    },
+    {
+        'x_qe_xc_name':       "vdwy",
+        'x_qe_xc_comment':    "vdW-DF-y (reserved Thonhauser, not implemented)"
+        'x_qe_xc_index_name': "inlc",
+        'x_qe_xc_index':      5,
+    },
+    {
+        'x_qe_xc_name':       "vdwz",
+        'x_qe_xc_comment':    "vdW-DF-z (reserved Thonhauser, not implemented)",
+        'x_qe_xc_index_name': "inlc",
+        'x_qe_xc_index':      6,
+    },
+]
+
+# origin: espresso-5.4.0/Modules/funct.f90
 # Note: as a rule, all keywords should be unique, and should be different
 # from the short name, but there are a few exceptions.
 # 
@@ -155,39 +538,3 @@ LOGGER = logging.getLogger(__name__)
 #          J. Chem. Phys. 131, 044108 (2009) ]
 # These two modifications accounts only for a 1e-5 Ha difference for a 
 # single He atom. Info by Fabien Bruneval
-
-def parse_qe_xc_num(xc_functional_num):
-    """parse Quantum Espresso XC number/index notation
-    :returns: list with 6 integer elements (components of QE XC functionals)
-              [iexch, icorr, igcx, igcc, imeta, inlc]
-                iexch, icorr - density exchange/correlation
-                igcx, igcc   - gradient correction exchange/correlation
-                imeta        - meta-GGA
-                inlc         - non-local term of Van der Waals functionals
-    """
-    xf_num_split_i = []
-    xf_num_split = re.split(r'\s+',xc_functional_num.strip())
-    if len(xf_num_split) > 6:
-        raise RuntimeError("unsupported number of XC components: %d" % (len(xf_num_split)))
-    elif len(xf_num_split) == 6:
-        # trivial case: we got 6 components from simply splitting
-        xf_num_split_i = [ int(x) for x in xf_num_split ]
-    elif len(xf_num_split) == 1 and len(xc_functional_num)==4:
-        # old 4-component form without space separator
-        xf_num_split_i = [ int(x) for x in re.findall('(\d)', xc_functional_num) ]
-    elif len(xc_functional_num)==10:
-        # intermediate versions used 2-digit, 5 component form, occasionally missing spaces
-        xf_num_split_i = [ int(x) for x in re.findall('([ \d]\d)',xc_functional_num) ]
-    else:
-        raise RuntimeError("unparsable input: '%s'", xc_functional_num)
-    if len(xf_num_split_i)<1:
-        raise RuntimeError("this should not happen")
-    # zero-pad up to 6 elements
-    xf_num_split_i += [ 0 ] * (6 - len(xf_num_split_i))
-    return xf_num_split_i
-
-
-def translate_qe_xc_num(xc_functional_num):
-    xf_num_split_i = parse_qe_xc_num(xc_functional_num)
-    LOGGER.info('num <- input: %s <- %s',  str(xf_num_split_i), xc_functional_num)
-
