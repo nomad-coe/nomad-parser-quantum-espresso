@@ -509,21 +509,21 @@ CORRELATION_GRADIENT_CORRECTION = [
 META_GGA= [
     None,
     {
-        'XC_functional_name': "MGGA_X_TPSS",
+        'XC_functional_name': ["MGGA_X_TPSS", "MGGA_C_TPSS"],
         'x_qe_xc_name':       "tpss",
         'x_qe_xc_comment':    "TPSS Meta-GGA",
         'x_qe_xc_index_name': "imeta",
         'x_qe_xc_index':      1,
     },
     {
-        'XC_functional_name': "MGGA_X_M06",
+        'XC_functional_name': ["MGGA_X_M06_L", "MGGA_C_M06_L"],
         'x_qe_xc_name':       "m6lx",
         'x_qe_xc_comment':    "M06L Meta-GGA",
         'x_qe_xc_index_name': "imeta",
         'x_qe_xc_index':      2,
     },
     {
-        'XC_functional_name': "MGGA_X_TB09",
+        'XC_functional_name': ["MGGA_X_TB09", "x_qe_MGGA_C_TB09"],
         'x_qe_xc_name':       "tb09",
         'x_qe_xc_comment':    "TB09 Meta-GGA",
         'x_qe_xc_index_name': "imeta",
