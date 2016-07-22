@@ -74,6 +74,9 @@ class ParserQuantumEspresso(object):
             r"\s*URL http://www.quantum-espresso.org\",\s*",
             r"\s*in publications or presentations arising from this work. More details at",
             r"\s*http://www.quantum-espresso.org/quote",
+            # warning msg is parsed before hints
+            r"\s*Any further DFT definition will be discarded",
+            r"\s*Please, verify this is what you really want",
         ]
         self.coverageIgnore = None
 
