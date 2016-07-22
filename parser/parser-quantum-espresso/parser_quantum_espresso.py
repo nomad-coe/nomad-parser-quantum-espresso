@@ -155,6 +155,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                startReStr=r"",
                sections = ['section_basis_set_cell_dependent', 'section_method', 'section_system'],
                subMatchers=[
+                   SM(name='qe_input_filename',
+                      startReStr=r"\s*Reading input from\s*(?P<x_qe_input_filename>.*?)\s*$",
+                   ),
                    SM(name='qe_dimensions',
                       startReStr=r"\s*Current dimensions of program\s*\S+\s*are:",
                       sections=['x_qe_section_compile_options'],
