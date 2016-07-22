@@ -77,6 +77,8 @@ class ParserQuantumEspresso(object):
             # warning msg is parsed before hints
             r"\s*Any further DFT definition will be discarded",
             r"\s*Please, verify this is what you really want",
+            # table separators
+            r"^\s*[=%-]+\s*$",
         ]
         self.coverageIgnore = None
 
