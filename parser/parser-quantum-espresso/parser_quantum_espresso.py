@@ -74,7 +74,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         if section['x_qe_t_xc_functional_shortname_enforced'] is not None:
             backend.addValue('x_qe_xc_functional_user_enforced', True)
         # translate XC functional to section_xc_functionals
-        xc_functional_num = section['x_qe_t_xc_functional_num'][-1]
+        xc_functional_num = section['x_qe_xc_functional_num'][-1]
 
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
@@ -179,7 +179,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*charge density cutoff\s*=\s*(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry"
                    ),
                    SM(name='xc_functional', required=True,
-                      startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>\S+)\s*\((?P<x_qe_t_xc_functional_num>[^\)]*)"
+                      startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>\S+)\s*\((?P<x_qe_xc_functional_num>[^\)]*)"
                    ),
                    SM(name='simulation_cell',
                       startReStr=r"\s*crystal axes: \(cart. coord.",
