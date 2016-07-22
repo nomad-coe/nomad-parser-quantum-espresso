@@ -12,6 +12,7 @@ import numpy as np
 import QuantumEspressoCommon as QeC
 from nomadcore.parser_backend import valueForStrValue
 from QuantumEspressoCommon import RE_f, RE_i
+from QuantumEspressoXC import translate_qe_xc_num
 
 
 LOGGER = logging.getLogger(__name__)
@@ -75,6 +76,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addValue('x_qe_xc_functional_user_enforced', True)
         # translate XC functional to section_xc_functionals
         xc_functional_num = section['x_qe_xc_functional_num'][-1]
+        xc_functionals = translate_qe_xc_num(xc_functional_num)
+        for xc_functional in xc_functionals:
+            self.addSectionDict(backend, 'section_XC_functionals', xc_functional)
 
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
