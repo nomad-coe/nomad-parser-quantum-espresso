@@ -152,9 +152,27 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         """submatchers of section_run"""
         return [
             SM(name='header',
-               startReStr=r".*(?:\s|\()lmax(?:x\))?\s*=",
+               startReStr=r"",
                sections = ['section_basis_set_cell_dependent', 'section_method', 'section_system'],
                subMatchers=[
+                   SM(name='qe_dimensions',
+                      startReStr=r"\s*Current dimensions of program\s*\S+\s*are:",
+                      sections=['x_qe_section_compile_options'],
+                      subMatchers=[
+                          SM(name="qe_dim_old",
+                             startReStr=r"\s*ntypx\s*=\s*(?P<x_qe_ntypx>\d+)\s*npk\s*=\s*(?P<x_qe_npk>\d+)\s*lmax\s*=\s*(?P<x_qe_lmaxx>\d+)\s*\s*ndmx\s*=\s*(?P<x_qe_ndmx>\d+)",
+                          ),
+                          SM(name="qe_dim_ntypx",
+                             startReStr=r"\s*Max number of different atomic species \(ntypx\)\s*=\s*(?P<x_qe_ntypx>\d+)",
+                          ),
+                          SM(name="qe_dim_npk",
+                             startReStr=r"\s*Max number of k-points \(npk\)\s*=\s*(?P<x_qe_npk>\d+)",
+                          ),
+                          SM(name="qe_dim_lmaxx",
+                             startReStr=r"\s*Max angular momentum in pseudopotentials \(lmaxx?\)\s*=\s*(?P<x_qe_lmaxx>\d+)",
+                          ),
+                      ],
+                   ),
                    SM(name='enforced_XC',
                       startReStr=r"\s*IMPORTANT: XC functional enforced from input",
                       subMatchers=[
