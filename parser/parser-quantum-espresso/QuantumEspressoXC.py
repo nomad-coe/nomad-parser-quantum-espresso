@@ -43,7 +43,10 @@ def parse_qe_xc_num(xc_functional_num):
 def translate_qe_xc_num(xc_functional_num):
     xf_num = parse_qe_xc_num(xc_functional_num)
     LOGGER.debug('num <- input: %s <- %s',  str(xf_num), xc_functional_num)
-    xc_data = []
+    # use dictionary to ensure uniqueness:
+    #   exchange/correlation functionals may be combined into _XC_, and we
+    #   only want to emit such combinations once
+    xc_data = {}
     for component_i in range(6):
         this_xf_num = xf_num[component_i]
         if this_xf_num == 0:
@@ -60,7 +63,18 @@ def translate_qe_xc_num(xc_functional_num):
         if this_component is None:
             raise RuntimeError("Undefined XC component %s[%d]" % (
                 XC_COMPONENT_NAME[component_i], this_xf_num))
-    return xc_data
+        if 'x_qe_t_xc_terms' in this_component:
+            for term in this_component['x_qe_t_xc_terms']:
+                sub_component = this_component.copy()
+                sub_component.pop('x_qe_t_xc_terms')
+                for k,v in term.items():
+                    sub_component[k]=v
+                if sub_component['XC_functional_name'] not in xc_data:
+                    xc_data[sub_component['XC_functional_name']] = sub_component
+        elif this_component['XC_functional_name'] not in xc_data:
+            xc_data[this_component['XC_functional_name']] = this_component
+    result = list(xc_data.values())
+    return result
 
 
 # origin: espresso-5.4.0/Modules/funct.f90
