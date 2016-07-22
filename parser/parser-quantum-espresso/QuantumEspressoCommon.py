@@ -74,7 +74,6 @@ class ParserQuantumEspresso(object):
             r"\s*URL http://www.quantum-espresso.org\",\s*",
             r"\s*in publications or presentations arising from this work. More details at",
             r"\s*http://www.quantum-espresso.org/quote",
-            r"\s*Current dimensions of program \S+ are:",
         ]
         self.coverageIgnore = None
 
