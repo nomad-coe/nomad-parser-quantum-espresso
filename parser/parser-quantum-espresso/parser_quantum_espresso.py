@@ -153,7 +153,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         return [
             SM(name='header',
                startReStr=r"",
-               sections = ['section_basis_set_cell_dependent', 'section_method', 'section_system'],
+               sections = ['section_basis_set_cell_dependent', 'section_method', 'section_system',
+                           'x_qe_section_parallelization_options', 'x_qe_section_compile_options'],
                subMatchers=[
                    SM(name='qe_input_filename',
                       startReStr=r"\s*Reading input from\s*(?P<x_qe_input_filename>.*?)\s*$",
