@@ -156,6 +156,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                sections = ['section_basis_set_cell_dependent', 'section_method', 'section_system',
                            'x_qe_section_parallelization_options', 'x_qe_section_compile_options'],
                subMatchers=[
+                   SM(name='serial_multithread',
+                      startReStr=r"\s*(?P<x_qe_compile_parallel_version>Serial multi-threaded) version, running on\s*(?P<x_qe_nthreads>\d+)\s*processor cores",
+                   ),
                    SM(name='qe_input_filename',
                       startReStr=r"\s*Reading input from\s*(?P<x_qe_input_filename>.*?)\s*$",
                    ),
