@@ -13,6 +13,7 @@ import QuantumEspressoCommon as QeC
 from nomadcore.parser_backend import valueForStrValue
 from QuantumEspressoCommon import RE_f, RE_i
 from QuantumEspressoXC import translate_qe_xc_num
+from nomadcore.parser_backend import valueForStrValue
 
 
 LOGGER = logging.getLogger(__name__)
@@ -129,6 +130,12 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addArrayValues('atom_positions',atpos_cart)
         backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
         backend.addArrayValues('x_qe_atom_idx',np.array(section['x_qe_t_atom_idx']))
+        celldm_joint = " ".join(section['x_qe_t_celldm'])
+        celldm = [None, None, None, None, None, None]
+        for match in re.findall(r"celldm\(\s*(\d+)\s*\)\s*=\s*(" + RE_f + r")", celldm_joint):
+            celldm[int(match[0])-1] = valueForStrValue(match[1], 'f')
+        celldm[0] = section['alat']
+        backend.addArrayValues('x_qe_celldm', np.array(celldm))
 
     def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
         self.tmp['this_k_energies'] = ''
@@ -247,6 +254,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                    SM(name='xc_functional', required=True,
                       startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>\S+)\s*\((?P<x_qe_xc_functional_num>[^\)]*)"
+                   ),
+                   SM(name='celldm', repeats = True,
+                      startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + ")+)",
                    ),
                    SM(name='simulation_cell',
                       startReStr=r"\s*crystal axes: \(cart. coord.",
