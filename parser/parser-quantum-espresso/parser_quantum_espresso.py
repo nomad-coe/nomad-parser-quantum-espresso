@@ -183,7 +183,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='enforced_XC',
                       startReStr=r"\s*IMPORTANT: XC functional enforced from input",
                       subMatchers=[
-                          SM(name='xc_functional_enforced', required=True,
+                          SM(name='xc_functional_enforced', required=True, # details are parsed in xc_functional
                              startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_t_xc_functional_shortname_enforced>\S+)"
                           ),
                       ],
