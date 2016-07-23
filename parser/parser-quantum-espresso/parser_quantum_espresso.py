@@ -188,6 +188,26 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
+                   SM(name='mesh_sticks',
+                      startReStr=r"\s*G-vector sticks info",
+                      subMatchers=[
+                          SM(name="sticks_separator",
+                             startReStr=r"\s*-+\s*$",
+                          ),
+                          SM(name="sticks_heading", required=True,
+                             startReStr=r"\s*sticks:\s*dense\s+smooth\s+PW\s+G-vecs:\s+dense\s+smooth\s+PW\s*$"
+                          ),
+                          SM(name='sticks_sum', required=True,
+                             startReStr=(
+                                 r"\s*Sum\s+(?P<x_qe_sticks_sum_dense>\d+)\s+(?P<x_qe_sticks_sum_smooth>\d+)\s+(?P<x_qe_sticks_sum_PW>\d+)" +
+                                 r"\s+(?P<x_qe_sticks_sum_G_dense>\d+)\s+(?P<x_qe_sticks_sum_G_smooth>\d+)\s+(?P<x_qe_sticks_sum_G_PW>\d+)"
+                             ),
+                          ),
+                          SM(name='sticks_tot',
+                             startReStr=r"\s*Tot\s+(?P<x_qe_sticks_tot_dense>\d+)\s+(?P<x_qe_sticks_tot_smooth>\d+)\s+(?P<x_qe_sticks_tot_PW>\d+)",
+                          ),
+                      ],
+                   ),
                    SM(name='alat', required=True,
                       startReStr=r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*(?P<x_qe_alat__bohr>" + RE_f + r")\s*a\.u\.",
                       adHoc=self.adHoc_alat,
