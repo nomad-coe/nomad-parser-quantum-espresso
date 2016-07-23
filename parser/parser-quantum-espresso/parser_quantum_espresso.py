@@ -302,7 +302,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='nsymm',
-                      startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.",
+                      startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.\s*\((?P<x_qe_symm_inversion>\S+) inversion\)\s*(?:found)?\s*$",
                    ),
                    SM(name='atom_pos_cart_list',
                       startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)",
