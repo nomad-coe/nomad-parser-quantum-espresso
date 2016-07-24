@@ -291,6 +291,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name='pp_comment',
                              startReStr=r"\s*(?P<x_qe_t_pp_comment>.*?)\s*$",
                           ),
+                          SM(name='pp_dimensions',
+                              startReStr=r"\s*Using radial grid of\s*(?P<x_qe_t_pp_ndmx>\d+) points,\s*(?P<x_qe_t_pp_nbeta>\d+) beta functions with\s*:\s*$",
+                          ),
                       ],
                    ),
                    SM(name='pp_atom_kind_map',
@@ -325,7 +328,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                sections = ['section_single_configuration_calculation'],
                subMatchers=[
                    SM(name='iteration', repeats=True,
-                      startReStr=r'\s*iteration\s*#',
+                      startReStr=(r"\s*iteration\s*#\s*(?P<x_qe_iteration_number>\d+)\s*" +
+                                  r"\s*ecut\s*=\s*(?P<x_qe_iteration_ecutwfc>" + RE_f +r")\s*Ry" +
+                                  r"\s*beta\s*=\s*(?P<x_qe_iteration_beta>" + RE_f + r")\s*$"),
                       sections=['section_scf_iteration'],
                       subMatchers=[
                           SM(name='e_total',
