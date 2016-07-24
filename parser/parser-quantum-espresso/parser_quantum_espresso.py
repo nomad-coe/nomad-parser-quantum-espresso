@@ -353,8 +353,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='atom_pos_cart_list',
-                      startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)\s*$",
+                      startReStr=r"\s*Cartesian axes\s*$",
                       subMatchers=[
+                          SM(name='cart_heading',
+                             startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)\s*$",
+                          ),
                           SM(name='atom_pos_cart', repeats=True,
                              startReStr=(
                                  r"\s*(?P<x_qe_t_atom_idx>" + RE_i + r")" +
