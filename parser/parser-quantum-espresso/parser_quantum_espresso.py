@@ -90,6 +90,12 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         xc_functionals = translate_qe_xc_num(xc_functional_num)
         for xc_functional in xc_functionals:
             self.addSectionDict(backend, 'section_XC_functionals', xc_functional)
+        backend.addArrayValues('x_qe_allocated_array_name', np.asarray(section['x_qe_t_allocated_array_name']))
+        backend.addArrayValues('x_qe_allocated_array_size', np.asarray(section['x_qe_t_allocated_array_size']))
+        backend.addArrayValues('x_qe_allocated_array_dimensions', np.asarray(section['x_qe_t_allocated_array_dimensions']))
+        backend.addArrayValues('x_qe_temporary_array_name', np.asarray(section['x_qe_t_temporary_array_name']))
+        backend.addArrayValues('x_qe_temporary_array_size', np.asarray(section['x_qe_t_temporary_array_size']))
+        backend.addArrayValues('x_qe_temporary_array_dimensions', np.asarray(section['x_qe_t_temporary_array_dimensions']))
 
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
@@ -398,6 +404,28 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   r"\(\s*(?P<x_qe_dense_g_vectors>\d+)\s*G-vectors\s*\)\s*FFT\s+grid:\s*\(\s*" +
                                   QeC.re_vec("x_qe_t_dense_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$"
                       ),
+                   ),
+                   SM(name='allocated_arrays',
+                      startReStr=r"\s*Largest allocated arrays\s*est. size \(Mb\)\s*dimensions",
+                      subMatchers=[
+                          SM(name='allocated_array', repeats=True,
+                             startReStr=(
+                                 r"\s*(?P<x_qe_t_allocated_array_name>.*?)\s*(?P<x_qe_t_allocated_array_size__mebibyte>" +
+                                 RE_f + r")\s*Mb\s*\(\s*(?P<x_qe_t_allocated_array_dimensions>(?:\s*\d+\s*,?)+)\s*\)\s*$"
+                             ),
+                          ),
+                      ],
+                   ),
+                   SM(name='temporary_arrays',
+                      startReStr=r"\s*Largest temporary arrays\s*est. size \(Mb\)\s*dimensions",
+                      subMatchers=[
+                          SM(name='temporary_array', repeats=True,
+                             startReStr=(
+                                 r"\s*(?P<x_qe_t_temporary_array_name>.*?)\s*(?P<x_qe_t_temporary_array_size__mebibyte>" +
+                                 RE_f + r")\s*Mb\s*\(\s*(?P<x_qe_t_temporary_array_dimensions>(?:\s*\d+\s*,?)+)\s*\)\s*$"
+                             ),
+                          ),
+                      ],
                    ),
                ],
             ), # header
