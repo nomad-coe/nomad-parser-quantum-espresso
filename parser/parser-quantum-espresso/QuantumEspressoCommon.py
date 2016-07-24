@@ -77,6 +77,7 @@ class ParserQuantumEspresso(object):
             # warning msg is parsed before hints
             r"\s*Any further DFT definition will be discarded",
             r"\s*Please, verify this is what you really want",
+            r"\s*their fractional translations are incommensurate with FFT grid\)\s*$",
             # table separators
             r"^\s*[=%-]+\s*$",
         ]
