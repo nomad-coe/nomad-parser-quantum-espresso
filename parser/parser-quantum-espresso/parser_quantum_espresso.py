@@ -427,6 +427,25 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
+                   SM(name='initial_potential',
+                      startReStr=r"\s*Initial potential from\s*(?P<x_qe_starting_potential>.*?)\s*$",
+                   ),
+                   SM(name='starting_charge_negative',
+                      startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_starting_charge_negative>" + RE_f +
+                                  r")\s*$"),
+                   ),
+                   SM(name='initial_charge',
+                      startReStr=(r"\s*starting charge\s*(?P<x_qe_starting_charge>" + RE_f +
+                                  r")\s*,\s*renormalised to\s*(?P<x_qe_starting_charge_renormalized>" + RE_f +
+                                  r")\s*$"),
+                   ),
+                   SM(name='starting_rho',
+                      startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_starting_charge_negative_up>" + RE_f +
+                                  r")\s*(?P<x_qe_starting_charge_negative_down>" + RE_f + r")\s*$"),
+                   ),
+                   SM(name='starting_wfc',
+                      startReStr=r"\s*Starting wfc are\s*(?P<x_qe_starting_wfc>.*?)\s*$",
+                   ),
                ],
             ), # header
             SM(name='self_consistent_calculation',
