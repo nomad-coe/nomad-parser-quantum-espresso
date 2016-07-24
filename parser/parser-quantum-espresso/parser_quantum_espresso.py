@@ -151,6 +151,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addArrayValues('x_qe_k_info_vec', np.array([
             section['x_qe_t_k_info_vec_x'], section['x_qe_t_k_info_vec_y'], section['x_qe_t_k_info_vec_z']
         ]).T)
+        backend.addArrayValues('x_qe_dense_FFT_grid', np.array([
+            section['x_qe_t_dense_FFT_grid_x'], section['x_qe_t_dense_FFT_grid_y'], section['x_qe_t_dense_FFT_grid_z']
+        ]).T)
 
     def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
         self.tmp['this_k_energies'] = ''
@@ -385,6 +388,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              ],
                          ),
                       ],
+                   ),
+                   SM(name='dense_grid',
+                      startReStr=(r"\s*Dense\s+grid:\s*(?P<x_qe_dense_g_vectors>\d+)\s*G-vectors\s*FFT\s+dimensions:\s*\(\s*" +
+                                  QeC.re_vec("x_qe_t_dense_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$")
+                   ),
+                   SM(name='dense_grid_old',
+                      startReStr=(r"\s*G\s+cutoff\s*=\s*(?P<x_qe_dense_g_cutoff>" + RE_f + r")\s*" +
+                                  r"\(\s*(?P<x_qe_dense_g_vectors>\d+)\s*G-vectors\s*\)\s*FFT\s+grid:\s*\(\s*" +
+                                  QeC.re_vec("x_qe_t_dense_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$"
+                      ),
                    ),
                ],
             ), # header
