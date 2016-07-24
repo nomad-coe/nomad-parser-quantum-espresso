@@ -221,6 +221,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
+                   SM(name='gamma_algorithms',
+                      startReStr=r"\s*gamma-point specific algorithms are used\s*$",
+                      adHoc=lambda p: p.backend.addValue('x_qe_gamma_algorithms', True)
+                   ),
                    SM(name='mesh_sticks',
                       startReStr=r"\s*G-vector sticks info\s*$",
                       subMatchers=[
