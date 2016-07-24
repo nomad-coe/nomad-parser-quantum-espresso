@@ -406,7 +406,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ),
                    ),
                    SM(name='allocated_arrays',
-                      startReStr=r"\s*Largest allocated arrays\s*est. size \(Mb\)\s*dimensions",
+                      startReStr=r"\s*Largest allocated arrays\s*est. size \(Mb\)\s*dimensions\s*$",
                       subMatchers=[
                           SM(name='allocated_array', repeats=True,
                              startReStr=(
@@ -417,7 +417,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='temporary_arrays',
-                      startReStr=r"\s*Largest temporary arrays\s*est. size \(Mb\)\s*dimensions",
+                      startReStr=r"\s*Largest temporary arrays\s*est. size \(Mb\)\s*dimensions\s*$",
                       subMatchers=[
                           SM(name='temporary_array', repeats=True,
                              startReStr=(
