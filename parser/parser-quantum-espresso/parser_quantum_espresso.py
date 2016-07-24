@@ -311,20 +311,21 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.\s*\((?P<x_qe_symm_inversion>\S+) inversion\)\s*(?:found)?\s*$",
                    ),
                    SM(name='atom_pos_cart_list',
-                      startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)",
+                      startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)\s*$",
                       subMatchers=[
                           SM(name='atom_pos_cart', repeats=True,
                              startReStr=(
                                  r"\s*(?P<x_qe_t_atom_idx>" + RE_i + r")" +
                                  r"\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*" + RE_i + "\)\s*"
-                                 r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat')),
+                                 r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat') +
+                                 r"\s*\)\s*$"),
                           ),
                       ],
                    ),
                ],
             ), # header
             SM(name='self_consistent_calculation',
-               startReStr=r"\s*Self-consistent Calculation",
+               startReStr=r"\s*Self-consistent Calculation\s*$",
                sections = ['section_single_configuration_calculation'],
                subMatchers=[
                    SM(name='iteration', repeats=True,
@@ -334,7 +335,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       sections=['section_scf_iteration'],
                       subMatchers=[
                           SM(name='e_total',
-                             startReStr=r"\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>" + RE_f + r")",
+                             startReStr=(r"\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>" + RE_f + r")" +
+                                         r"\s*Ry\s*$")
                           ),
                       ],
                    ),
