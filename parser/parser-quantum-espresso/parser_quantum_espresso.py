@@ -146,6 +146,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             celldm[int(match[0])-1] = valueForStrValue(match[1], 'f')
         celldm[0] = section['alat']
         backend.addArrayValues('x_qe_celldm', np.array(celldm))
+        backend.addArrayValues('x_qe_k_info_ik', np.array(section['x_qe_t_k_info_ik']))
+        backend.addArrayValues('x_qe_k_info_wk', np.array(section['x_qe_t_k_info_wk']))
+        backend.addArrayValues('x_qe_k_info_vec', np.array([
+            section['x_qe_t_k_info_vec_x'], section['x_qe_t_k_info_vec_y'], section['x_qe_t_k_info_vec_z']
+        ]).T)
 
     def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
         self.tmp['this_k_energies'] = ''
@@ -365,6 +370,20 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat') +
                                  r"\s*\)\s*$"),
                           ),
+                          SM(name='kpoint_info',
+                             startReStr=r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*$",
+                             subMatchers=[
+                                 SM(name="kpoint_heading",
+                                    startReStr=r"\s*cart. coord. in units 2pi/(?:alat|a_0)\s*$",
+                                 ),
+                                 SM(name="kpoint_kpoints", repeats=True,
+                                    startReStr=(r"\s*k\(\s*(?P<x_qe_t_k_info_ik>\d+)\s*\)\s*=\s*\(\s*" +
+                                                QeC.re_vec('x_qe_t_k_info_vec', 'usrAlat') +
+                                                r"\s*\),\s*wk\s*=\s*(?P<x_qe_t_k_info_wk>" + RE_f + r")\s*$"),
+
+                                 ),
+                             ],
+                         ),
                       ],
                    ),
                ],
