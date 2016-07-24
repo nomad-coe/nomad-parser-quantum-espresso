@@ -49,6 +49,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             self, backend, gIndex, section):
         self.secMethodIndex = gIndex
         self.cache_t_pseudopotential = {}
+        self.cache_t_pp_report = {}
 
     def onOpen_section_system(
             self, backend, gIndex, section):
@@ -69,6 +70,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             if target == key:
                 raise RuntimeError('found non-temporary key in pseudopotential cache: "%s"' % (key))
             backend.addValue(target, value[-1])
+        pp_num = pp['x_qe_t_pp_idx'][-1]
+        pp_report = self.cache_t_pp_report.get(pp_num, None)
+        if pp_report is not None:
+            backend.addValue('x_qe_pp_report_version', pp_report['x_qe_t_pp_report_version'][-1])
+            backend.addValue('x_qe_pp_report_contents', "\n".join(pp_report['x_qe_t_pp_report_line']))
+
+    def onClose_x_qe_t_section_pp_report(
+            self, backend, gIndex, section):
+        self.cache_t_pp_report[section['x_qe_t_pp_report_species'][0]] = section
 
     def onClose_section_method(
             self, backend, gIndex, section):
@@ -184,6 +194,22 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name="qe_dim_lmaxx",
                              startReStr=r"\s*Max angular momentum in pseudopotentials \(lmaxx?\)\s*=\s*(?P<x_qe_lmaxx>\d+)\s*$",
+                          ),
+                      ],
+                   ),
+                   SM(name='pseudopotential_report', repeats=True,
+                      startReStr=r"\s*\|\s*pseudopotential report for atomic species\s*:\s*(?P<x_qe_t_pp_report_species>\d+)\s*\|\s*$",
+                      endReStr=r"\s*={4,}\s*$",
+                      sections=['x_qe_t_section_pp_report'],
+                      subMatchers=[
+                          SM(name='ppr_version',
+                             startReStr=r"\s*\|\s*pseudo potential version(?P<x_qe_t_pp_report_version>(?:\s+\d+)+)\s*\|\s*$",
+                          ),
+                          SM(name='ppr_separator',
+                             startReStr=r"\s*-{4,}\s*$",
+                          ),
+                          SM(name='ppr_line', repeats=True,
+                             startReStr=r"\s*\|  (?P<x_qe_t_pp_report_line>.*?)\s*\|\s*$",
                           ),
                       ],
                    ),
