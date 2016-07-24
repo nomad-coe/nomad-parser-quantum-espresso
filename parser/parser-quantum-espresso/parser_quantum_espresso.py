@@ -446,6 +446,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='starting_wfc',
                       startReStr=r"\s*Starting wfc are\s*(?P<x_qe_starting_wfc>.*?)\s*$",
                    ),
+                   SM(name='cputime_msg',
+                      startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_time_setup_cpu1_end>" + RE_f +
+                                  r")\s*secs"),
+                   ),
+                   SM(name='per_process_mem',
+                      startReStr=r"\s*per-process dynamical memory:\s*(?P<x_qe_per_process_mem__mebibyte>" + RE_f + ")\s*Mb",
+                   ),
                ],
             ), # header
             SM(name='self_consistent_calculation',
