@@ -553,6 +553,25 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
                           ),
+                          SM(name="profiling0", repeats=True,
+                             startReStr=(r"\s*(?P<x_qe_profile_function>\S+)\s*:\s*(?P<x_qe_profile_cputime__s>" + RE_f +
+                                         r")\s*s\s*CPU\s*(?P<x_qe_profile_walltime__s>" + RE_f + r")\s*s\s*WALL" +
+                                         r"\s*\(\s*(?P<x_qe_profile_ncalls>\d+)\s*calls\s*\)\s*$"),
+                          ),
+                          SM(name="profiling_caller", repeats=True,
+                             startReStr=r"\s*(?:Called by|General)\s*(?P<x_qe_t_profile_caller>\S+?):?\s*$",
+                             subMatchers=[
+                                 SM(name="profiling", repeats=True,
+                                    startReStr=(r"\s*(?P<x_qe_profile_function>\S+)\s*:\s*(?P<x_qe_profile_cputime__s>" + RE_f +
+                                                r")\s*s\s*CPU\s*(?P<x_qe_profile_walltime__s>" + RE_f + r")\s*s\s*WALL" +
+                                                r"\s*\(\s*(?P<x_qe_profile_ncalls>\d+)\s*calls\s*\)\s*$"),
+                                 ),
+                             ],
+                          ),
+                          SM(name="profiling2",
+                             startReStr=(r"\s*(?P<x_qe_profile_function>\S+)\s*:\s*(?P<x_qe_profile_cputime__s>" + RE_f +
+                                         r")\s*s\s*CPU\s*(?P<x_qe_profile_walltime__s>" + RE_f + r")\s*s\s*WALL\s*$")
+                          ),
                        ],
                    ),
                ],
