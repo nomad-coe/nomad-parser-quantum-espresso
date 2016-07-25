@@ -519,6 +519,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   ),
                               ],
                           ),
+                          SM(name='highest_occupied',
+                             startReStr=(r"\s*highest occupied level \(ev\):\s*(?P<x_qe_highest_occupied__eV>" + RE_f +
+                                         r")\s*$"),
+                          ),
                           SM(name='e_total',
                              startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total>' + RE_f + ')\s*Ry\s*$',
                           ),
