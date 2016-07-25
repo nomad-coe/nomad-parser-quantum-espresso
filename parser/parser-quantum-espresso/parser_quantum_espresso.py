@@ -103,6 +103,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         is closed"""
         backend.addValue('single_configuration_to_calculation_method_ref', self.secMethodIndex)
         backend.addValue('single_configuration_calculation_to_system_ref', self.secSystemIndex)
+        backend.addArrayValues('x_qe_energy_decomposition_name', np.asarray(
+            section['x_qe_t_energy_decomposition_name']))
+        backend.addArrayValues('x_qe_energy_decomposition_value', np.asarray(
+            section['x_qe_t_energy_decomposition_value']))
 
     def onOpen_section_eigenvalues(self, backend, gIndex, section):
         self.tmp['k_point'] = []
@@ -533,6 +537,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name='estimate_accuracy',
                              startReStr=(r"\s*estimated scf accuracy\s*<\s*(?P<x_qe_energy_total_accuracy_estimate>" +
                                          RE_f + r")\s*Ry\s*$"),
+                          ),
+                          SM(name='energy_decomposition',
+                             startReStr=r"\s*The total energy is the sum of the following terms\s*:\s*$",
+                             subMatchers=[
+                                 SM(name='energy_decomposition_contribution', repeats=True,
+                                    startReStr=(r"\s*(?P<x_qe_t_energy_decomposition_name>.*?)\s*=\s*" +
+                                                r"(?P<x_qe_t_energy_decomposition_value__rydberg>" + RE_f + r")\s*Ry"),
+                                 ),
+                             ],
                           ),
                        ],
                    ),
