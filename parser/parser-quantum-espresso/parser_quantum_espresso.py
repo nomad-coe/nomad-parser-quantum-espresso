@@ -465,9 +465,43 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   r"\s*beta\s*=\s*(?P<x_qe_iteration_beta>" + RE_f + r")\s*$"),
                       sections=['section_scf_iteration'],
                       subMatchers=[
+                          SM(name='david_overlap',
+                             startReStr=r"\s*Davidson diagonalization with overlap\s*$",
+                             adHoc=lambda p: p.backend.addValue("x_qe_david_with_overlap", True)
+                          ),
+                          SM(name='ethr',
+                             startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_iteration_ethr>" + RE_f +
+                                         r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_iteration_avg>" + RE_f +
+                                         r")\s*$")
+                          ),
+                          SM(name='david_overlap2',
+                             startReStr=r"\s*Davidson diagonalization with overlap\s*$",
+                             adHoc=lambda p: p.backend.addValue("x_qe_david_with_overlap", True)
+                          ),
+                          SM(name='ethr2',
+                             startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_iteration_ethr>" + RE_f +
+                                         r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_iteration_avg>" + RE_f +
+                                         r")\s*$")
+                          ),
+                          SM(name='iteration_rho',
+                             startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_iteration_charge_negative_up>" + RE_f +
+                                         r")\s*(?P<x_qe_iteration_charge_negative_down>" + RE_f + r")\s*$"),
+                          ),
+                          SM(name='cputime_iteration_msg',
+                             startReStr=(r"\s*total cpu time spent up to now is\s*(?P<time_scf_iteration_cpu1_end>" + RE_f +
+                                         r")\s*secs"),
+                          ),
                           SM(name='e_total',
                              startReStr=(r"\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>" + RE_f + r")" +
-                                         r"\s*Ry\s*$")
+                                         r"\s*Ry\s*$"),
+                          ),
+                          SM(name='harris',
+                             startReStr=(r"\s*Harris-Foulkes estimate\s*=\s*(?P<x_qe_energy_total_harris_foulkes_estimate_iteration>" +
+                                         RE_f + r")\s*Ry\s*$"),
+                          ),
+                          SM(name='estimate_accuracy',
+                             startReStr=(r"\s*estimated scf accuracy\s*<\s*(?P<x_qe_energy_total_accuracy_estimate_iteration>" +
+                                         RE_f + r")\s*Ry\s*$"),
                           ),
                       ],
                    ),
@@ -486,7 +520,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                               ],
                           ),
                           SM(name='e_total',
-                             startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total>' + RE_f + ')',
+                             startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total>' + RE_f + ')\s*Ry\s*$',
+                          ),
+                          SM(name='harris',
+                             startReStr=(r"\s*Harris-Foulkes estimate\s*=\s*(?P<x_qe_energy_total_harris_foulkes_estimate>" +
+                                         RE_f + r")\s*Ry\s*$"),
+                          ),
+                          SM(name='estimate_accuracy',
+                             startReStr=(r"\s*estimated scf accuracy\s*<\s*(?P<x_qe_energy_total_accuracy_estimate>" +
+                                         RE_f + r")\s*Ry\s*$"),
                           ),
                        ],
                    ),

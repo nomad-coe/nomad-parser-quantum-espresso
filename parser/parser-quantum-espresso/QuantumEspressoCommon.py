@@ -78,6 +78,8 @@ class ParserQuantumEspresso(object):
             r"\s*Any further DFT definition will be discarded",
             r"\s*Please, verify this is what you really want",
             r"\s*their fractional translations are incommensurate with FFT grid\)\s*$",
+            r"\s*Threshold \(ethr\) on eigenvalues was too large:\s*$",
+            r"\s*Diagonalizing with lowered threshold\s*$",
             # table separators
             r"^\s*[=%-]+\s*$",
         ]
