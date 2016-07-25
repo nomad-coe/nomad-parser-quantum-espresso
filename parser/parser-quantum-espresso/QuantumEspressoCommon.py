@@ -128,6 +128,8 @@ class ParserQuantumEspresso(object):
         return []
 
     def strValueTransform_strQeDate(self, espresso_date):
+        if espresso_date is None:
+            return None
         match = re.match(
             r"(\d+)\s*([A-Za-z]+)\s*(\d+)\s+at\s+(\d+):\s*(\d+):\s*(\d+)",
             espresso_date)
