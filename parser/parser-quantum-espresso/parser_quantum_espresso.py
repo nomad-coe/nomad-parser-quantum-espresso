@@ -30,6 +30,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.secMethodIndex = None
         self.secSystemDescriptionIndex = None
         self.tmp = {}
+        self.alat = None
 
     def startedParsing(self, path, parser):
         """called when parsing starts"""
@@ -154,7 +155,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         celldm = [None, None, None, None, None, None]
         for match in re.findall(r"celldm\(\s*(\d+)\s*\)\s*=\s*(" + RE_f + r")", celldm_joint):
             celldm[int(match[0])-1] = valueForStrValue(match[1], 'f')
-        celldm[0] = section['alat']
+        celldm[0] = self.alat
         backend.addArrayValues('x_qe_celldm', np.array(celldm))
         backend.addArrayValues('x_qe_k_info_ik', np.array(section['x_qe_t_k_info_ik']))
         backend.addArrayValues('x_qe_k_info_wk', np.array(section['x_qe_t_k_info_wk']))
@@ -180,6 +181,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def adHoc_alat(self, parser):
         alat = parser.lastMatch['x_qe_alat']
+        self.alat = parser.lastMatch['x_qe_alat']
         unit_conversion.register_userdefined_quantity('usrAlat', 'm', alat)
         unit_conversion.register_userdefined_quantity('usrTpiba', '1/m', 2*math.pi/alat)
 
