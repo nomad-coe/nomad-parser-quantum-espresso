@@ -433,7 +433,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       subMatchers=[
                           SM(name='atom_kind', repeats=True,
                              startReStr=r"\s*(?P<method_atom_kind_label>\S+)\s+(?P<x_qe_pp_valence>" + RE_f + r")" +
-                                        r"\s+(?P<x_qe_kind_mass>" + RE_f + r")\s+(?P<x_qe_pp_label>[^\s\(]+)" +
+                                        r"\s+(?P<x_qe_kind_mass>" + RE_f + r")\s+(?P<x_qe_pp_label>[^\s\(]+)\s*" +
                                         r"\(\s*(?P<x_qe_pp_weight>" + RE_f + r")\s*\)\s*$",
                              sections=['section_method_atom_kind'],
                           ),
