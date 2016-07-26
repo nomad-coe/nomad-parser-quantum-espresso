@@ -118,7 +118,15 @@ class ParserQuantumEspresso(object):
                        SM(name='run_date',
                           startReStr=r"\s*Today is\s*(?P<time_run_date_start__strQeDate>.+?)\s*$"
                        ),
-                   ] + self.run_submatchers()),
+                   ] + self.run_submatchers() + [
+                       SM(name='end_date',
+                          startReStr=r"\s*This run was terminated on:\s*(?P<time_run_date_end__strQeDate>.+?)\s*$",
+                       ),
+                       SM(name='job_done',
+                          startReStr=r"\s*JOB DONE\.\s*",
+                          adHoc=lambda p: p.backend.addValue('run_clean_end', True),
+                       ),
+                   ]),
                 )
             ]
         )
@@ -130,6 +138,7 @@ class ParserQuantumEspresso(object):
     def strValueTransform_strQeDate(self, espresso_date):
         if espresso_date is None:
             return None
+        epoch = 0
         match = re.match(
             r"(\d+)\s*([A-Za-z]+)\s*(\d+)\s+at\s+(\d+):\s*(\d+):\s*(\d+)",
             espresso_date)
@@ -138,9 +147,18 @@ class ParserQuantumEspresso(object):
             epoch = calendar.timegm(
                 (int(match.group(3)), int(month), int(match.group(1)),
                  int(match.group(4)), int(match.group(5)), int(match.group(6))))
-            return(epoch)
         else:
-            raise RuntimeError("unparsable date: %s", espresso_date)
+            match = re.match(
+                r"\s*(\d+):\s*(\d+):\s*(\d+)\s+(\d+)\s*([A-Za-z]+)\s*(\d+)\s*",
+                espresso_date)
+            if match:
+                month = MONTH_NUMBER[match.group(5)]
+                epoch = calendar.timegm(
+                    (int(match.group(6)), int(month), int(match.group(4)),
+                     int(match.group(1)), int(match.group(2)), int(match.group(3))))
+            else:
+                raise RuntimeError("unparsable date: %s", espresso_date)
+        return(epoch)
     strValueTransform_strQeDate.units = 's'
 
     def addSectionDict(self, backend, section_name, section_dict):
