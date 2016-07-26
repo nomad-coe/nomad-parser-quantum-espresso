@@ -52,7 +52,7 @@ PARSER_INFO_DEFAULT = {
 # constants for date conversion
 MONTHS = [ 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec' ]
-MONTH_NUMBER = { MONTHS[num]: num for num in range(0,12) }
+MONTH_NUMBER = { MONTHS[num]: num+1 for num in range(0,12) }
 
 class ParserQuantumEspresso(object):
     """Base class for all Quantum Espresso parsers"""
