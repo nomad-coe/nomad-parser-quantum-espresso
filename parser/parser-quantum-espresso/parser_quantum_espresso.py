@@ -588,6 +588,12 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                                 r"\s*type\s*\d+\s*force\s*=\s*"+
                                                 QeC.re_vec('x_qe_t_force', 'rydberg_bohr_1') + "\s*$")
                                  ),
+                                 SM(name="total_force",
+                                    startReStr=(r"\s*Total\s+force\s*=\s*(?P<x_qe_force_total__rydberg_bohr_1>" + RE_f +
+                                                r")\s*Total SCF correction =\s*" +
+                                                r"(?P<x_qe_force_total_scf_correction__rydberg_bohr_1>" + RE_f +
+                                                r")\s*$"),
+                                 ),
                              ],
                           ),
                           SM(name="stress_tensor",
