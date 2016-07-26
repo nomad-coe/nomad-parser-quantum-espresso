@@ -108,6 +108,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             section['x_qe_t_energy_decomposition_name']))
         backend.addArrayValues('x_qe_energy_decomposition_value', np.asarray(
             section['x_qe_t_energy_decomposition_value']))
+        backend.addArrayValues('atom_forces', np.array([
+            section['x_qe_t_force_x'], section['x_qe_t_force_y'], section['x_qe_t_force_z']
+            ]).T)
 
     def onClose_section_scf_iteration(
             self, backend, gIndex, section):
@@ -573,6 +576,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name="convergence_iterations",
                              startReStr=r"\s*convergence has been achieved in\s*(?P<x_qe_convergence_iterations>\d+)\s*iterations\s*",
+                          ),
+                          SM(name="atom_forces",
+                             startReStr=r"\s*Forces acting on atoms\s*\(Ry/au\):\s*$",
+                             subMatchers=[
+                                 SM(name="atom_force", repeats=True,
+                                    startReStr=(r"\s*atom\s*(?P<x_qe_t_force_atom_idx>\d+)"+
+                                                r"\s*type\s*\d+\s*force\s*=\s*"+
+                                                QeC.re_vec('x_qe_t_force', 'rydberg_bohr_1') + "\s*$")
+                                 ),
+                             ],
                           ),
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
