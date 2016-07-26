@@ -166,6 +166,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addValue('x_qe_diagonalization_scheme', 'conjugate_gradient')
         if section['x_qe_t_iteration_ethr'] is not None:
             backend.addValue('x_qe_iteration_ethr', section['x_qe_t_iteration_ethr'][-1])
+        self.tmp['last_iteration'] = section['x_qe_iteration_number'][-1]
 
     def onOpen_section_eigenvalues(self, backend, gIndex, section):
         self.tmp['k_point'] = []
@@ -806,6 +807,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name="convergence_iterations",
                              startReStr=r"\s*convergence has been achieved in\s*(?P<x_qe_convergence_iterations>\d+)\s*iterations\s*",
+                          ),
+                          SM(name="convergence_achieved",
+                             startReStr=r"\s*convergence has been achieved\s*$",
+                             adHoc=lambda p: p.backend.addValue('x_qe_convergence_iterations', p.superContext.tmp['last_iteration'])
                           ),
                           SM(name="warning_save_mgga",
                              startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
