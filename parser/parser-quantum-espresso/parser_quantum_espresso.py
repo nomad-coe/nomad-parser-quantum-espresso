@@ -480,6 +480,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name='pp_comment',
                              startReStr=r"\s*(?P<x_qe_t_pp_comment>.*?)\s*$",
                           ),
+                          SM(name='pp_augmentation_shape',
+                             startReStr=r"\s*Shape of augmentation charge:\s*(?P<x_qe_t_pp_augmentation_shape>.*?)\s*$",
+                          ),
                           SM(name='pp_dimensions',
                              startReStr=r"\s*Using radial grid of\s*(?P<x_qe_t_pp_ndmx>\d+) points,\s*(?P<x_qe_t_pp_nbeta>\d+) beta functions with\s*:\s*$",
                           ),
@@ -712,6 +715,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name='estimate_accuracy',
                              startReStr=(r"\s*estimated scf accuracy\s*<\s*(?P<x_qe_energy_total_accuracy_estimate>" +
+                                         RE_f + r")\s*Ry\s*$"),
+                          ),
+                          SM(name='total_AE_energy',
+                             startReStr=(r"\s*total all-electron energy\s*=\s*(?P<x_qe_energy_total_paw_all_electron>" +
                                          RE_f + r")\s*Ry\s*$"),
                           ),
                           SM(name='energy_decomposition',
