@@ -815,8 +815,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              ],
                           ),
                           SM(name="profiling2", repeats=True,
-                             startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" + RE_f +
-                                         r")\s*s\s*CPU\s*(?P<x_qe_t_profile_walltime__s>" + RE_f + r")\s*s\s*WALL\s*$"),
+                             startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*" +
+                                         r"(?P<x_qe_t_profile_cputime__strQeTimespan>.*)CPU" +
+                                         r"\s*(?P<x_qe_t_profile_walltime__strQeTimespan>.*)\s*WALL\s*$"),
                              adHoc=lambda p: p.backend.addValue('x_qe_t_profile_ncalls', 1),
                           ),
                           # profiling of 'old' espresso
