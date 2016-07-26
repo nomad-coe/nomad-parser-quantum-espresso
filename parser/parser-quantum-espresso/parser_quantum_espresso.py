@@ -784,6 +784,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name="convergence_iterations",
                              startReStr=r"\s*convergence has been achieved in\s*(?P<x_qe_convergence_iterations>\d+)\s*iterations\s*",
                           ),
+                          SM(name="warning_save_mgga",
+                             startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
+                          ),
                           SM(name="atom_forces",
                              startReStr=r"\s*Forces acting on atoms\s*\(Ry/au\):\s*$",
                              subMatchers=[
@@ -824,6 +827,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
+                          ),
+                          SM(name="warning_save_mgga2",
+                             startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
                           ),
                           SM(name="profiling0", repeats=True,
                              startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" + RE_f +
