@@ -607,6 +607,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
+                   SM(name='core_charge_check',
+                      startReStr=(r"\s*Check: negative/imaginary core charge\s*=\s*(?P<x_qe_core_charge_negative>" +
+                                  RE_f + r")\s*(?P<x_qe_core_charge_imaginary>" + RE_f + r")\s*$")
+                   ),
                    SM(name='initial_potential',
                       startReStr=r"\s*Initial potential from\s*(?P<x_qe_starting_potential>.*?)\s*$",
                    ),
