@@ -162,6 +162,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         """trigger called when section_scf_iteration is closed"""
         if section['x_qe_t_david_with_overlap'] is not None:
             backend.addValue('x_qe_diagonalization_scheme', 'davidson')
+        elif section['x_qe_t_cg_diag']:
+            backend.addValue('x_qe_diagonalization_scheme', 'conjugate_gradient')
         if section['x_qe_t_iteration_ethr'] is not None:
             backend.addValue('x_qe_iteration_ethr', section['x_qe_t_iteration_ethr'][-1])
 
@@ -673,6 +675,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name='david_overlap',
                               startReStr=r"\s*(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)\s*$",
                           ),
+                          SM(name='cg_style_diag',
+                              startReStr=r"\s*(?P<x_qe_t_cg_diag>CG style diagonalization.*)\s*$",
+                          ),
                           SM(name='ethr',
                              startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
                                          r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_t_iteration_avg>" + RE_f +
@@ -680,6 +685,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name='david_overlap2',
                              startReStr=r"\s*(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)\s*$",
+                          ),
+                          SM(name='cg_style_diag2',
+                              startReStr=r"\s*(?P<x_qe_t_cg_diag>CG style diagonalization.*)\s*$",
                           ),
                           SM(name='ethr2',
                              startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
