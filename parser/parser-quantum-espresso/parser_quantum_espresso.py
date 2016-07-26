@@ -440,7 +440,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='nsymm',
-                      startReStr=r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.\s*\((?P<x_qe_t_symm_inversion>\S+) inversion\)\s*(?:found)?\s*$",
+                      startReStr=(r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.\s*[\(,]\s*(?P<x_qe_t_symm_inversion>\S+) inversion\s*[\),]\s*(?:found)?\s*"
+                                  r"(?:\(\s*(?P<x_qe_nsymm_with_fractional_translation>\d+)\s*have fractional translation\s*\))?\s*$"),
                       adHoc=lambda p: p.backend.addValue('x_qe_symm_inversion', (p.lastMatch['x_qe_t_symm_inversion'] == 'with')),
                       subMatchers=[
                           SM(name='nsymm_ignored',
