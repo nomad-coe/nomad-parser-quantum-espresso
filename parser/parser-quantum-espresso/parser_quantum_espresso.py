@@ -576,6 +576,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   QeC.re_vec("x_qe_t_smooth_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$"
                       ),
                    ),
+                   SM(name='core_charge_realspace',
+                      startReStr=r"\s*Real space treatment of Q\(r\)\s*",
+                      adHoc=lambda p: p.backend.addValue('x_qe_core_charge_realspace', True)
+                   ),
                    SM(name='input_occupations',
                       startReStr=r"\s*Occupations\s*read\s*from\s*input\s*$",
                       sections=['x_qe_t_section_input_occupations'],
