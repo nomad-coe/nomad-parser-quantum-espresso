@@ -361,7 +361,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*number of iterations used\s*=\s*(?P<x_qe_potential_mixing_iterations>\d+)\s*(?P<x_qe_potential_mixing_scheme>.*?)\s+mixing\s*$",
                    ),
                    SM(name='xc_functional', required=True,
-                      startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>\S+)\s*\((?P<x_qe_xc_functional_num>[^\)]*)\s*\)\s*$"
+                      startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>.*?)\s*\((?P<x_qe_xc_functional_num>[^\)]*)\s*\)\s*$"
                    ),
                    SM(name='celldm', repeats = True,
                       startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + ")+)\s*$",
