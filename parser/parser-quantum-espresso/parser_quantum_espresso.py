@@ -770,6 +770,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
+                          SM(name="stress_message",
+                             startReStr=r"\s*Message from routine stress\s*",
+                             subMatchers=[
+                                 SM(name="no_mgga",
+                                    startReStr=r"\s*Meta-GGA and stress not implemented\s*$",
+                                    adHoc=lambda p: p.backend.addValue("x_qe_stress_unimplemented", "Meta-GGA")
+                                 ),
+                             ],
+                          ),
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
                           ),
