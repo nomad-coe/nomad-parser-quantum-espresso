@@ -573,7 +573,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                        subMatchers=[
                           SM(name='bands', repeats=True,
                               sections=['x_qe_t_section_kbands'],
-                              startReStr=r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba') + r'\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i + ')\s*PWs',
+                              startReStr=r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba', '\s*') + r'\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i + ')\s*PWs',
                               subMatchers=[
                                   SM(name='kbnd', repeats=True,
                                       startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
