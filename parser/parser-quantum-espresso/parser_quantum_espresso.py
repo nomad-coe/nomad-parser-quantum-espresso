@@ -308,6 +308,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='serial_multithread',
                       startReStr=r"\s*(?P<x_qe_compile_parallel_version>Serial multi-threaded) version, running on\s*(?P<x_qe_nthreads>\d+)\s*processor cores\s*$",
                    ),
+                   SM(name='parallel_mpi',
+                      startReStr=r"\s*(?P<x_qe_compile_parallel_version>Parallel version \(MPI\)), running on\s*(?P<x_qe_nproc>\d+)\s*processors\s*$",
+                      subMatchers=[
+                          SM(name='npool',
+                              startReStr=r"\s*K-points division:\s*npool\s*=\s*(?P<x_qe_npool>\d+)\s*$",
+                          ),
+                      ],
+                   ),
                    SM(name='qe_input_filename',
                       startReStr=r"\s*Reading input from\s*(?P<x_qe_input_filename>.*?)\s*$",
                    ),
@@ -380,6 +388,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='gamma_algorithms',
                       startReStr=r"\s*gamma-point specific algorithms are used\s*$",
                       adHoc=lambda p: p.backend.addValue('x_qe_gamma_algorithms', True)
+                   ),
+                   SM(name='subspace_diagonalization',
+                      startReStr=r"\s*Subspace diagonalization in iterative solution of the eigenvalue problem:\s*$",
+                      subMatchers=[
+                          SM(name='serial_algorithm',
+                             startReStr=r"\s*a serial algorithm will be used\s*$",
+                             adHoc=lambda p: p.backend.addValue('x_qe_diagonalization_algorithm', 'serial')
+                          ),
+                      ],
                    ),
                    SM(name='mesh_sticks',
                       startReStr=r"\s*G-vector sticks info\s*$",
