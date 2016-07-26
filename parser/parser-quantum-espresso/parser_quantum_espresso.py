@@ -97,6 +97,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             self, backend, gIndex, section):
         self.cache_t_pp_report[section['x_qe_t_pp_report_species'][0]] = section
 
+    def onClose_x_qe_t_section_input_occupations(
+            self, backend, gIndex, section):
+        if section['x_qe_t_input_occupations'] is not None:
+            iocc_joined = ' '.join(section['x_qe_t_input_occupations'])
+            iocc_split = re.findall(RE_f, iocc_joined)
+            LOGGER.error("implement proper output of x_qe_t_section_input_occupations")
+        else:
+            LOGGER.error("closing x_qe_t_section_input_occupations, but no input occupations parsed")
+
     def onClose_section_method(
             self, backend, gIndex, section):
         # set flag if we deal with user-enforced XC functional
@@ -516,6 +525,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   r"\(\s*(?P<x_qe_dense_g_vectors>\d+)\s*G-vectors\s*\)\s*FFT\s+grid:\s*\(\s*" +
                                   QeC.re_vec("x_qe_t_dense_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$"
                       ),
+                   ),
+                   SM(name='input_occupations',
+                      startReStr=r"\s*Occupations\s*read\s*from\s*input\s*$",
+                      sections=['x_qe_t_section_input_occupations'],
+                      subMatchers=[
+                          SM(name='input_occupations_occupations', repeats=True,
+                              startReStr=r'\s*(?P<x_qe_t_input_occupations>(?:\s*' + RE_f + ')+\s*$)',
+                          ),
+                      ],
                    ),
                    SM(name='allocated_arrays',
                       startReStr=r"\s*Largest allocated arrays\s*est. size \(Mb\)\s*dimensions\s*$",
