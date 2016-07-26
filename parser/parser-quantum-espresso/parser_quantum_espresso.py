@@ -343,7 +343,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*Found symmetry operation:\s*I\s*\+\s*\(\s*" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*\)\s*$",
                    ),
                    SM(name='supercell2',
-                      startReStr=r"\s*This is a supercell, fractional translations are disabled\s*$",
+                      startReStr=r"\s*This is a supercell, fractional translations? are disabled\s*$",
                       adHoc=lambda p: p.backend.addValue('x_qe_supercell', True)
                    ),
                    SM(name='pseudopotential_report', repeats=True,
@@ -516,7 +516,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='nosymm',
-                      startReStr=r"\s*No symmetry found\s*$",
+                      startReStr=r"\s*No symmetry\s*(?:found|!)\s*$",
                       adHoc=lambda p: p.backend.addValue('x_qe_nsymm', 0)
                    ),
                    SM(name='atom_pos_cart_list',
