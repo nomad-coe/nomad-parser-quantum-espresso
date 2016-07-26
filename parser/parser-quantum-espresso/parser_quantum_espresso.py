@@ -54,6 +54,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.secMethodIndex = gIndex
         self.cache_t_pseudopotential = {}
         self.cache_t_pp_report = {}
+        self.cache_t_pp_renorm_wfc = {}
 
     def onOpen_section_system(
             self, backend, gIndex, section):
@@ -85,6 +86,12 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 backend.addValue('x_qe_pp_report_contents', "\n".join(pp_report['x_qe_t_pp_report_line']))
         else:
             LOGGER.error("x_qe_t_pp_idx is not set")
+        if pp['x_qe_t_pp_filename'] is not None:
+            fpath = pp['x_qe_t_pp_filename'][-1]
+            basename = re.sub(r".*\/", r"", fpath)
+            renorm_info = self.cache_t_pp_renorm_wfc.get(basename, None)
+            if renorm_info is not None:
+                backend.addValue('x_qe_pp_renormalized_wfc', renorm_info)
 
     def onClose_x_qe_t_section_pp_report(
             self, backend, gIndex, section):
@@ -257,6 +264,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         unit_conversion.register_userdefined_quantity('usrAlat', 'm', alat)
         unit_conversion.register_userdefined_quantity('usrTpiba', '1/m', 2*math.pi/alat)
 
+    def adHoc_pp_renorm(self, parser):
+        self.cache_t_pp_renorm_wfc[parser.lastMatch[
+            'x_qe_t_pp_renormalized_filename']] = parser.lastMatch['x_qe_t_pp_renormalized_wfc']
+
     def adHoc_profiling4(self, parser):
         parser.backend.addValue('x_qe_t_profile_ncalls', 1)
         parser.backend.addValue('x_qe_t_profile_walltime', parser.lastMatch['x_qe_t_profile_cputime'])
@@ -322,6 +333,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*\|  (?P<x_qe_t_pp_report_line>.*?)\s*\|\s*$",
                           ),
                       ],
+                   ),
+                   SM(name='renormalized_pseudo_wavefunction', repeats=True,
+                      startReStr=r"\s*file\s*(?P<x_qe_t_pp_renormalized_filename>.*?)\s*:\s*wavefunction\(s\)\s*(?P<x_qe_t_pp_renormalized_wfc>.*?)\s*renormalized",
+                      adHoc=self.adHoc_pp_renorm,
                    ),
                    SM(name='enforced_XC',
                       startReStr=r"\s*IMPORTANT: XC functional enforced from input\s*:\s*",
