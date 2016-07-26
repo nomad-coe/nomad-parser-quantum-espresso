@@ -327,6 +327,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
+                   SM(name='qe_input_filename2',
+                      # second possible location for input filename
+                      startReStr=r"\s*Reading input from\s*(?P<x_qe_input_filename>.*?)\s*$",
+                   ),
                    SM(name='pseudopotential_report', repeats=True,
                       startReStr=r"\s*\|\s*pseudopotential report for atomic species\s*:\s*(?P<x_qe_t_pp_report_species>\d+)\s*\|\s*$",
                       endReStr=r"\s*={4,}\s*$",
