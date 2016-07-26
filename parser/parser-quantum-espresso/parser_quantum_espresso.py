@@ -115,7 +115,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         xc_functionals = None
         if section['x_qe_xc_functional_num'] is not None:
             xc_functional_num = section['x_qe_xc_functional_num'][-1]
-            xc_functionals = translate_qe_xc_num(xc_functional_num)
+            xc_functionals = translate_qe_xc_num(xc_functional_num, section['x_qe_t_exact_exchange_fraction'])
         else:
             LOGGER.error("x_qe_xc_functional_num is not set")
         if xc_functionals is not None:
@@ -353,6 +353,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name='xc_functional_enforced', required=True, # details are parsed in xc_functional
                              startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_t_xc_functional_shortname_enforced>\S+)\s*\([^\(]+\)\s*$"
                           ),
+                          SM(name='exx_fraction_enforced',
+                             startReStr=r"\s*EXX-fraction\s*=\s*" + RE_f + r"\s*$",
+                          ),
                       ],
                    ),
                    SM(name='gamma_algorithms',
@@ -418,6 +421,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                    SM(name='xc_functional', required=True,
                       startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>.*?)\s*\((?P<x_qe_xc_functional_num>[^\)]*)\s*\)\s*$"
+                   ),
+                   SM(name='exx_fraction', required=True,
+                      startReStr=r"\s*EXX-fraction\s*=\s*(?P<x_qe_t_exact_exchange_fraction>" + RE_f + r")\s*$",
                    ),
                    SM(name='celldm', repeats = True,
                       startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + ")+)\s*$",

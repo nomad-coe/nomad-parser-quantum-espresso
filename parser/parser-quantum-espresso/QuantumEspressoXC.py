@@ -40,7 +40,7 @@ def parse_qe_xc_num(xc_functional_num):
     return xf_num_split_i
 
 
-def translate_qe_xc_num(xc_functional_num):
+def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
     xf_num = parse_qe_xc_num(xc_functional_num)
     LOGGER.debug('num <- input: %s <- %s',  str(xf_num), xc_functional_num)
     # use dictionary to ensure uniqueness:
@@ -63,12 +63,25 @@ def translate_qe_xc_num(xc_functional_num):
         if this_component is None:
             raise RuntimeError("Undefined XC component %s[%d]" % (
                 XC_COMPONENT_NAME[component_i], this_xf_num))
+        if exact_exchange_fraction is not None and abs(exact_exchange_fraction[-1]) < 1e-9:
+            # older exx-supporting espresso print exx_fraction == 0
+            exact_exchange_fraction = None
         if 'x_qe_t_xc_terms' in this_component:
+            other_exchange_fraction = None
             for term in this_component['x_qe_t_xc_terms']:
                 sub_component = this_component.copy()
                 sub_component.pop('x_qe_t_xc_terms')
                 for k,v in term.items():
                     sub_component[k]=v
+                if sub_component.get('XC_functional_name', None) == 'HF_X':
+                    if exact_exchange_fraction is not None:
+                        # we are at HF_X component, with explicit exact_exchange_fraction
+                        sub_component['XC_functional_weight'] = exact_exchange_fraction[-1]
+                        # assume max. 2 components
+                        other_exchange_fraction = 1.0 - exact_exchange_fraction[-1]
+                elif (other_exchange_fraction is not None):
+                    # assign remainder to weight of remaining component
+                    sub_component['XC_functional_weight'] = other_exchange_fraction
                 if sub_component['XC_functional_name'] not in xc_data:
                     xc_data[sub_component['XC_functional_name']] = sub_component
         elif this_component['XC_functional_name'] not in xc_data:
