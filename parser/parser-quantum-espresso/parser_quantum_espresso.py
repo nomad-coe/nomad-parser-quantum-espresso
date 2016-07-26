@@ -111,6 +111,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addArrayValues('atom_forces', np.array([
             section['x_qe_t_force_x'], section['x_qe_t_force_y'], section['x_qe_t_force_z']
             ]).T)
+        backend.addArrayValues('stress_tensor', np.array([
+            section['x_qe_t_stress_x'], section['x_qe_t_stress_y'], section['x_qe_t_stress_z']
+            ]).T)
 
     def onClose_section_scf_iteration(
             self, backend, gIndex, section):
@@ -584,6 +587,19 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                     startReStr=(r"\s*atom\s*(?P<x_qe_t_force_atom_idx>\d+)"+
                                                 r"\s*type\s*\d+\s*force\s*=\s*"+
                                                 QeC.re_vec('x_qe_t_force', 'rydberg_bohr_1') + "\s*$")
+                                 ),
+                             ],
+                          ),
+                          SM(name="stress_tensor",
+                             startReStr=r"\s*entering subroutine stress \.\.\.\s*$",
+                             subMatchers=[
+                                 SM(name="stress_header",
+                                    startReStr=(r"\s*total\s*stress\s*\(Ry/bohr\*\*3\)\s*\(kbar\)\s*P=\s*" +
+                                                r"(?P<x_qe_pressure__kilobar>" + RE_f + r")\s*$"),
+                                 ),
+                                 SM(name="stress_components", repeats=True,
+                                    startReStr=(r"\s*" + QeC.re_vec('x_qe_t_stress', 'rydberg_bohr_3') + "\s*" +
+                                                RE_f + r"\s*" + RE_f + r"\s*" + RE_f + r"\s*$")
                                  ),
                              ],
                           ),
