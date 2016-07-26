@@ -287,6 +287,12 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*Current dimensions of program\s*\S+\s*are:\s*$",
                       sections=['x_qe_section_compile_options'],
                       subMatchers=[
+                          SM(name="qe_dim_ancient1",
+                             startReStr=r"\s*ntypx\s*=\s*(?P<x_qe_ntypx>\d+)\s*npk\s*=\s*(?P<x_qe_npk>\d+)\s*lmax\s*=\s*(?P<x_qe_lmaxx>\d+)\s*$"
+                          ),
+                          SM(name="qe_dim_ancient2",
+                             startReStr=r"\s*nchix\s*=\s*(?P<x_qe_nchix>\d+)\s*ndmx\s*=\s*(?P<x_qe_ndmx>\d+)\s*nbrx\s*=\s*(?P<x_qe_nbrx>\d+)\s*nqfx\s*=\s*(?P<x_qe_nqfx>\d+)\s*$",
+                          ),
                           SM(name="qe_dim_old",
                              startReStr=r"\s*ntypx\s*=\s*(?P<x_qe_ntypx>\d+)\s*npk\s*=\s*(?P<x_qe_npk>\d+)\s*lmax\s*=\s*(?P<x_qe_lmaxx>\d+)\s*\s*ndmx\s*=\s*(?P<x_qe_ndmx>\d+)\s*$",
                           ),
