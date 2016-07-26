@@ -169,6 +169,19 @@ class ParserQuantumEspresso(object):
         return(epoch)
     strValueTransform_strQeDate.units = 's'
 
+    def strValueTransform_strQeTimespan(self, espresso_timespan):
+        if espresso_timespan is None:
+            return None
+        match = re.match(r"(?:(\d+)\s*m)?\s*(" + RE_f + ")\s*s", espresso_timespan)
+        if match:
+            timespan_seconds = float(match.group(2))
+            if match.group(1) is not None:
+                timespan_seconds += float(match.group(1))*60
+        else:
+            raise RuntimeError("unparsable timespan: %s", espresso_timespan)
+        return(timespan_seconds)
+    strValueTransform_strQeTimespan.units = 's'
+
     def addSectionDict(self, backend, section_name, section_dict):
         gIndex = backend.openSection(section_name)
         for key, value in section_dict.items():
