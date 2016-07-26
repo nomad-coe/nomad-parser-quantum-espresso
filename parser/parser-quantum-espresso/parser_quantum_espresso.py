@@ -380,7 +380,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='ibrav', required=True,
-                      startReStr=r"\s*bravais-lattice index\s*=\s*(?P<x_qe_ibrav>\d+)\s*$",
+                      startReStr=r"\s*bravais-lattice index\s*=\s*(?P<x_qe_ibrav>" + RE_i + r")\s*$",
                    ),
                    SM(name='alat', required=True,
                       startReStr=r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*(?P<x_qe_alat__bohr>" + RE_f + r")\s*a\.u\.\s*$",
