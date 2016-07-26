@@ -86,6 +86,8 @@ class ParserQuantumEspresso(object):
             r"\s*their fractional transl?ations are incommensurate with FFT grid\)\s*$",
             r"\s*Threshold \(ethr\) on eigenvalues was too large:\s*$",
             r"\s*Diagonalizing with lowered threshold\s*$",
+            # initialization info
+            r"\s*Initializing real-space augmentation for DENSE grid\s*$",
             # table separators
             r"^\s*[=%-]+\s*$",
         ]
