@@ -183,6 +183,19 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.tmp['k_energies'].append(ek_split)
         self.tmp['k_point'].append([section['x_qe_t_k_x'][0], section['x_qe_t_k_y'][0], section['x_qe_t_k_z'][0]])
 
+    def onClose_section_run(
+            self, backend, gIndex, section):
+        """trigger called when section_single_configuration_calculation
+        is closed"""
+        backend.addArrayValues('x_qe_profile_function', np.asarray(
+            section['x_qe_t_profile_function']))
+        backend.addArrayValues('x_qe_profile_cputime', np.asarray(
+            section['x_qe_t_profile_cputime']))
+        backend.addArrayValues('x_qe_profile_walltime', np.asarray(
+            section['x_qe_t_profile_walltime']))
+        backend.addArrayValues('x_qe_profile_ncalls', np.asarray(
+            section['x_qe_t_profile_ncalls']))
+
     def appendToTmp(self, tmpname, value):
         self.tmp[tmpname] += value
 
