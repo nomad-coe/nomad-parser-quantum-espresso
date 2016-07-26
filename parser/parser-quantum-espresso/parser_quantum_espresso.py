@@ -261,6 +261,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         parser.backend.addValue('x_qe_t_profile_ncalls', 1)
         parser.backend.addValue('x_qe_t_profile_walltime', parser.lastMatch['x_qe_t_profile_cputime'])
 
+    def adHoc_profiling5(self, parser):
+        if parser.lastMatch.get('x_qe_t_profile_ncalls', None) is None:
+            parser.backend.addValue('x_qe_t_profile_ncalls', 1)
+        parser.backend.addValue('x_qe_t_profile_walltime', parser.lastMatch['x_qe_t_profile_cputime'])
+
     def run_submatchers(self):
         """submatchers of section_run"""
         return [
@@ -696,9 +701,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name="profiling5", repeats=True,
                              startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" +
                                          RE_f + r")\s*s\s*CPU" +
-                                         r"\s*\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls,\s*" + RE_f +
-                                         r"\s*s\s*avg\s*\)\s*$"),
-                             adHoc=lambda p: p.backend.addValue('x_qe_t_profile_walltime', p.lastMatch['x_qe_t_profile_cputime'])
+                                         r"\s*(?:\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls,\s*" + RE_f +
+                                         r"\s*s\s*avg\s*\))?\s*$"),
+                             adHoc=self.adHoc_profiling5,
                           ),
                           SM(name="profiling6_caller_general",
                              startReStr=r"\s*(?:Called by)?\s*(?P<x_qe_t_profile_caller>\S+?)(?:\s*routines)?:?\s*$",
