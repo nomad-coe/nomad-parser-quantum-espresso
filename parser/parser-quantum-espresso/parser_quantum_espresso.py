@@ -239,6 +239,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ]).T)
         else:
             LOGGER.warning("No FFT grid info found in output")
+        if section['x_qe_t_vec_supercell_x'] is not None:
+            backend.addArrayValues('x_qe_vec_supercell', np.array([
+                section['x_qe_t_vec_supercell_x'], section['x_qe_t_vec_supercell_y'], section['x_qe_t_vec_supercell_z']
+            ]).T)
 
     def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
         self.tmp['this_k_energies'] = ''
@@ -330,6 +334,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='qe_input_filename2',
                       # second possible location for input filename
                       startReStr=r"\s*Reading input from\s*(?P<x_qe_input_filename>.*?)\s*$",
+                   ),
+                   SM(name='supercell1',
+                      startReStr=r"\s*Found symmetry operation:\s*I\s*\+\s*\(\s*" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*\)\s*$",
+                   ),
+                   SM(name='supercell2',
+                      startReStr=r"\s*This is a supercell, fractional translations are disabled\s*$",
+                      adHoc=lambda p: p.backend.addValue('x_qe_supercell', True)
                    ),
                    SM(name='pseudopotential_report', repeats=True,
                       startReStr=r"\s*\|\s*pseudopotential report for atomic species\s*:\s*(?P<x_qe_t_pp_report_species>\d+)\s*\|\s*$",
