@@ -40,6 +40,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def onClose_section_basis_set_cell_dependent(
             self, backend, gIndex, section):
+        if section['basis_set_planewave_cutoff'] is None:
+            LOGGER.error("basis_set_planewave_cutoff is not set")
+            return
         pwc_ry = unit_conversion.convert_unit(
             section['basis_set_planewave_cutoff'][-1],
             'J', 'rydberg')
@@ -58,6 +61,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def onClose_x_qe_t_section_pseudopotential(
             self, backend, gIndex, section):
+        if section['x_qe_t_pp_label'] is None:
+            LOGGER.error("x_qe_t_pp_label is not set")
+            return
         self.cache_t_pseudopotential[section['x_qe_t_pp_label'][0]] = section
 
     def onClose_section_method_atom_kind(
@@ -65,17 +71,20 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         pp_label = section['x_qe_pp_label'][0]
         pp = self.cache_t_pseudopotential[pp_label]
         for key, value in pp.simpleValues.items():
-            if key == 'x_qe_t_pp_label' or key == 'x_qe_pp_valence':
+            if key == 'x_qe_t_pp_label' or key == 'x_qe_pp_valence' or value is None:
                 continue
             target = re.sub(r'^x_qe_t_',r'x_qe_',key)
             if target == key:
                 raise RuntimeError('found non-temporary key in pseudopotential cache: "%s"' % (key))
             backend.addValue(target, value[-1])
-        pp_num = pp['x_qe_t_pp_idx'][-1]
-        pp_report = self.cache_t_pp_report.get(pp_num, None)
-        if pp_report is not None:
-            backend.addValue('x_qe_pp_report_version', pp_report['x_qe_t_pp_report_version'][-1])
-            backend.addValue('x_qe_pp_report_contents', "\n".join(pp_report['x_qe_t_pp_report_line']))
+        if pp['x_qe_t_pp_idx'] is not None:
+            pp_num = pp['x_qe_t_pp_idx'][-1]
+            pp_report = self.cache_t_pp_report.get(pp_num, None)
+            if pp_report is not None:
+                backend.addValue('x_qe_pp_report_version', pp_report['x_qe_t_pp_report_version'][-1])
+                backend.addValue('x_qe_pp_report_contents', "\n".join(pp_report['x_qe_t_pp_report_line']))
+        else:
+            LOGGER.error("x_qe_t_pp_idx is not set")
 
     def onClose_x_qe_t_section_pp_report(
             self, backend, gIndex, section):
@@ -87,16 +96,29 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         if section['x_qe_t_xc_functional_shortname_enforced'] is not None:
             backend.addValue('x_qe_xc_functional_user_enforced', True)
         # translate XC functional to section_xc_functionals
-        xc_functional_num = section['x_qe_xc_functional_num'][-1]
-        xc_functionals = translate_qe_xc_num(xc_functional_num)
-        for xc_functional in xc_functionals:
-            self.addSectionDict(backend, 'section_XC_functionals', xc_functional)
-        backend.addArrayValues('x_qe_allocated_array_name', np.asarray(section['x_qe_t_allocated_array_name']))
-        backend.addArrayValues('x_qe_allocated_array_size', np.asarray(section['x_qe_t_allocated_array_size']))
-        backend.addArrayValues('x_qe_allocated_array_dimensions', np.asarray(section['x_qe_t_allocated_array_dimensions']))
-        backend.addArrayValues('x_qe_temporary_array_name', np.asarray(section['x_qe_t_temporary_array_name']))
-        backend.addArrayValues('x_qe_temporary_array_size', np.asarray(section['x_qe_t_temporary_array_size']))
-        backend.addArrayValues('x_qe_temporary_array_dimensions', np.asarray(section['x_qe_t_temporary_array_dimensions']))
+        xc_functionals = None
+        if section['x_qe_xc_functional_num'] is not None:
+            xc_functional_num = section['x_qe_xc_functional_num'][-1]
+            xc_functionals = translate_qe_xc_num(xc_functional_num)
+        else:
+            LOGGER.error("x_qe_xc_functional_num is not set")
+        if xc_functionals is not None:
+            for xc_functional in xc_functionals:
+                self.addSectionDict(backend, 'section_XC_functionals', xc_functional)
+        else:
+            LOGGER.error("error getting xc_functionals")
+        if section['x_qe_t_allocated_array_name'] is not None:
+            backend.addArrayValues('x_qe_allocated_array_name', np.asarray(section['x_qe_t_allocated_array_name']))
+        if section['x_qe_t_allocated_array_size'] is not None:
+            backend.addArrayValues('x_qe_allocated_array_size', np.asarray(section['x_qe_t_allocated_array_size']))
+        if section['x_qe_t_allocated_array_dimensions'] is not None:
+            backend.addArrayValues('x_qe_allocated_array_dimensions', np.asarray(section['x_qe_t_allocated_array_dimensions']))
+        if section['x_qe_t_temporary_array_name'] is not None:
+            backend.addArrayValues('x_qe_temporary_array_name', np.asarray(section['x_qe_t_temporary_array_name']))
+        if section['x_qe_t_temporary_array_size'] is not None:
+            backend.addArrayValues('x_qe_temporary_array_size', np.asarray(section['x_qe_t_temporary_array_size']))
+        if section['x_qe_t_temporary_array_dimensions'] is not None:
+            backend.addArrayValues('x_qe_temporary_array_dimensions', np.asarray(section['x_qe_t_temporary_array_dimensions']))
 
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
@@ -104,23 +126,28 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         is closed"""
         backend.addValue('single_configuration_to_calculation_method_ref', self.secMethodIndex)
         backend.addValue('single_configuration_calculation_to_system_ref', self.secSystemIndex)
-        backend.addArrayValues('x_qe_energy_decomposition_name', np.asarray(
-            section['x_qe_t_energy_decomposition_name']))
-        backend.addArrayValues('x_qe_energy_decomposition_value', np.asarray(
-            section['x_qe_t_energy_decomposition_value']))
-        backend.addArrayValues('atom_forces', np.array([
-            section['x_qe_t_force_x'], section['x_qe_t_force_y'], section['x_qe_t_force_z']
-            ]).T)
-        backend.addArrayValues('stress_tensor', np.array([
-            section['x_qe_t_stress_x'], section['x_qe_t_stress_y'], section['x_qe_t_stress_z']
-            ]).T)
+        if section['x_qe_t_energy_decomposition_name'] is not None:
+            backend.addArrayValues('x_qe_energy_decomposition_name', np.asarray(
+                section['x_qe_t_energy_decomposition_name']))
+        if section['x_qe_t_energy_decomposition_value'] is not None:
+            backend.addArrayValues('x_qe_energy_decomposition_value', np.asarray(
+                section['x_qe_t_energy_decomposition_value']))
+        if section['x_qe_t_force_x'] is not None:
+            backend.addArrayValues('atom_forces', np.array([
+                section['x_qe_t_force_x'], section['x_qe_t_force_y'], section['x_qe_t_force_z']
+                ]).T)
+        if section['x_qe_t_stress_x'] is not None:
+            backend.addArrayValues('stress_tensor', np.array([
+                section['x_qe_t_stress_x'], section['x_qe_t_stress_y'], section['x_qe_t_stress_z']
+                ]).T)
 
     def onClose_section_scf_iteration(
             self, backend, gIndex, section):
         """trigger called when section_scf_iteration is closed"""
         if section['x_qe_t_david_with_overlap'] is not None:
             backend.addValue('x_qe_diagonalization_scheme', 'davidson')
-        backend.addValue('x_qe_iteration_ethr', section['x_qe_t_iteration_ethr'][-1])
+        if section['x_qe_t_iteration_ethr'] is not None:
+            backend.addValue('x_qe_iteration_ethr', section['x_qe_t_iteration_ethr'][-1])
 
     def onOpen_section_eigenvalues(self, backend, gIndex, section):
         self.tmp['k_point'] = []
@@ -193,14 +220,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             self, backend, gIndex, section):
         """trigger called when section_single_configuration_calculation
         is closed"""
-        backend.addArrayValues('x_qe_profile_function', np.asarray(
-            section['x_qe_t_profile_function']))
-        backend.addArrayValues('x_qe_profile_cputime', np.asarray(
-            section['x_qe_t_profile_cputime']))
-        backend.addArrayValues('x_qe_profile_walltime', np.asarray(
-            section['x_qe_t_profile_walltime']))
-        backend.addArrayValues('x_qe_profile_ncalls', np.asarray(
-            section['x_qe_t_profile_ncalls']))
+        if section['x_qe_t_profile_function'] is not None:
+            backend.addArrayValues('x_qe_profile_function', np.asarray(
+                section['x_qe_t_profile_function']))
+            backend.addArrayValues('x_qe_profile_cputime', np.asarray(
+                section['x_qe_t_profile_cputime']))
+            backend.addArrayValues('x_qe_profile_walltime', np.asarray(
+                section['x_qe_t_profile_walltime']))
+            backend.addArrayValues('x_qe_profile_ncalls', np.asarray(
+                section['x_qe_t_profile_ncalls']))
 
     def appendToTmp(self, tmpname, value):
         self.tmp[tmpname] += value
