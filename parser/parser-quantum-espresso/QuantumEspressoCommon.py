@@ -74,7 +74,7 @@ class ParserQuantumEspresso(object):
             r"\s*\"P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 \(2009\);\s*",
             r"\s*URL http://www.quantum-espresso.org\",\s*",
             r"\s*in publications or presentations arising from this work. More details at",
-            r"\s*http://www.quantum-espresso.org/quote",
+            r"\s*http://www.quantum-espresso.org/quote(?:\.php)?",
             r"\s*http://www.quantum-espresso.org/wiki/index.php/Citing_Quantum-ESPRESSO\s*",
             # pure informational msg about how code was compiled
             r"\s*Ultrasoft \(Vanderbilt\) Pseudopotentials\s*(?:and PAW)?\s*",
@@ -83,7 +83,7 @@ class ParserQuantumEspresso(object):
             # warning msg is parsed before hints
             r"\s*Any further DFT definition will be discarded",
             r"\s*Please, verify this is what you really want",
-            r"\s*their fractional translations are incommensurate with FFT grid\)\s*$",
+            r"\s*their fractional transl?ations are incommensurate with FFT grid\)\s*$",
             r"\s*Threshold \(ethr\) on eigenvalues was too large:\s*$",
             r"\s*Diagonalizing with lowered threshold\s*$",
             # table separators
