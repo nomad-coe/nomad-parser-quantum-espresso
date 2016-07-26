@@ -78,6 +78,7 @@ class ParserQuantumEspresso(object):
             r"\s*http://www.quantum-espresso.org/wiki/index.php/Citing_Quantum-ESPRESSO\s*",
             # pure informational msg about how code was compiled
             r"\s*Ultrasoft \(Vanderbilt\) Pseudopotentials\s*(?:and PAW)?\s*",
+            r"\s*For Norm-Conserving or Ultrasoft \(Vanderbilt\) Pseudopotentials or PAW\s*",
             # when input is read from stdin...
             r"\s*Waiting for input\.\.\.\s*",
             # warning msg is parsed before hints
