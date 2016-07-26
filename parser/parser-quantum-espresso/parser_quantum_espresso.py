@@ -408,6 +408,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='subspace_diagonalization',
                       startReStr=r"\s*Subspace diagonalization in iterative solution of the eigenvalue problem:\s*$",
                       subMatchers=[
+                          SM(name='too_few_procs',
+                             startReStr=r"\s*Too few procs for parallel algorithm\s*$",
+                             subMatchers=[
+                                 SM(name='min_procs',
+                                    startReStr=r"\s*we need at least \d+ procs per pool\s*$",
+                                 )
+                             ],
+                          ),
                           SM(name='serial_algorithm',
                              startReStr=r"\s*a serial algorithm will be used\s*$",
                              adHoc=lambda p: p.backend.addValue('x_qe_diagonalization_algorithm', 'serial')
