@@ -511,6 +511,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
+                   SM(name='nosymm',
+                      startReStr=r"\s*No symmetry found\s*$",
+                      adHoc=lambda p: p.backend.addValue('x_qe_nsymm', 0)
+                   ),
                    SM(name='atom_pos_cart_list',
                       startReStr=r"\s*Cartesian axes\s*$",
                       subMatchers=[
