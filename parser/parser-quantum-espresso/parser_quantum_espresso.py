@@ -109,6 +109,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addArrayValues('x_qe_energy_decomposition_value', np.asarray(
             section['x_qe_t_energy_decomposition_value']))
 
+    def onClose_section_scf_iteration(
+            self, backend, gIndex, section):
+        """trigger called when section_scf_iteration is closed"""
+        if section['x_qe_t_david_with_overlap'] is not None:
+            backend.addValue('x_qe_diagonalization_scheme', 'davidson')
+        backend.addValue('x_qe_iteration_ethr', section['x_qe_t_iteration_ethr'][-1])
+
     def onOpen_section_eigenvalues(self, backend, gIndex, section):
         self.tmp['k_point'] = []
         self.tmp['k_energies'] = []
@@ -472,21 +479,19 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       sections=['section_scf_iteration'],
                       subMatchers=[
                           SM(name='david_overlap',
-                             startReStr=r"\s*Davidson diagonalization with overlap\s*$",
-                             adHoc=lambda p: p.backend.addValue("x_qe_david_with_overlap", True)
+                              startReStr=r"\s*(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)\s*$",
                           ),
                           SM(name='ethr',
-                             startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_iteration_ethr>" + RE_f +
-                                         r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_iteration_avg>" + RE_f +
+                             startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
+                                         r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_t_iteration_avg>" + RE_f +
                                          r")\s*$")
                           ),
                           SM(name='david_overlap2',
-                             startReStr=r"\s*Davidson diagonalization with overlap\s*$",
-                             adHoc=lambda p: p.backend.addValue("x_qe_david_with_overlap", True)
+                             startReStr=r"\s*(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)\s*$",
                           ),
                           SM(name='ethr2',
-                             startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_iteration_ethr>" + RE_f +
-                                         r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_iteration_avg>" + RE_f +
+                             startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
+                                         r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_t_iteration_avg>" + RE_f +
                                          r")\s*$")
                           ),
                           SM(name='iteration_rho',
