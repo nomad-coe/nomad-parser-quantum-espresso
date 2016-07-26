@@ -165,46 +165,64 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def onClose_section_system(self, backend, gIndex, section):
         # store direct lattice matrix for transformation crystal -> cartesian
-        self.amat = np.array([
-            section['x_qe_t_vec_a_x'], section['x_qe_t_vec_a_y'], section['x_qe_t_vec_a_z'],
-        ], dtype=np.float64).T
-        # store inverse for transformation cartesian -> crystal
-        try:
-            self.amat_inv = np.linalg.inv(self.amat)
-        except np.linalg.linalg.LinAlgError:
-            raise RuntimeError("error inverting bravais matrix " + str(self.amat))
-        # store reciprocal lattice matrix for transformation crystal -> cartesian
-        self.bmat = np.array([
-            section['x_qe_t_vec_b_x'], section['x_qe_t_vec_b_y'], section['x_qe_t_vec_b_z'],
-        ], dtype=np.float64).T
-        # store inverse for transformation cartesian -> crystal
-        try:
-            self.bmat_inv = np.linalg.inv(self.bmat)
-        except np.linalg.linalg.LinAlgError:
-            raise RuntimeError("error inverting reciprocal cell matrix")
-        backend.addArrayValues('simulation_cell', self.amat)
-        backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
+        if section['x_qe_t_vec_a_x'] is not None:
+            self.amat = np.array([
+                section['x_qe_t_vec_a_x'], section['x_qe_t_vec_a_y'], section['x_qe_t_vec_a_z'],
+            ], dtype=np.float64).T
+            # store inverse for transformation cartesian -> crystal
+            try:
+                self.amat_inv = np.linalg.inv(self.amat)
+            except np.linalg.linalg.LinAlgError:
+                raise RuntimeError("error inverting bravais matrix " + str(self.amat))
+            backend.addArrayValues('simulation_cell', self.amat)
+        else:
+            LOGGER.warning("No bravais matrix found in output")
+        if section['x_qe_t_vec_b_x'] is not None:
+            # store reciprocal lattice matrix for transformation crystal -> cartesian
+            self.bmat = np.array([
+                section['x_qe_t_vec_b_x'], section['x_qe_t_vec_b_y'], section['x_qe_t_vec_b_z'],
+            ], dtype=np.float64).T
+            # store inverse for transformation cartesian -> crystal
+            try:
+                self.bmat_inv = np.linalg.inv(self.bmat)
+            except np.linalg.linalg.LinAlgError:
+                raise RuntimeError("error inverting reciprocal cell matrix")
+            backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
+        else:
+            LOGGER.warning("No reciprocal cell matrix found in output")
         # atom positions
-        atpos_cart = np.array([
-            section['x_qe_t_atpos_x'], section['x_qe_t_atpos_y'], section['x_qe_t_atpos_z']
-        ], dtype=np.float64).T
-        backend.addArrayValues('atom_positions',atpos_cart)
-        backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
-        backend.addArrayValues('x_qe_atom_idx',np.array(section['x_qe_t_atom_idx']))
-        celldm_joint = " ".join(section['x_qe_t_celldm'])
-        celldm = [None, None, None, None, None, None]
-        for match in re.findall(r"celldm\(\s*(\d+)\s*\)\s*=\s*(" + RE_f + r")", celldm_joint):
-            celldm[int(match[0])-1] = valueForStrValue(match[1], 'f')
-        celldm[0] = self.alat
-        backend.addArrayValues('x_qe_celldm', np.array(celldm))
-        backend.addArrayValues('x_qe_k_info_ik', np.array(section['x_qe_t_k_info_ik']))
-        backend.addArrayValues('x_qe_k_info_wk', np.array(section['x_qe_t_k_info_wk']))
-        backend.addArrayValues('x_qe_k_info_vec', np.array([
-            section['x_qe_t_k_info_vec_x'], section['x_qe_t_k_info_vec_y'], section['x_qe_t_k_info_vec_z']
-        ]).T)
-        backend.addArrayValues('x_qe_dense_FFT_grid', np.array([
-            section['x_qe_t_dense_FFT_grid_x'], section['x_qe_t_dense_FFT_grid_y'], section['x_qe_t_dense_FFT_grid_z']
-        ]).T)
+        if section['x_qe_t_atpos_x'] is not None:
+            atpos_cart = np.array([
+                section['x_qe_t_atpos_x'], section['x_qe_t_atpos_y'], section['x_qe_t_atpos_z']
+            ], dtype=np.float64).T
+            backend.addArrayValues('atom_positions',atpos_cart)
+            backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
+            backend.addArrayValues('x_qe_atom_idx',np.array(section['x_qe_t_atom_idx']))
+        else:
+            LOGGER.warning("No atom positions found in output")
+        if section['x_qe_t_celldm'] is not None:
+            celldm_joint = " ".join(section['x_qe_t_celldm'])
+            celldm = [None, None, None, None, None, None]
+            for match in re.findall(r"celldm\(\s*(\d+)\s*\)\s*=\s*(" + RE_f + r")", celldm_joint):
+                celldm[int(match[0])-1] = valueForStrValue(match[1], 'f')
+            celldm[0] = self.alat
+            backend.addArrayValues('x_qe_celldm', np.array(celldm))
+        else:
+            LOGGER.warning("No QE cell dimensions found in output")
+        if section['x_qe_t_k_info_vec_x'] is not None:
+            backend.addArrayValues('x_qe_k_info_ik', np.array(section['x_qe_t_k_info_ik']))
+            backend.addArrayValues('x_qe_k_info_wk', np.array(section['x_qe_t_k_info_wk']))
+            backend.addArrayValues('x_qe_k_info_vec', np.array([
+                section['x_qe_t_k_info_vec_x'], section['x_qe_t_k_info_vec_y'], section['x_qe_t_k_info_vec_z']
+            ]).T)
+        else:
+            LOGGER.warning("No K-point info found in output")
+        if section['x_qe_t_dense_FFT_grid_x'] is not None:
+            backend.addArrayValues('x_qe_dense_FFT_grid', np.array([
+                section['x_qe_t_dense_FFT_grid_x'], section['x_qe_t_dense_FFT_grid_y'], section['x_qe_t_dense_FFT_grid_z']
+            ]).T)
+        else:
+            LOGGER.warning("No FFT grid info found in output")
 
     def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
         self.tmp['this_k_energies'] = ''
