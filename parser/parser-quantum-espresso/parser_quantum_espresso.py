@@ -239,6 +239,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ]).T)
         else:
             LOGGER.warning("No FFT grid info found in output")
+        if section['x_qe_t_smooth_FFT_grid_x'] is not None:
+            backend.addArrayValues('x_qe_smooth_FFT_grid', np.array([
+                section['x_qe_t_smooth_FFT_grid_x'], section['x_qe_t_smooth_FFT_grid_y'], section['x_qe_t_smooth_FFT_grid_z']
+            ]).T)
         if section['x_qe_t_vec_supercell_x'] is not None:
             backend.addArrayValues('x_qe_vec_supercell', np.array([
                 section['x_qe_t_vec_supercell_x'], section['x_qe_t_vec_supercell_y'], section['x_qe_t_vec_supercell_z']
@@ -552,6 +556,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=(r"\s*G\s+cutoff\s*=\s*(?P<x_qe_dense_g_cutoff>" + RE_f + r")\s*" +
                                   r"\(\s*(?P<x_qe_dense_g_vectors>\d+)\s*G-vectors\s*\)\s*FFT\s+grid:\s*\(\s*" +
                                   QeC.re_vec("x_qe_t_dense_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$"
+                      ),
+                   ),
+                   SM(name='smooth_grid',
+                      startReStr=(r"\s*Smooth\s+grid:\s*(?P<x_qe_smooth_g_vectors>\d+)\s*G-vectors\s*FFT\s+dimensions:\s*\(\s*" +
+                                  QeC.re_vec("x_qe_t_smooth_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$")
+                   ),
+                   SM(name='smooth_grid_old',
+                      startReStr=(r"\s*G\s+cutoff\s*=\s*(?P<x_qe_smooth_g_cutoff>" + RE_f + r")\s*" +
+                                  r"\(\s*(?P<x_qe_smooth_g_vectors>\d+)\s*G-vectors\s*\)\s*smooth\s+grid:\s*\(\s*" +
+                                  QeC.re_vec("x_qe_t_smooth_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$"
                       ),
                    ),
                    SM(name='input_occupations',
