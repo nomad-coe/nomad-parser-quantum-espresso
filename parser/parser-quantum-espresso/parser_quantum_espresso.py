@@ -426,7 +426,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*EXX-fraction\s*=\s*(?P<x_qe_t_exact_exchange_fraction>" + RE_f + r")\s*$",
                    ),
                    SM(name='celldm', repeats = True,
-                      startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + ")+)\s*$",
+                      startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + r")+)\s*$",
                    ),
                    SM(name='simulation_cell',
                       startReStr=r"\s*crystal axes: \(cart. coord.\s*in units of (?:a_0|alat)\s*\)\s*$",
