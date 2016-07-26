@@ -67,7 +67,7 @@ class ParserQuantumEspresso(object):
         # common prosa in espresso output
         self.coverageIgnoreList = [
             r"\s*",
-            r"\s*Ultrasoft \(Vanderbilt\) Pseudopotentials\s*",
+            r"\s*Ultrasoft \(Vanderbilt\) Pseudopotentials\s*(?:and PAW)?\s*",
             r"\s*This program is part of the open-source Quantum ESPRESSO suite",
             r"\s*for quantum simulation of materials; please cite",
             r"\s*\"P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 \(2009\);\s*",
