@@ -893,15 +893,17 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                          r"\s*s\s*avg\s*\))?\s*$"),
                              adHoc=self.adHoc_profiling5,
                           ),
-                          SM(name="profiling6_caller_general",
+                          SM(name="profiling6_caller_general", repeats=True,
                              startReStr=r"\s*(?:Called by)?\s*(?P<x_qe_t_profile_caller>\S+?)(?:\s*routines)?:?\s*$",
-                          ),
-                          SM(name="profiling6", repeats=True,
-                             startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" +
-                                         RE_f + r")\s*s\s*CPU" +
-                                         r"\s*\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls,\s*" + RE_f +
-                                         r"\s*s\s*avg\s*\)\s*$"),
-                             adHoc=lambda p: p.backend.addValue('x_qe_t_profile_walltime', p.lastMatch['x_qe_t_profile_cputime'])
+                             subMatchers=[
+                                 SM(name="profiling6", repeats=True,
+                                    startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" +
+                                                RE_f + r")\s*s\s*CPU" +
+                                                r"\s*\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls,\s*" + RE_f +
+                                                r"\s*s\s*avg\s*\)\s*$"),
+                                    adHoc=lambda p: p.backend.addValue('x_qe_t_profile_walltime', p.lastMatch['x_qe_t_profile_cputime'])
+                                 ),
+                             ],
                           ),
                        ],
                    ),
