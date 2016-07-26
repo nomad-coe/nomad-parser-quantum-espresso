@@ -383,7 +383,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='pseudopotential', repeats=True,
-                      startReStr=(r"\s*PseudoPot\.\s*#\s*(?P<x_qe_t_pp_idx>" + RE_i + r") for (?P<x_qe_t_pp_label>\S+) read from file" +
+                      startReStr=(r"\s*PseudoPot\.\s*#\s*(?P<x_qe_t_pp_idx>" + RE_i + r") for\s+(?P<x_qe_t_pp_label>\S+)\s+read from file" +
                                   r"(?::|\s*(?P<x_qe_t_pp_filename>\S+))\s*"),
                       sections=['x_qe_t_section_pseudopotential'],
                       subMatchers=[
