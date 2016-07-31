@@ -76,7 +76,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 continue
             target = re.sub(r'^x_qe_t_',r'x_qe_',key)
             if target == key:
-                raise RuntimeError('found non-temporary key in pseudopotential cache: "%s"' % (key))
+                raise Exception('found non-temporary key in pseudopotential cache: "%s"' % (key))
             backend.addValue(target, value[-1])
         if pp['x_qe_t_pp_idx'] is not None:
             pp_num = pp['x_qe_t_pp_idx'][-1]
@@ -192,7 +192,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             try:
                 self.amat_inv = np.linalg.inv(self.amat)
             except np.linalg.linalg.LinAlgError:
-                raise RuntimeError("error inverting bravais matrix " + str(self.amat))
+                raise Exception("error inverting bravais matrix " + str(self.amat))
             backend.addArrayValues('simulation_cell', self.amat)
         else:
             LOGGER.warning("No bravais matrix found in output")
@@ -205,7 +205,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             try:
                 self.bmat_inv = np.linalg.inv(self.bmat)
             except np.linalg.linalg.LinAlgError:
-                raise RuntimeError("error inverting reciprocal cell matrix")
+                raise Exception("error inverting reciprocal cell matrix")
             backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
         else:
             LOGGER.warning("No reciprocal cell matrix found in output")
