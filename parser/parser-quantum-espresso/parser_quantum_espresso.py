@@ -71,7 +71,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             self, backend, gIndex, section):
         pp_label = section['x_qe_pp_label'][0]
         pp = self.cache_t_pseudopotential[pp_label]
-        for key, value in pp.simpleValues.items():
+        for key, value in sorted(pp.simpleValues.items()):
             if key == 'x_qe_t_pp_label' or key == 'x_qe_pp_valence' or value is None:
                 continue
             target = re.sub(r'^x_qe_t_',r'x_qe_',key)

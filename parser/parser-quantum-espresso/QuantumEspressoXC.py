@@ -86,7 +86,9 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
                     xc_data[sub_component['XC_functional_name']] = sub_component
         elif this_component['XC_functional_name'] not in xc_data:
             xc_data[this_component['XC_functional_name']] = this_component
-    result = list(xc_data.values())
+    result = []
+    for k,v in sorted(xc_data.items()):
+        result.append(v)
     return result
 
 
