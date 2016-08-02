@@ -1,0 +1,50 @@
+#!/usr/bin/env python
+import os
+import sys
+import re
+import subprocess
+
+baseDir = os.path.dirname(os.path.abspath(__file__))
+qeDir = os.path.normpath(os.path.join(baseDir,"../"))
+
+if not qeDir in sys.path:
+        sys.path.insert(0, qeDir)
+
+import parser_quantum_espresso
+
+TESTSUITE_DIR = '/srv/work/tmp/espresso/test-link'
+RE_IGNORE_FILE = re.compile(r".*\.(?:annotate|json)$")
+RE_NO = re.compile(r"[^\|]+      no\|")
+
+# def run_test(parser_stream, qe_output):
+#     json_filename = qe_output + ".stream.json"
+#     parser_stream.communicate(
+#         input='{\n"mainFileUri": "file://%s",\n"mainFile": "%s",\n"outFile": "%s"},\n' % (
+#             qe_output, qe_output, qe_output + ".stream.json"))
+#     # count non-covered lines
+#     annotate_filename = qe_output + ".annotate"
+#     with open(annotate_filename) as annotate_file:
+#         countno = 0 
+#         for line in annotate_file:
+#             if RE_NO.match(line):
+#                 countno += 1
+#         print("# cmissing: %6d %s" % (countno, qe_output),file=sys.stderr)
+
+
+def run_tests():
+    with open("input_stream.json", "w") as input_stream:
+        for filename in os.listdir(TESTSUITE_DIR):
+            if RE_IGNORE_FILE.match(filename):
+                continue
+            src_file = TESTSUITE_DIR + "/" + filename
+            input_stream.write(
+                '{\n  "mainFileUri": "file://%s",\n  "mainFile": "%s",\n  "outFile": "%s"\n},\n' % (
+                    src_file, src_file, src_file + ".stream.json"))
+    with open("input_stream.json", "r") as input_stream:
+        subprocess.call([
+            'python', 'parser_quantum_espresso.py', '--annotate', '--stream'],
+            stdin=input_stream
+        )
+
+if __name__ == '__main__':
+    run_tests()
