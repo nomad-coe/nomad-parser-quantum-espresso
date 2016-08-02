@@ -633,9 +633,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name='kpoint_info_smearing_old',
                              startReStr=(r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*gaussian broad.\s*\(Ry\)\s*=" +
-                                         r"\s*(?P<x_qe_smearing_width__rydberg>" + RE_f + r")\s*ngauss\s*=" +
-                                         r"\s*(?P<x_qe_ngauss>" + RE_i + ")\s*$"),
-                             adHoc=lambda p: LOGGER.error("translate ngauss to name of smearing"),
+                                         r"\s*(?P<smearing_width__rydberg>" + RE_f + r")\s*ngauss\s*=" +
+                                         r"\s*(?P<x_qe_smearing_ngauss>" + RE_i + ")\s*$"),
+                             adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND.get(str(p.lastMatch['x_qe_smearing_ngauss']))),
                              subMatchers=[
                                  SM(name="kpoint_heading",
                                     startReStr=r"\s*cart. coord. in units 2pi/(?:alat|a_0)\s*$",
