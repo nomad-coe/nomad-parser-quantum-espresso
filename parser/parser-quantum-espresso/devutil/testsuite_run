@@ -3,6 +3,12 @@ import os
 import sys
 import re
 import subprocess
+import io
+import logging
+
+
+LOGGER=logging.getLogger(__name__)
+
 
 baseDir = os.path.dirname(os.path.abspath(__file__))
 qeDir = os.path.normpath(os.path.join(baseDir,"../"))
@@ -15,23 +21,12 @@ import parser_quantum_espresso
 TESTSUITE_DIR = '/srv/work/tmp/espresso/test-link'
 RE_IGNORE_FILE = re.compile(r".*\.(?:annotate|json)$")
 RE_NO = re.compile(r"[^\|]+      no\|")
-
-# def run_test(parser_stream, qe_output):
-#     json_filename = qe_output + ".stream.json"
-#     parser_stream.communicate(
-#         input='{\n"mainFileUri": "file://%s",\n"mainFile": "%s",\n"outFile": "%s"},\n' % (
-#             qe_output, qe_output, qe_output + ".stream.json"))
-#     # count non-covered lines
-#     annotate_filename = qe_output + ".annotate"
-#     with open(annotate_filename) as annotate_file:
-#         countno = 0 
-#         for line in annotate_file:
-#             if RE_NO.match(line):
-#                 countno += 1
-#         print("# cmissing: %6d %s" % (countno, qe_output),file=sys.stderr)
-
+RE_GREPC = re.compile(r"(.*):(\d+)\S*$")
+RE_WCL = re.compile(r"\s*(\d+)\s+(.*)$")
 
 def run_tests():
+    annotated = []
+    input_files = [] 
     with open("input_stream.json", "w") as input_stream:
         for filename in os.listdir(TESTSUITE_DIR):
             if RE_IGNORE_FILE.match(filename):
@@ -40,11 +35,58 @@ def run_tests():
             input_stream.write(
                 '{\n  "mainFileUri": "file://%s",\n  "mainFile": "%s",\n  "outFile": "%s"\n},\n' % (
                     src_file, src_file, src_file + ".stream.json"))
-    with open("input_stream.json", "r") as input_stream:
+            annotated.append(src_file + ".annotate")
+            input_files.append(src_file)
+    with open("input_stream.json", "r") as input_stream, open("input_stream.out","w") as input_stdout, open("input_stream.log","w") as input_stderr:
         subprocess.call([
             'python', 'parser_quantum_espresso.py', '--annotate', '--stream'],
-            stdin=input_stream
+            stdin=input_stream, stdout=input_stdout, stderr=input_stderr
         )
+    input_nlines = {}
+    with subprocess.Popen([
+            'wc', '-l' ] + input_files, stdout=subprocess.PIPE) as wcl:
+        for line in io.TextIOWrapper(wcl.stdout, encoding="utf-8"):
+            if line == '':
+                break
+            line = line.rstrip()
+            m = RE_WCL.match(line)
+            if m is None:
+                LOGGER.warning("skipping wc -l output: %s", line)
+                continue
+            input_nlines[m.group(2)] = int(m.group(1))
+    annotated_nlines = {}
+    with subprocess.Popen([
+            'wc', '-l' ] + annotated, stdout=subprocess.PIPE) as wcl:
+        for line in io.TextIOWrapper(wcl.stdout, encoding="utf-8"):
+            if line == '':
+                break
+            line = line.rstrip()
+            m = RE_WCL.match(line)
+            if m is None:
+                LOGGER.warning("skipping wc -l output: %s", line)
+                continue
+            annotated_nlines[m.group(2)] = int(m.group(1))
+    with open("input_stream.parsed_missing", "w") as parsed_missing:
+        pm = []
+        with subprocess.Popen([
+                'grep', '-c', '     no|'] + annotated, stdout=subprocess.PIPE) as grepc:
+            for line in io.TextIOWrapper(grepc.stdout, encoding="utf-8"):
+                if line == '':
+                    break
+                m = RE_GREPC.match(line)
+                if not m:
+                    LOGGER.error("unrecognized grep output: %s",line.rstrip())
+                    continue
+                fname = m.group(1)
+                input_fname = re.sub(r"\.annotate",r"", fname)
+                aborted_parse = (input_nlines[input_fname] > (annotated_nlines[fname]-1))
+                if aborted_parse:
+                    count_missing = -1
+                else:
+                    count_missing =int(m.group(2))
+                pm.append( (count_missing, fname) )
+        for num, fname in sorted(pm):
+            parsed_missing.write("%5d %s\n" % (num, fname))
 
 if __name__ == '__main__':
     run_tests()
