@@ -55,3 +55,6 @@ TAGS
 
 lib/
 env/
+
+#QE test runs on pw.x testsuite
+parser/parser-quantum-espresso/testsuite.*

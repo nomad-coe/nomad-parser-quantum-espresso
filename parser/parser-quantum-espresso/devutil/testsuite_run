@@ -27,7 +27,7 @@ RE_WCL = re.compile(r"\s*(\d+)\s+(.*)$")
 def run_tests():
     annotated = []
     input_files = [] 
-    with open("input_stream.json", "w") as input_stream:
+    with open("testsuite.input.json", "w") as input_stream:
         for filename in os.listdir(TESTSUITE_DIR):
             if RE_IGNORE_FILE.match(filename):
                 continue
@@ -37,7 +37,7 @@ def run_tests():
                     src_file, src_file, src_file + ".stream.json"))
             annotated.append(src_file + ".annotate")
             input_files.append(src_file)
-    with open("input_stream.json", "r") as input_stream, open("input_stream.out","w") as input_stdout, open("input_stream.log","w") as input_stderr:
+    with open("testsuite.input.json", "r") as input_stream, open("testsuite.out","w") as input_stdout, open("testsuite.log","w") as input_stderr:
         subprocess.call([
             'python', 'parser_quantum_espresso.py', '--annotate', '--stream'],
             stdin=input_stream, stdout=input_stdout, stderr=input_stderr
@@ -66,7 +66,7 @@ def run_tests():
                 LOGGER.warning("skipping wc -l output: %s", line)
                 continue
             annotated_nlines[m.group(2)] = int(m.group(1))
-    with open("input_stream.parsed_missing", "w") as parsed_missing:
+    with open("testsuite.parsed_missing", "w") as parsed_missing:
         pm = []
         with subprocess.Popen([
                 'grep', '-c', '     no|'] + annotated, stdout=subprocess.PIPE) as grepc:
