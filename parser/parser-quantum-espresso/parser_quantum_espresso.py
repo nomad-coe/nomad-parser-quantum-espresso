@@ -389,6 +389,12 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*This is a supercell, fractional translations? are disabled\s*$",
                       adHoc=lambda p: p.backend.addValue('x_qe_supercell', True)
                    ),
+                   SM(name='supercell3', repeats=True,
+                      # observed in PWSCF 4.0
+                      # "     Found additional translation:   -0.5000   -0.5000    0.0000"
+                      startReStr=r"\s*Found additional translation:\s*" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*$",
+                      adHoc=lambda p: p.backend.addValue('x_qe_supercell', True),
+                   ),
                    SM(name='pseudopotential_report', repeats=True,
                       startReStr=r"\s*\|\s*pseudopotential report for atomic species\s*:\s*(?P<x_qe_t_pp_report_species>\d+)\s*\|\s*$",
                       endReStr=r"\s*={4,}\s*$",
