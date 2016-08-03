@@ -571,6 +571,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name='pp_comment',
                              startReStr=r"\s*(?P<x_qe_t_pp_comment>.*?)\s*$",
                           ),
+                          SM(name='pp_integral_directions',
+                             startReStr=(r"\s*Setup to integrate on\s*" +
+                                         r"(?P<x_qe_t_pp_integral_ndirections>\d+)\s+directions:\s*" +
+                                         r"integral exact up to l =\s*(?P<x_qe_t_pp_integral_lmax_exact>\d+)\s*$"),
+                          ),
                           SM(name='pp_augmentation_shape',
                              startReStr=r"\s*Shape of augmentation charge:\s*(?P<x_qe_t_pp_augmentation_shape>.*?)\s*$",
                           ),
