@@ -313,8 +313,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             parser.backend.addValue('x_qe_t_profile_walltime', QeC.NAN)
         if parser.lastMatch.get('x_qe_t_profile_ncalls', None) is None:
             parser.backend.addValue('x_qe_t_profile_ncalls', QeC.NAN)
-        parser.backend.addValue('x_qe_t_profile_caller_list', self.tmp.get('x_qe_t_profile_caller', None))
-        parser.backend.addValue('x_qe_t_profile_category_list', self.tmp.get('x_qe_t_profile_category', None))
+        parser.backend.addValue('x_qe_t_profile_caller_list', self.tmp.get('x_qe_t_profile_caller', ''))
+        parser.backend.addValue('x_qe_t_profile_category_list', self.tmp.get('x_qe_t_profile_category', ''))
 
     def run_submatchers(self):
         """submatchers of section_run"""
