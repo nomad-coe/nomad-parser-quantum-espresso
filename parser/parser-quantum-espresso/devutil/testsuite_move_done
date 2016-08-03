@@ -1,0 +1,2 @@
+#!/bin/bash
+perl -ne '@l=split; if ($l[0]==0) { $a=$l[1]; if ($a=~s/\.annotate//) { @g=glob "$a*"; print join("\n", @g) . "\n"; }}' /srv/work/build/nomad-lab-base/parsers/quantum-espresso/parser/parser-quantum-espresso/testsuite.parsed_missing | xargs mv --target-directory=/srv/work/tmp/espresso/test-link-done/
