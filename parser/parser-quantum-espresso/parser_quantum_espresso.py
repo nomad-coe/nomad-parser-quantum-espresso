@@ -97,6 +97,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             self, backend, gIndex, section):
         self.cache_t_pp_report[section['x_qe_t_pp_report_species'][0]] = section
 
+    def onClose_x_qe_t_section_pp_warning(
+            self, backend, gIndex, section):
+        self.cache_t_pp_renorm_wfc[
+            section['x_qe_t_pp_warning_filename'][-1]] = section['x_qe_t_pp_warning_wfclabel'][-1]
+
     def onClose_x_qe_t_section_input_occupations(
             self, backend, gIndex, section):
         if section['x_qe_t_input_occupations'] is not None:
@@ -403,6 +408,24 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='renormalized_pseudo_wavefunction', repeats=True,
                       startReStr=r"\s*file\s*(?P<x_qe_t_pp_renormalized_filename>.*?)\s*:\s*wavefunction\(s\)\s*(?P<x_qe_t_pp_renormalized_wfc>.*?)\s*renormalized",
                       adHoc=self.adHoc_pp_renorm,
+                   ),
+                   SM(name='pseudopotential_warning', repeats=True,
+                      # same as 'renormalized_pseudo_wavefunction', but seen in QE 4.1
+                      startReStr=(r"\s*WARNING: Pseudopotential #\s*(?P<x_qe_t_pp_warning_idx>\d+)\s*"+
+                                  r"file\s*:\s*(?P<x_qe_t_pp_warning_filename>.+?)\s*$"),
+                      subMatchers=[
+                          SM(name='pp_warning_not_normalized', repeats=True,
+                             startReStr=(r"\s*WARNING: WFC #\s*(?P<x_qe_t_pp_warning_wfcidx>\d+)\s*" +
+                                         r"\((?P<x_qe_t_pp_warning_wfclabel>[^\)]+)\) IS NOT CORRECTLY NORMALIZED:\s*" +
+                                         r"norm=\s*(?P<x_qe_t_pp_warning_wfcnorm>" + RE_f + r")\s*$"),
+                             subMatchers=[
+                                 SM(name='pp_warning_normalization_msg', repeats=True,
+                                    startReStr=r"\s*WARNING: WFC HAS BEEN NOW RENORMALIZED",
+                                 ),
+                             ],
+                          ),
+                      ],
+                      sections=['x_qe_t_section_pp_warning'],
                    ),
                    SM(name='enforced_XC',
                       startReStr=r"\s*IMPORTANT: XC functional enforced from input\s*:\s*",
