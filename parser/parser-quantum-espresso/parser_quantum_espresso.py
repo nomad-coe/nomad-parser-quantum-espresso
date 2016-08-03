@@ -278,6 +278,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def appendToTmp(self, tmpname, value):
         self.tmp[tmpname] += value
 
+    def setTmp(self, tmpname, value):
+        self.tmp[tmpname] = value
+
     def adHoc_alat(self, parser):
         alat = parser.lastMatch['x_qe_alat']
         self.alat = parser.lastMatch['x_qe_alat']
