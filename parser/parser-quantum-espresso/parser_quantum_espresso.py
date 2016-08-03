@@ -261,6 +261,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.tmp['k_energies'].append(ek_split)
         self.tmp['k_point'].append([section['x_qe_t_k_x'][0], section['x_qe_t_k_y'][0], section['x_qe_t_k_z'][0]])
 
+    def onOpen_section_run(
+            self, backend, gIndex, section):
+        """trigger called when section_single_configuration_calculation
+        is closed"""
+        self.tmp.pop('x_qe_t_profile_caller', None)
+        self.tmp.pop('x_qe_t_profile_category', None)
+
     def onClose_section_run(
             self, backend, gIndex, section):
         """trigger called when section_single_configuration_calculation
@@ -274,6 +281,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 section['x_qe_t_profile_walltime']))
             backend.addArrayValues('x_qe_profile_ncalls', np.asarray(
                 section['x_qe_t_profile_ncalls']))
+            backend.addArrayValues('x_qe_profile_category', np.asarray(
+                section['x_qe_t_profile_category_list']))
+            backend.addArrayValues('x_qe_profile_caller', np.asarray(
+                section['x_qe_t_profile_caller_list']))
 
     def appendToTmp(self, tmpname, value):
         self.tmp[tmpname] += value
@@ -291,19 +302,19 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.cache_t_pp_renorm_wfc[parser.lastMatch[
             'x_qe_t_pp_renormalized_filename']] = parser.lastMatch['x_qe_t_pp_renormalized_wfc']
 
-    def adHoc_profiling4(self, parser):
-        parser.backend.addValue('x_qe_t_profile_ncalls', 1)
-        parser.backend.addValue('x_qe_t_profile_walltime', parser.lastMatch['x_qe_t_profile_cputime'])
+    def adHoc_profiling_category(self, parser):
+        self.setTmp('x_qe_t_profile_category', parser.lastMatch['x_qe_t_profile_category'])
+        self.tmp.pop('x_qe_t_profile_caller', None)
 
-    def adHoc_profiling5(self, parser):
+    def adHoc_profiling_complete(self, parser):
+        if parser.lastMatch.get('x_qe_t_profile_cputime', None) is None:
+            parser.backend.addValue('x_qe_t_profile_cputime', QeC.NAN)
+        if parser.lastMatch.get('x_qe_t_profile_walltime', None) is None:
+            parser.backend.addValue('x_qe_t_profile_walltime', QeC.NAN)
         if parser.lastMatch.get('x_qe_t_profile_ncalls', None) is None:
-            parser.backend.addValue('x_qe_t_profile_ncalls', 1)
-        parser.backend.addValue('x_qe_t_profile_walltime', parser.lastMatch['x_qe_t_profile_cputime'])
-
-    def adHoc_profiling6(self, parser):
-        if parser.lastMatch.get('x_qe_t_profile_ncalls', None) is None:
-            parser.backend.addValue('x_qe_t_profile_ncalls', 1)
-        parser.backend.addValue('x_qe_t_profile_walltime', parser.lastMatch['x_qe_t_profile_cputime'])
+            parser.backend.addValue('x_qe_t_profile_ncalls', QeC.NAN)
+        parser.backend.addValue('x_qe_t_profile_caller_list', self.tmp.get('x_qe_t_profile_caller', None))
+        parser.backend.addValue('x_qe_t_profile_category_list', self.tmp.get('x_qe_t_profile_category', None))
 
     def run_submatchers(self):
         """submatchers of section_run"""
@@ -897,59 +908,33 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
-                          ),
-                          SM(name="warning_save_mgga2",
-                             startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
-                          ),
-                          SM(name="profiling0", repeats=True,
-                             startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" + RE_f +
-                                         r")\s*s\s*CPU\s*(?P<x_qe_t_profile_walltime__s>" + RE_f + r")\s*s\s*WALL" +
-                                         r"\s*\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls\s*\)\s*$"),
-                          ),
-                          SM(name="profiling_caller", repeats=True,
-                             startReStr=r"\s*(?:Called by)?\s*(?P<x_qe_t_profile_caller>\S+?)(?:\s*routines)?:?\s*$",
                              subMatchers=[
-                                 SM(name="profiling", repeats=True,
-                                    startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" + RE_f +
-                                                r")\s*s\s*CPU\s*(?P<x_qe_t_profile_walltime__s>" + RE_f + r")\s*s\s*WALL" +
-                                                r"\s*\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls\s*\)\s*$"),
-                                 ),
-                             ],
-                          ),
-                          SM(name="profiling2", repeats=True,
-                             startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*" +
-                                         r"(?P<x_qe_t_profile_cputime__strQeTimespan>.*)CPU" +
-                                         r"\s*(?P<x_qe_t_profile_walltime__strQeTimespan>.*)\s*WALL\s*$"),
-                             adHoc=lambda p: p.backend.addValue('x_qe_t_profile_ncalls', 1),
-                          ),
-                          # profiling of 'old' espresso
-                          SM(name="profiling3",
-                             startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" + RE_f +
-                                         r")\s*s\s*CPU\s*time,\s*(?P<x_qe_t_profile_walltime__s>" + RE_f + r")\s*s\s*wall\s*time\s*$"),
-                             adHoc=lambda p: p.backend.addValue('x_qe_t_profile_ncalls', 1),
-                          ),
-                          SM(name="profiling4", repeats=True,
-                             startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" + RE_f +
-                                         r")\s*s\s*CPU\s*$"),
-                             adHoc=self.adHoc_profiling4,
-                          ),
-                          SM(name="profiling5", repeats=True,
-                             startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" +
-                                         RE_f + r")\s*s\s*CPU" +
-                                         r"\s*(?:\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls,\s*" + RE_f +
-                                         r"\s*s\s*avg\s*\))?\s*$"),
-                             adHoc=self.adHoc_profiling5,
-                          ),
-                          SM(name="profiling6_caller_general", repeats=True,
-                             startReStr=r"\s*(?:Called by)?\s*(?P<x_qe_t_profile_caller>\S+?)(?:\s*routines)?:?\s*$",
-                             subMatchers=[
-                                 SM(name="profiling6", repeats=True,
-                                    startReStr=(r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*(?P<x_qe_t_profile_cputime__s>" +
-                                                RE_f + r")\s*s\s*CPU" +
-                                                r"(?:\s*\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls,\s*" + RE_f +
-                                                r"\s*s\s*avg\s*\))?\s*$"),
-                                    adHoc=self.adHoc_profiling6
-                                 ),
+                                SM(name="warning_save_mgga2",
+                                   startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
+                                ),
+                                SM(name="profiling", repeats=True,
+                                   # empty line starts/continues profiling info
+                                   startReStr=r"\s*$",
+                                   subMatchers=[
+                                       SM(name="profiling_caller", repeats=True,
+                                          startReStr=r"\s*Called by\s*(?P<x_qe_t_profile_caller>\S+?):?\s*$",
+                                          adHoc=lambda p: self.setTmp('x_qe_t_profile_caller', p.lastMatch['x_qe_t_profile_caller']),
+                                       ),
+                                       SM(name="profiling_category", repeats=True,
+                                          startReStr=r"\s*(?P<x_qe_t_profile_category>.*?)\s*routines:?\s*$",
+                                          adHoc=self.adHoc_profiling_category,
+                                       ),
+                                       SM(name="profiling_complete", repeats=True,
+                                          startReStr=(
+                                              r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*" +
+                                              r"(?:(?P<x_qe_t_profile_cputime__strQeTimespan>.*)\s*(?:CPU\s*time\s*,|CPU)\s*)?" +
+                                              r"(?:(?P<x_qe_t_profile_walltime__strQeTimespan>.*)\s*(?:wall\s*time|WALL)\s*)?"
+                                              r"(?:\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls\s*(?:,\s*\S+\s*s\s*avg\s*)?\)\s*)?$"
+                                          ),
+                                          adHoc=self.adHoc_profiling_complete,
+                                       ),
+                                   ],
+                                ),
                              ],
                           ),
                        ],
