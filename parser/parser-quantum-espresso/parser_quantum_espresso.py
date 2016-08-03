@@ -766,27 +766,23 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   r"\s*beta\s*=\s*(?P<x_qe_iteration_beta>" + RE_f + r")\s*$"),
                       sections=['section_scf_iteration'],
                       subMatchers=[
-                          SM(name='david_overlap',
-                              startReStr=r"\s*(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)\s*$",
-                          ),
-                          SM(name='cg_style_diag',
-                              startReStr=r"\s*(?P<x_qe_t_cg_diag>CG style diagonalization.*)\s*$",
-                          ),
-                          SM(name='ethr',
-                             startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
-                                         r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_t_iteration_avg>" + RE_f +
-                                         r")\s*$")
-                          ),
-                          SM(name='david_overlap2',
-                             startReStr=r"\s*(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)\s*$",
-                          ),
-                          SM(name='cg_style_diag2',
-                              startReStr=r"\s*(?P<x_qe_t_cg_diag>CG style diagonalization.*)\s*$",
-                          ),
-                          SM(name='ethr2',
-                             startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
-                                         r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_t_iteration_avg>" + RE_f +
-                                         r")\s*$")
+                          SM(name='david_or_cg', repeats=True,
+                             startReStr=r"\s*(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)|(?P<x_qe_t_cg_diag>CG style diagonalization.*)\s*$",
+                             subMatchers=[
+                                 SM(name='warn_not_converged', repeats=True,
+                                    startReStr=(r"\s*WARNING:\s*(?P<x_qe_warn_n_unconverged_eigenvalues>" + RE_i +
+                                                r")\s*eigenvalues not converged"),
+                                 ),
+                                 SM(name='c_bands_not_converged', repeats=True,
+                                    startReStr=(r"\s*c_bands:\s*(?P<x_qe_c_bands_n_unconverged_eigenvalues>" + RE_i +
+                                                r")\s*eigenvalues not converged"),
+                                 ),
+                                 SM(name='ethr', repeats=True,
+                                    startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
+                                                r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_t_iteration_avg>" + RE_f +
+                                                r")\s*$"),
+                                 ),
+                             ],
                           ),
                           SM(name='iteration_rho',
                              startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_iteration_charge_negative_up>" + RE_f +
