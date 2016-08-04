@@ -61,6 +61,10 @@ QE_SMEARING_KIND = {
      '-1': 'marzari-vanderbilt',
       '0': 'gaussian',
       '1': 'methfessel-paxton',
+    'Marzari-Vanderbilt smearing': 'marzari-vanderbilt',
+     'Methfessel-Paxton smearing': 'methfessel-paxton',
+              'gaussian smearing': 'gaussian',
+           'Fermi-Dirac smearing': 'fermi',
 }
 
 
