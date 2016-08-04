@@ -19,6 +19,13 @@ from nomadcore.parser_backend import valueForStrValue
 LOGGER = logging.getLogger(__name__)
 
 
+# Lookup table mapping string to bool flag
+QE_SPIN_NONCOLLINEAR = {
+    'Noncollinear': True,
+    'Non magnetic': False,
+}
+
+
 class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     """main place to keep the parser status, open ancillary files,..."""
     def __init__(self):
@@ -150,6 +157,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('x_qe_temporary_array_size', np.asarray(section['x_qe_t_temporary_array_size']))
         if section['x_qe_t_temporary_array_dimensions'] is not None:
             backend.addArrayValues('x_qe_temporary_array_dimensions', np.asarray(section['x_qe_t_temporary_array_dimensions']))
+        if section['x_qe_t_spin_orbit_magn'] is not None:
+            backend.addValue('x_qe_spin_orbit', (section['x_qe_t_spin_orbit_mode'][-1] == 'with'))
+            noncollinear = QE_SPIN_NONCOLLINEAR.get(section['x_qe_t_spin_orbit_magn'][-1], None)
+            if noncollinear is None:
+                LOGGER.error("unimplemented value for 'x_qe_t_spin_orbit_magn': '%s'",
+                             str(section['x_qe_t_spin_orbit_magn'][-1]))
+            else:
+                backend.addValue('x_qe_spin_noncollinear', noncollinear)
 
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
@@ -597,6 +612,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                    SM(name='exx_fraction',
                       startReStr=r"\s*EXX-fraction\s*=\s*(?P<x_qe_t_exact_exchange_fraction>" + RE_f + r")\s*$",
+                   ),
+                   SM(name='spin_orbit_mode',
+                      startReStr=r"\s*(?P<x_qe_t_spin_orbit_magn>.*?)\s*calculation\s*(?P<x_qe_t_spin_orbit_mode>with(?:out)?)\s*spin-orbit\s*$",
                    ),
                    SM(name='celldm', repeats = True,
                       startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + r")+)\s*$",
