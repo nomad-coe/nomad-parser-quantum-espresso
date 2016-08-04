@@ -232,6 +232,17 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('atom_positions',atpos_cart)
             backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
             backend.addArrayValues('x_qe_atom_idx',np.array(section['x_qe_t_atom_idx']))
+            if section['x_qe_t_starting_magnetization_species'] is not None:
+                # build dict with per-species magnetization
+                sp_magn = {}
+                for (label, magn) in zip(
+                        section['x_qe_t_starting_magnetization_species'],
+                        section['x_qe_t_starting_magnetization_value']):
+                    sp_magn[label] = magn
+                at_magn = []
+                for label in section['x_qe_t_atom_labels']:
+                    at_magn.append(sp_magn[label])
+                backend.addArrayValues('x_qe_atom_starting_magnetization',np.array(at_magn))
         else:
             LOGGER.warning("No atom positions found in output")
         if section['x_qe_t_celldm'] is not None:
@@ -659,6 +670,20 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                         r"\s+(?P<x_qe_kind_mass>" + RE_f + r")\s+(?P<x_qe_pp_label>[^\s\(]+)\s*" +
                                         r"\(\s*(?P<x_qe_pp_weight>" + RE_f + r")\s*\)\s*$",
                              sections=['section_method_atom_kind'],
+                          ),
+                      ],
+                   ),
+                   SM(name='starting_magnetization',
+                      startReStr=r"\s*Starting magnetic structure\s*$",
+                      subMatchers=[
+                          SM(name='starting_magnetization_header',
+                             startReStr=r"\s*atomic species\s+magnetization\s*$",
+                             subMatchers=[
+                                 SM(name='starting_magnetization_data',
+                                    startReStr=(r"\s*(?P<x_qe_t_starting_magnetization_species>.*?)\s*" +
+                                                r"(?P<x_qe_t_starting_magnetization_value>" + RE_f + r")\s*$"),
+                                 ),
+                             ],
                           ),
                       ],
                    ),
