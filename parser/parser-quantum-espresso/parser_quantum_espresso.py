@@ -461,6 +461,17 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
+                   SM(name='enforced_XC',
+                      startReStr=r"\s*IMPORTANT: XC functional enforced from input\s*:\s*",
+                      subMatchers=[
+                          SM(name='xc_functional_enforced', required=True, # details are parsed in xc_functional
+                             startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_t_xc_functional_shortname_enforced>\S+)\s*\([^\(]+\)\s*$"
+                          ),
+                          SM(name='exx_fraction_enforced',
+                             startReStr=r"\s*EXX-fraction\s*=\s*" + RE_f + r"\s*$",
+                          ),
+                      ],
+                   ),
                    SM(name='renormalized_pseudo_wavefunction', repeats=True,
                       startReStr=r"\s*file\s*(?P<x_qe_t_pp_renormalized_filename>.*?)\s*:\s*wavefunction\(s\)\s*(?P<x_qe_t_pp_renormalized_wfc>.*?)\s*renormalized",
                       adHoc=self.adHoc_pp_renorm,
@@ -482,17 +493,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                       sections=['x_qe_t_section_pp_warning'],
-                   ),
-                   SM(name='enforced_XC',
-                      startReStr=r"\s*IMPORTANT: XC functional enforced from input\s*:\s*",
-                      subMatchers=[
-                          SM(name='xc_functional_enforced', required=True, # details are parsed in xc_functional
-                             startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_t_xc_functional_shortname_enforced>\S+)\s*\([^\(]+\)\s*$"
-                          ),
-                          SM(name='exx_fraction_enforced',
-                             startReStr=r"\s*EXX-fraction\s*=\s*" + RE_f + r"\s*$",
-                          ),
-                      ],
                    ),
                    SM(name='dispersion_correction',
                       startReStr=r"\s*Parameters for Dispersion Correction:\s*$",
