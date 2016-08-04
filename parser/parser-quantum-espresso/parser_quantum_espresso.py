@@ -109,6 +109,12 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              unit_conversion.convert_unit(
                                  integration_radius[self.atom_kind_idx],
                                  'usrAlat'))
+        # DFT-D data
+        cache_dft_d = self.tmp.get('dispersion_correction', {})
+        dft_d = cache_dft_d.get(pp_label, None)
+        if dft_d is not None:
+            for k, v in dft_d.items():
+                backend.addValue(k, v)
 
     def onClose_x_qe_t_section_pp_report(
             self, backend, gIndex, section):
@@ -333,6 +339,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def setTmp(self, tmpname, value):
         self.tmp[tmpname] = value
 
+    def adHoc_dispersion_correction_values(self, parser):
+        if 'dispersion_correction' not in self.tmp:
+            self.tmp['dispersion_correction'] = {}
+        self.tmp['dispersion_correction'][parser.lastMatch['x_qe_t_species_dispersion_correction_label']] = {
+            'x_qe_dispersion_correction_vdw_radius': parser.lastMatch['x_qe_t_species_dispersion_correction_vdw_radius'],
+            'x_qe_dispersion_correction_C6': parser.lastMatch['x_qe_t_species_dispersion_correction_C6'],
+        }
+
     def adHoc_alat(self, parser):
         alat = parser.lastMatch['x_qe_alat']
         self.alat = parser.lastMatch['x_qe_alat']
@@ -479,6 +493,23 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*EXX-fraction\s*=\s*" + RE_f + r"\s*$",
                           ),
                       ],
+                   ),
+                   SM(name='dispersion_correction',
+                      startReStr=r"\s*Parameters for Dispersion Correction:\s*$",
+                      subMatchers=[
+                          SM(name='dispersion_correction_header',
+                             startReStr=r"\s*atom\s*VdW radius\s*C_6\s*$",
+                             subMatchers=[
+                                 SM(name='dispersion_correction_values', repeats=True,
+                                    startReStr=(r"\s*(?P<x_qe_t_species_dispersion_correction_label>.+?)\s+" +
+                                                r"(?P<x_qe_t_species_dispersion_correction_vdw_radius>" + RE_f + r")" +
+                                                r"\s*(?P<x_qe_t_species_dispersion_correction_C6>" + RE_f + r")\s*$"),
+                                    adHoc=self.adHoc_dispersion_correction_values,
+                                 ),
+                             ],
+                          ),
+                      ],
+                      adHoc=lambda p: p.backend.addValue('x_qe_dispersion_correction', True)
                    ),
                    SM(name='gamma_algorithms',
                       startReStr=r"\s*gamma-point specific algorithms are used\s*$",
