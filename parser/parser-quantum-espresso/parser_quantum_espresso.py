@@ -188,6 +188,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('atom_forces', np.array([
                 section['x_qe_t_force_x'], section['x_qe_t_force_y'], section['x_qe_t_force_z']
                 ]).T)
+        if section['x_qe_t_dispersion_force_x'] is not None:
+            backend.addArrayValues('x_qe_atom_dispersion_force', np.array([
+                section['x_qe_t_dispersion_force_x'], section['x_qe_t_dispersion_force_y'], section['x_qe_t_dispersion_force_z']
+                ]).T)
         if section['x_qe_t_stress_x'] is not None:
             backend.addArrayValues('stress_tensor', np.array([
                 section['x_qe_t_stress_x'], section['x_qe_t_stress_y'], section['x_qe_t_stress_z']
@@ -1051,10 +1055,26 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                                 r"(?P<x_qe_force_total_scf_correction__rydberg_bohr_1>" + RE_f +
                                                 r")\s*$"),
                                  ),
-                                 SM(name="force_ethr_warning",
-                                    startReStr=r"\s*(?P<x_qe_warning>SCF correction compared to forces is large: reduce conv_thr to get better values)\s*$",
+                             ],
+                          ),
+                          SM(name="atoms_dispersion_forces",
+                             startReStr=(r"\s*Total Dispersion Force =\s*(?P<x_qe_dispersion_force_total__rydberg_bohr_1>" +
+                                         RE_f + r")\s*"),
+                             subMatchers=[
+                                 SM(name="atom_dispersion_force_header",
+                                    startReStr=r"\s*Dispersion forces acting on atoms:\s*$",
+                                    subMatchers=[
+                                        SM(name="atom_dispersion_force", repeats=True,
+                                           startReStr=(r"\s*atom\s*(?P<x_qe_t_dispersion_force_atom_idx>\d+)"+
+                                                       r"\s*type\s*\d+\s*force\s*=\s*"+
+                                                       QeC.re_vec('x_qe_t_dispersion_force', 'rydberg_bohr_1') + "\s*$")
+                                        ),
+                                    ],
                                  ),
                              ],
+                          ),
+                          SM(name="force_ethr_warning",
+                             startReStr=r"\s*(?P<x_qe_warning>SCF correction compared to forces is large: reduce conv_thr to get better values)\s*$",
                           ),
                           SM(name="stress_tensor",
                              startReStr=r"\s*entering subroutine stress \.\.\.\s*$",
