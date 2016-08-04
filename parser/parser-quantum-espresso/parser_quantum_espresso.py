@@ -1025,6 +1025,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                                 r"(?P<x_qe_force_total_scf_correction__rydberg_bohr_1>" + RE_f +
                                                 r")\s*$"),
                                  ),
+                                 SM(name="force_ethr_warning",
+                                    startReStr=r"\s*(?P<x_qe_warning>SCF correction compared to forces is large: reduce conv_thr to get better values)\s*$",
+                                 ),
                              ],
                           ),
                           SM(name="stress_tensor",
