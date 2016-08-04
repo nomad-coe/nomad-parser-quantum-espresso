@@ -552,7 +552,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                          r"(?:\((?:alat|a0)\s*units\)\s*" + RE_f + r"\s*\(a\.u\.\)\s*for type\s*" +
                                          r"(?P<x_qe_t_species_integration_radius_idx>" + RE_i + r"))?\s*$"
                              ),
-                             adHoc=lambda p: LOGGER.error("fix me"),
                           ),
                       ],
                    ),
