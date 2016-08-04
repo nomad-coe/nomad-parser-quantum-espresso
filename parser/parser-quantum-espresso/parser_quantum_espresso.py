@@ -674,6 +674,27 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='spin_orbit_mode',
                       startReStr=r"\s*(?P<x_qe_t_spin_orbit_magn>.*?)\s*calculation\s*(?P<x_qe_t_spin_orbit_mode>with(?:out)?)\s*spin-orbit\s*$",
                    ),
+                   SM(name='berry_efield',
+                      startReStr=r"\s*Using Berry phase electric field\s*$",
+                      subMatchers=[
+                          SM(name='berry_efield_direction',
+                             startReStr=r"\s*Direction\s*:\s*(?P<x_qe_berry_efield_direction>\d+)\s*$",
+                          ),
+                          SM(name='berry_efield_intensity',
+                             startReStr=(r"\s*Intensity \(Ry a.u.\)\s*:\s*(?P<x_qe_berry_efield_intensity>" + RE_f +
+                                         r")\s*$"),
+                          ),
+                          SM(name='berry_efield_strings',
+                             startReStr=(r"\s*Strings composed by\s*:\s*(?P<x_qe_berry_efield_strings_nk>" + RE_i +
+                                         r")\s*k-points\s*$"),
+                          ),
+                          SM(name='berry_efield_niter',
+                             startReStr=(r"\s*Number of iterative cycles:\s*(?P<x_qe_berry_efield_niter>" + RE_i +
+                                         r")\s*$"),
+                          ),
+                      ],
+                      adHoc=lambda p: p.backend.addValue('x_qe_berry_efield', True),
+                   ),
                    SM(name='celldm', repeats = True,
                       startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + r")+)\s*$",
                    ),
