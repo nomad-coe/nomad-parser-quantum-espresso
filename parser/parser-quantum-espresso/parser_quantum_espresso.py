@@ -524,7 +524,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       adHoc=lambda p: p.backend.addValue('x_qe_gamma_algorithms', True)
                    ),
                    SM(name='subspace_diagonalization',
-                      startReStr=r"\s*Subspace diagonalization in iterative solution of the eigenvalue problem:\s*$",
+                      startReStr=r"\s*(?:Subspace diagonalization in iterative solution of the eigenvalue problem:|Iterative solution of the eigenvalue problem)\s*$",
                       subMatchers=[
                           SM(name='too_few_procs',
                              startReStr=r"\s*Too few procs for parallel algorithm\s*$",
