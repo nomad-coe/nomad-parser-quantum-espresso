@@ -585,7 +585,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='xc_functional', required=True,
                       startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>.*?)\s*\((?P<x_qe_xc_functional_num>[^\)]*)\s*\)\s*$"
                    ),
-                   SM(name='exx_fraction', required=True,
+                   SM(name='exx_fraction',
                       startReStr=r"\s*EXX-fraction\s*=\s*(?P<x_qe_t_exact_exchange_fraction>" + RE_f + r")\s*$",
                    ),
                    SM(name='celldm', repeats = True,
