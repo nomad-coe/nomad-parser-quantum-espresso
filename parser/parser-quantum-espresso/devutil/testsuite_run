@@ -25,7 +25,7 @@ RE_NO = re.compile(r"[^\|]+      no\|")
 RE_GREPC = re.compile(r"(.*):(\d+)\S*$")
 RE_WCL = re.compile(r"\s*(\d+)\s+(.*)$")
 
-def run_tests(testsuite_base):
+def run_tests(testsuite_dir, testsuite_base):
     annotated = []
     input_files = [] 
     testsuite_list_file = testsuite_base + ".input.json"
@@ -33,10 +33,10 @@ def run_tests(testsuite_base):
     testsuite_log = testsuite_base + ".log"
     testsuite_parsed_missing = testsuite_base + ".parsed_missing"
     with open(testsuite_list_file, "w") as input_stream:
-        for filename in os.listdir(TESTSUITE_DIR):
+        for filename in os.listdir(testsuite_dir):
             if RE_IGNORE_FILE.match(filename):
                 continue
-            src_file = TESTSUITE_DIR + "/" + filename
+            src_file = testsuite_dir + "/" + filename
             input_stream.write(
                 '{\n  "mainFileUri": "file://%s",\n  "mainFile": "%s",\n  "outFile": "%s"\n},\n' % (
                     src_file, src_file, src_file + ".stream.json"))
@@ -94,4 +94,4 @@ def run_tests(testsuite_base):
             parsed_missing.write("%5d %s\n" % (num, fname))
 
 if __name__ == '__main__':
-    run_tests(TESTSUITE_BASE)
+    run_tests(TESTSUITE_DIR, TESTSUITE_BASE)
