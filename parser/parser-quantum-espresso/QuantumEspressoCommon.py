@@ -84,7 +84,7 @@ class ParserQuantumEspresso(object):
             r"\s*",
             # ignore copyright/citation msg
             r"\s*This program is part of the open-source Quantum ESPRESSO suite",
-            r"\s*for quantum simulation of materials; please cite",
+            r"\s*for quantum simulation of materials; please (?:cite|acknowledge)",
             r"\s*\"P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 \(2009\);\s*",
             r"\s*URL http://www.quantum-espresso.org\",\s*",
             r"\s*in publications or presentations arising from this work. More details at",
@@ -104,6 +104,7 @@ class ParserQuantumEspresso(object):
             # initialization info
             r"\s*Initializing real-space augmentation for DENSE grid\s*$",
             r"\s*Checking if some PAW data can be deallocated\.\.\.\s*$",
+            r"\s*ierr\s*=\s*\d+",
             # table separators
             r"^\s*[=%-]+\s*$",
         ]
