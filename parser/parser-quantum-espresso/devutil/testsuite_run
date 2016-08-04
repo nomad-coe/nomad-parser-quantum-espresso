@@ -19,15 +19,20 @@ if not qeDir in sys.path:
 import parser_quantum_espresso
 
 TESTSUITE_DIR = '/srv/work/tmp/espresso/test-link'
+TESTSUITE_BASE = 'testsuite'
 RE_IGNORE_FILE = re.compile(r".*\.(?:annotate|json)$")
 RE_NO = re.compile(r"[^\|]+      no\|")
 RE_GREPC = re.compile(r"(.*):(\d+)\S*$")
 RE_WCL = re.compile(r"\s*(\d+)\s+(.*)$")
 
-def run_tests():
+def run_tests(testsuite_base):
     annotated = []
     input_files = [] 
-    with open("testsuite.input.json", "w") as input_stream:
+    testsuite_list_file = testsuite_base + ".input.json"
+    testsuite_out = testsuite_base + ".out"
+    testsuite_log = testsuite_base + ".log"
+    testsuite_parsed_missing = testsuite_base + ".parsed_missing"
+    with open(testsuite_list_file, "w") as input_stream:
         for filename in os.listdir(TESTSUITE_DIR):
             if RE_IGNORE_FILE.match(filename):
                 continue
@@ -37,7 +42,7 @@ def run_tests():
                     src_file, src_file, src_file + ".stream.json"))
             annotated.append(src_file + ".annotate")
             input_files.append(src_file)
-    with open("testsuite.input.json", "r") as input_stream, open("testsuite.out","w") as input_stdout, open("testsuite.log","w") as input_stderr:
+    with open(testsuite_list_file, "r") as input_stream, open(testsuite_out, "w") as input_stdout, open(testsuite_log, "w") as input_stderr:
         subprocess.call([
             'python', 'parser_quantum_espresso.py', '--annotate', '--stream'],
             stdin=input_stream, stdout=input_stdout, stderr=input_stderr
@@ -66,7 +71,7 @@ def run_tests():
                 LOGGER.warning("skipping wc -l output: %s", line)
                 continue
             annotated_nlines[m.group(2)] = int(m.group(1))
-    with open("testsuite.parsed_missing", "w") as parsed_missing:
+    with open(testsuite_parsed_missing, "w") as parsed_missing:
         pm = []
         with subprocess.Popen([
                 'grep', '-c', '     no|'] + annotated, stdout=subprocess.PIPE) as grepc:
@@ -89,4 +94,4 @@ def run_tests():
             parsed_missing.write("%5d %s\n" % (num, fname))
 
 if __name__ == '__main__':
-    run_tests()
+    run_tests(TESTSUITE_BASE)
