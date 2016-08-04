@@ -949,6 +949,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
+                          SM(name="iter_warning_save_mgga",
+                             startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
+                          ),
                           SM(name='iteration_rho',
                              startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_iteration_charge_negative_up>" + RE_f +
                                          r")\s*(?P<x_qe_iteration_charge_negative_down>" + RE_f + r")\s*$"),
