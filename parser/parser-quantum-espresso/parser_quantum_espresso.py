@@ -534,6 +534,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  )
                              ],
                           ),
+                          SM(name='too_few_proc_42',
+                             # fallback for 4.2, msg on one line
+                             startReStr=r"\s*Too few procs for parallel algorithm: we need at least \d* procs per pool\s*$",
+                          ),
                           SM(name='serial_algorithm',
                              startReStr=r"\s*a serial algorithm will be used\s*$",
                              adHoc=lambda p: p.backend.addValue('x_qe_diagonalization_algorithm', 'serial')
