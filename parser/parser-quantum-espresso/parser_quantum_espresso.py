@@ -231,7 +231,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 raise Exception("error inverting bravais matrix " + str(self.amat))
             backend.addArrayValues('simulation_cell', self.amat)
         else:
-            LOGGER.warning("No bravais matrix found in output")
+            LOGGER.error("No bravais matrix found in output")
         if section['x_qe_t_vec_b_x'] is not None:
             # store reciprocal lattice matrix for transformation crystal -> cartesian
             self.bmat = np.array([
@@ -244,7 +244,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 raise Exception("error inverting reciprocal cell matrix")
             backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
         else:
-            LOGGER.warning("No reciprocal cell matrix found in output")
+            LOGGER.error("No reciprocal cell matrix found in output")
         # atom positions
         if section['x_qe_t_atpos_x'] is not None:
             atpos_cart = np.array([
@@ -265,7 +265,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                     at_magn.append(sp_magn[label])
                 backend.addArrayValues('x_qe_atom_starting_magnetization',np.array(at_magn))
         else:
-            LOGGER.warning("No atom positions found in output")
+            LOGGER.error("No atom positions found in output")
         if section['x_qe_t_celldm'] is not None:
             celldm_joint = " ".join(section['x_qe_t_celldm'])
             celldm = [None, None, None, None, None, None]
@@ -274,7 +274,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             celldm[0] = self.alat
             backend.addArrayValues('x_qe_celldm', np.array(celldm))
         else:
-            LOGGER.warning("No QE cell dimensions found in output")
+            LOGGER.error("No QE cell dimensions found in output")
         if section['x_qe_t_k_info_vec_x'] is not None:
             backend.addArrayValues('x_qe_k_info_ik', np.array(section['x_qe_t_k_info_ik']))
             backend.addArrayValues('x_qe_k_info_wk', np.array(section['x_qe_t_k_info_wk']))
@@ -282,7 +282,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 section['x_qe_t_k_info_vec_x'], section['x_qe_t_k_info_vec_y'], section['x_qe_t_k_info_vec_z']
             ]).T)
         else:
-            LOGGER.warning("No K-point info found in output")
+            LOGGER.error("No K-point info found in output")
         if section['x_qe_t_dense_FFT_grid_x'] is not None:
             backend.addArrayValues('x_qe_dense_FFT_grid', np.array([
                 section['x_qe_t_dense_FFT_grid_x'], section['x_qe_t_dense_FFT_grid_y'], section['x_qe_t_dense_FFT_grid_z']
