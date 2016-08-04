@@ -494,6 +494,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                       sections=['x_qe_t_section_pp_warning'],
                    ),
+                   SM(name='dispersion_correction_obsolete_iosys',
+                      startReStr=r"\s*Message from routine iosys:\s*$",
+                      subMatchers=[
+                          SM(name='dispersion_correction_obsolete',
+                             startReStr=r"\s*(?P<x_qe_warning>london is obsolete, use \"vdw_corr='grimme-d2'\" instead)\s*$",
+                          )
+                      ],
+                   ),
                    SM(name='dispersion_correction',
                       startReStr=r"\s*Parameters for Dispersion Correction:\s*$",
                       subMatchers=[
