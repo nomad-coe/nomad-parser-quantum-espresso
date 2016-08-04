@@ -1086,7 +1086,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                           startReStr=(
                                               r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*" +
                                               r"(?:(?P<x_qe_t_profile_cputime__strQeTimespan>.*)\s*(?:CPU\s*time\s*,|CPU)\s*)?" +
-                                              r"(?:(?P<x_qe_t_profile_walltime__strQeTimespan>.*)\s*(?:wall\s*time|WALL)\s*)?"
+                                              r"(?:(?P<x_qe_t_profile_walltime__strQeTimespan>.*)\s*[wW][aA][lL][lL](?:\s*[tT][iI][mM][eE])?\s*)?"
                                               r"(?:\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls\s*(?:,\s*\S+\s*s\s*avg\s*)?\)\s*)?$"
                                           ),
                                           adHoc=self.adHoc_profiling_complete,
