@@ -55,6 +55,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.cache_t_pseudopotential = {}
         self.cache_t_pp_report = {}
         self.cache_t_pp_renorm_wfc = {}
+        self.cache_t_method = section
+        self.atom_kind_idx = -1
 
     def onOpen_section_system(
             self, backend, gIndex, section):
@@ -69,6 +71,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def onClose_section_method_atom_kind(
             self, backend, gIndex, section):
+        self.atom_kind_idx += 1
         pp_label = section['x_qe_pp_label'][0]
         pp = self.cache_t_pseudopotential[pp_label]
         for key, value in sorted(pp.simpleValues.items()):
@@ -92,6 +95,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             renorm_info = self.cache_t_pp_renorm_wfc.get(basename, None)
             if renorm_info is not None:
                 backend.addValue('x_qe_pp_renormalized_wfc', renorm_info)
+        # set charge/magnetization integration radius if applicable
+        integration_radius=self.cache_t_method['x_qe_t_species_integration_radius']
+        if integration_radius:
+            backend.addValue('x_qe_species_integration_radius',
+                             unit_conversion.convert_unit(
+                                 integration_radius[self.atom_kind_idx],
+                                 'usrAlat'))
 
     def onClose_x_qe_t_section_pp_report(
             self, backend, gIndex, section):
@@ -518,6 +528,20 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name='sticks_line40', repeats=True,
                              startReStr=r"\s*(?P<x_qe_sticks_old>(?:\s+\d+){9})\s*$",
+                          ),
+                      ],
+                   ),
+                   SM(name='atom_radii',
+                      startReStr=r"\s*Generating pointlists\s*\.\.\.\s*$",
+                      subMatchers=[
+                          SM(name='new_r_m', repeats=True,
+                             # radius is in alat units, but they are not yet defined.
+                             # convert manually in onClose hook...
+                             startReStr=(r"\s*new\s+r_m\s*:\s*(?P<x_qe_t_species_integration_radius>" + RE_f + r")\s*" +
+                                         r"(?:\((?:alat|a0)\s*units\)\s*" + RE_f + r"\s*\(a\.u\.\)\s*for type\s*" +
+                                         r"(?P<x_qe_t_species_integration_radius_idx>" + RE_i + r"))?\s*$"
+                             ),
+                             adHoc=lambda p: LOGGER.error("fix me"),
                           ),
                       ],
                    ),
