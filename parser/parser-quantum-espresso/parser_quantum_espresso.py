@@ -990,6 +990,24 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_iteration_charge_negative_up>" + RE_f +
                                          r")\s*(?P<x_qe_iteration_charge_negative_down>" + RE_f + r")\s*$"),
                           ),
+                          SM(name='iteration_Efield',
+                             startReStr=(r"\s*Expectation value of exp\(iGx\):\s*\(\s*" +
+                                         r"(?P<x_qe_iteration_efield_eeigx_re>" + RE_f + r")\s*,\s*" +
+                                         r"(?P<x_qe_iteration_efield_eeigx_im>" + RE_f + r")\s*\)(?:\s*" + RE_f + r")?\s*$"),
+                             subMatchers=[
+                                 SM(name='iteration_Efield_dkfact',
+                                    startReStr=(r"\s*" + RE_f + r"\s*$"),
+                                 ),
+                                 SM(name='iteration_Efield_dipole_electric',
+                                    startReStr=(r"\s*Electronic Dipole per cell \((?:Ry\s*)?a.u.\)\s*" +
+                                                r"(?P<x_qe_iteration_efield_dipole_electronic__rydberg>" + RE_f + r")\s*$"),
+                                 ),
+                                 SM(name='iteration_Efield_dipole_ionic',
+                                    startReStr=(r"\s*Ionic Dipole per cell \((?:Ry\s*)?a.u.\)\s*" +
+                                                r"(?P<x_qe_iteration_efield_dipole_ionic__rydberg>" + RE_f + r")\s*$"),
+                                 ),
+                             ],
+                          ),
                           SM(name='cputime_iteration_msg',
                              startReStr=(r"\s*total cpu time spent up to now is\s*(?P<time_scf_iteration_cpu1_end>" + RE_f +
                                          r")\s*secs"),
