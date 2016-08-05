@@ -681,7 +681,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*Direction\s*:\s*(?P<x_qe_berry_efield_direction>\d+)\s*$",
                           ),
                           SM(name='berry_efield_intensity',
-                             startReStr=(r"\s*Intensity \(Ry a.u.\)\s*:\s*(?P<x_qe_berry_efield_intensity>" + RE_f +
+                             # Ry unit is not printed in 4.0
+                             startReStr=(r"\s*Intensity \((?:Ry\s*)?a.u.\)\s*:\s*(?P<x_qe_berry_efield_intensity>" + RE_f +
                                          r")\s*$"),
                           ),
                           SM(name='berry_efield_strings',
