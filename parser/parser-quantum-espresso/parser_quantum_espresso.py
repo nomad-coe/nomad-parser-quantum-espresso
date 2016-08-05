@@ -488,7 +488,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='renormalized_pseudo_wavefunction', repeats=True,
-                      startReStr=r"\s*file\s*(?P<x_qe_t_pp_renormalized_filename>.*?)\s*:\s*wavefunction\(s\)\s*(?P<x_qe_t_pp_renormalized_wfc>.*?)\s*renormalized",
+                      startReStr=r"\s*file\s*(?P<x_qe_t_pp_renormalized_filename>.*?)\s*:\s*wavefunction\(s\)\s*(?P<x_qe_t_pp_renormalized_wfc>.*?)\s*renormalized\s*$",
                       adHoc=self.adHoc_pp_renorm,
                    ),
                    SM(name='pseudopotential_warning', repeats=True,
@@ -502,7 +502,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                          r"norm=\s*(?P<x_qe_t_pp_warning_wfcnorm>" + RE_f + r")\s*$"),
                              subMatchers=[
                                  SM(name='pp_warning_normalization_msg', repeats=True,
-                                    startReStr=r"\s*WARNING: WFC HAS BEEN NOW RENORMALIZED",
+                                    startReStr=r"\s*WARNING: WFC HAS BEEN NOW RENORMALIZED\s*$",
                                  ),
                              ],
                           ),
@@ -586,11 +586,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name="sticks_separator43",
                              startReStr=r"\s*-+\s*$",
                           ),
-                          SM(name="sticks_summary43", required=True,
-                             startReStr=r"\s*(?P<x_qe_sticks_old>nst =.*)",
+                          SM(name="sticks_summary43",
+                             startReStr=r"\s*(?P<x_qe_sticks_old>nst =.*)\s*$",
                           ),
-                          SM(name="sticks_header43", required=True,
-                             startReStr=r"\s*(?P<x_qe_sticks_old>n\.st\s+n\.stw\s+n\.sts\s+n\.g\s+n\.gw\s+n\.gs)",
+                          SM(name="sticks_header43",
+                             startReStr=r"\s*(?P<x_qe_sticks_old>n\.st\s+n\.stw\s+n\.sts\s+n\.g\s+n\.gw\s+n\.gs)\s*$",
                           ),
                           SM(name='sticks_line43', repeats=True,
                              startReStr=r"\s*(?P<x_qe_sticks_old>(?:min|max|)(?:\s+\d+){6})\s*$",
@@ -963,10 +963,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                    SM(name='cputime_msg',
                       startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_time_setup_cpu1_end>" + RE_f +
-                                  r")\s*secs"),
+                                  r")\s*secs\s*$"),
                    ),
                    SM(name='per_process_mem',
-                      startReStr=r"\s*per-process dynamical memory:\s*(?P<x_qe_per_process_mem__mebibyte>" + RE_f + ")\s*Mb",
+                      startReStr=r"\s*per-process dynamical memory:\s*(?P<x_qe_per_process_mem__mebibyte>" + RE_f + ")\s*Mb\s*$",
                    ),
                ],
             ), # header
@@ -985,11 +985,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              subMatchers=[
                                  SM(name='warn_not_converged', repeats=True,
                                     startReStr=(r"\s*WARNING:\s*(?P<x_qe_warn_n_unconverged_eigenvalues>" + RE_i +
-                                                r")\s*eigenvalues not converged"),
+                                                r")\s*eigenvalues not converged\s*$"),
                                  ),
                                  SM(name='c_bands_not_converged', repeats=True,
                                     startReStr=(r"\s*c_bands:\s*(?P<x_qe_c_bands_n_unconverged_eigenvalues>" + RE_i +
-                                                r")\s*eigenvalues not converged"),
+                                                r")\s*eigenvalues not converged\s*$"),
                                  ),
                                  SM(name='ethr', repeats=True,
                                     startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
@@ -1025,7 +1025,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name='cputime_iteration_msg',
                              startReStr=(r"\s*total cpu time spent up to now is\s*(?P<time_scf_iteration_cpu1_end>" + RE_f +
-                                         r")\s*secs"),
+                                         r")\s*secs\s*$"),
                           ),
                           SM(name='e_total',
                              startReStr=(r"\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>" + RE_f + r")" +
@@ -1050,12 +1050,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='scf_result', repeats=False,
-                       startReStr=r'\s*End of self-consistent calculation',
+                       startReStr=r'\s*End of self-consistent calculation\s*$',
                        sections=['section_eigenvalues'],
                        subMatchers=[
                           SM(name='bands', repeats=True,
                               sections=['x_qe_t_section_kbands'],
-                              startReStr=r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba', '\s*') + r'\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i + ')\s*PWs',
+                              startReStr=(r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba', '\s*') +
+                                          r'\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i +
+                                          r")\s*PWs\s*\)\s*bands\s*\(\s*[eE][vV]\s*\)\s*:?\s*$"),
                               subMatchers=[
                                   SM(name='kbnd', repeats=True,
                                       startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
@@ -1098,7 +1100,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              subMatchers=[
                                  SM(name='energy_decomposition_contribution', repeats=True,
                                     startReStr=(r"\s*(?P<x_qe_t_energy_decomposition_name>.*?)\s*=\s*" +
-                                                r"(?P<x_qe_t_energy_decomposition_value__rydberg>" + RE_f + r")\s*Ry"),
+                                                r"(?P<x_qe_t_energy_decomposition_value__rydberg>" + RE_f + r")\s*Ry\s*$"),
                                  ),
                              ],
                           ),
@@ -1169,7 +1171,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              ],
                           ),
                           SM(name="stress_message",
-                             startReStr=r"\s*Message from routine stress\s*",
+                             startReStr=r"\s*Message from routine stress\s*:?\s*$",
                              subMatchers=[
                                  SM(name="no_mgga",
                                     startReStr=r"\s*Meta-GGA and stress not implemented\s*$",
