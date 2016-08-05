@@ -858,6 +858,21 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
+                          SM(name='kpoint_info_tetrahedra',
+                             startReStr=r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*\((?P<x_qe_smearing_kind>tetrahedron method)\)\s*$",
+                             adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND[p.lastMatch['x_qe_smearing_kind']]),
+                             subMatchers=[
+                                 SM(name="kpoint_heading",
+                                    startReStr=r"\s*cart. coord. in units 2pi/(?:alat|a_0)\s*$",
+                                 ),
+                                 SM(name="kpoint_kpoints", repeats=True,
+                                    startReStr=(r"\s*k\(\s*(?P<x_qe_t_k_info_ik>\d+)\s*\)\s*=\s*\(\s*" +
+                                                QeC.re_vec('x_qe_t_k_info_vec', 'usrAlat') +
+                                                r"\s*\),\s*wk\s*=\s*(?P<x_qe_t_k_info_wk>" + RE_f + r")\s*$"),
+
+                                 ),
+                             ],
+                          ),
                       ],
                    ),
                    SM(name='dense_grid',

@@ -65,6 +65,7 @@ QE_SMEARING_KIND = {
      'Methfessel-Paxton smearing': 'methfessel-paxton',
               'gaussian smearing': 'gaussian',
            'Fermi-Dirac smearing': 'fermi',
+             'tetrahedron method': 'tetrahedra',
 }
 
 
