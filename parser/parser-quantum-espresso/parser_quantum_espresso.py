@@ -1039,6 +1039,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=(r"\s*estimated scf accuracy\s*<\s*(?P<x_qe_energy_total_accuracy_estimate_iteration>" +
                                          RE_f + r")\s*Ry\s*$"),
                           ),
+                          SM(name='total_magnetization',
+                             startReStr=(r"\s*total magnetization\s*=\s*(?P<x_qe_magnetization_total_iteration>" + RE_f +
+                                         r")\s*Bohr mag/cell\s*$"),
+                          ),
+                          SM(name='absolute_magnetization',
+                             startReStr=(r"\s*absolute magnetization\s*=\s*(?P<x_qe_magnetization_absolute_iteration>" + RE_f +
+                                         r")\s*Bohr mag/cell\s*$"),
+                          ),
                       ],
                    ),
                    SM(name='scf_result', repeats=False,
@@ -1093,6 +1101,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                                 r"(?P<x_qe_t_energy_decomposition_value__rydberg>" + RE_f + r")\s*Ry"),
                                  ),
                              ],
+                          ),
+                          SM(name='total_magnetization',
+                             startReStr=(r"\s*total magnetization\s*=\s*(?P<x_qe_magnetization_total>" + RE_f +
+                                         r")\s*Bohr mag/cell\s*$"),
+                          ),
+                          SM(name='absolute_magnetization',
+                             startReStr=(r"\s*absolute magnetization\s*=\s*(?P<x_qe_magnetization_absolute>" + RE_f +
+                                         r")\s*Bohr mag/cell\s*$"),
                           ),
                           SM(name="convergence_iterations",
                              startReStr=r"\s*convergence has been achieved in\s*(?P<x_qe_convergence_iterations>\d+)\s*iterations\s*",
