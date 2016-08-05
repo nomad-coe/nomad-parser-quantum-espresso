@@ -943,7 +943,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   r")\s*(?P<x_qe_starting_charge_negative_down>" + RE_f + r")\s*$"),
                    ),
                    SM(name='starting_wfc',
-                      startReStr=r"\s*Starting wfc are\s*(?P<x_qe_starting_wfc>.*?)\s*$",
+                      startReStr=r"\s*Starting wfc\s*(?P<x_qe_starting_wfc>.*?)\s*$",
                    ),
                    SM(name='cputime_msg',
                       startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_time_setup_cpu1_end>" + RE_f +
