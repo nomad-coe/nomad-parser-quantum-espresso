@@ -923,7 +923,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*The initial density is read from file\s*:\s*$",
                       subMatchers=[
                           SM(name='initial_density_file',
-                             startReStr=r"\s*(?P<x_qe_starting_density_file>.+\.dat)\s*$",
+                             startReStr=r"\s*(?P<x_qe_starting_density_file>.+\.(?:dat|xml))\s*$",
                           ),
                       ],
                    ),
