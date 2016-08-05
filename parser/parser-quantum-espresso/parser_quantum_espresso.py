@@ -918,6 +918,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=(r"\s*Check: negative/imaginary core charge\s*=\s*(?P<x_qe_core_charge_negative>" +
                                   RE_f + r")\s*(?P<x_qe_core_charge_imaginary>" + RE_f + r")\s*$")
                    ),
+                   SM(name='initial_density_from_file',
+                      startReStr=r"\s*The initial density is read from file\s*:\s*$",
+                      subMatchers=[
+                          SM(name='initial_density_file',
+                             startReStr=r"\s*(?P<x_qe_starting_density_file>.+\.dat)\s*$",
+                          ),
+                      ],
+                   ),
                    SM(name='initial_potential',
                       startReStr=r"\s*Initial potential from\s*(?P<x_qe_starting_potential>.*?)\s*$",
                    ),
