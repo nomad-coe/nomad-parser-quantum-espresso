@@ -1040,11 +1040,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                          RE_f + r")\s*Ry\s*$"),
                           ),
                           SM(name='total_magnetization',
-                             startReStr=(r"\s*total magnetization\s*=\s*(?P<x_qe_magnetization_total_iteration>" + RE_f +
+                             startReStr=(r"\s*total magnetization\s*=\s*(?P<x_qe_magnetization_total_iteration__mubohr>" + RE_f +
                                          r")\s*Bohr mag/cell\s*$"),
                           ),
                           SM(name='absolute_magnetization',
-                             startReStr=(r"\s*absolute magnetization\s*=\s*(?P<x_qe_magnetization_absolute_iteration>" + RE_f +
+                             startReStr=(r"\s*absolute magnetization\s*=\s*(?P<x_qe_magnetization_absolute_iteration__mubohr>" + RE_f +
                                          r")\s*Bohr mag/cell\s*$"),
                           ),
                       ],
@@ -1105,11 +1105,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              ],
                           ),
                           SM(name='total_magnetization',
-                             startReStr=(r"\s*total magnetization\s*=\s*(?P<x_qe_magnetization_total>" + RE_f +
+                             startReStr=(r"\s*total magnetization\s*=\s*(?P<x_qe_magnetization_total__mubohr>" + RE_f +
                                          r")\s*Bohr mag/cell\s*$"),
                           ),
                           SM(name='absolute_magnetization',
-                             startReStr=(r"\s*absolute magnetization\s*=\s*(?P<x_qe_magnetization_absolute>" + RE_f +
+                             startReStr=(r"\s*absolute magnetization\s*=\s*(?P<x_qe_magnetization_absolute__mubohr>" + RE_f +
                                          r")\s*Bohr mag/cell\s*$"),
                           ),
                           SM(name="convergence_iterations",
