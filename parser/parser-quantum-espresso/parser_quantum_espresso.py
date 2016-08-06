@@ -1066,19 +1066,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                               ],
                           ),
                           SM(name='highest_occupied',
-                             startReStr=(r"\s*highest occupied level \(ev\):\s*(?P<x_qe_highest_occupied__eV>" + RE_f +
+                             startReStr=(r"\s*highest occupied level \(ev\):\s*(?P<energy_reference_highest_occupied__eV>" + RE_f +
                                          r")\s*$"),
-                             adHoc=lambda p: LOGGER.error("apply highest occupied"),
                           ),
                           SM(name='highest_occupied_lowest_unoccupied',
                              startReStr=(r"\s*highest occupied, lowest unoccupied level \(ev\):\s*" +
-                                         r"(?P<x_qe_highest_occupied__eV>" + RE_f + r")\s*" +
-                                         r"(?P<x_qe_lowest_unoccupied__eV>" + RE_f + r")\s*$"),
-                             adHoc=lambda p: LOGGER.error("apply highest occupied/lowest unoccupied"),
+                                         r"(?P<energy_reference_highest_occupied__eV>" + RE_f + r")\s*" +
+                                         r"(?P<energy_reference_lowest_unoccupied__eV>" + RE_f + r")\s*$"),
                           ),
                           SM(name='e_fermi',
-                             startReStr=(r"\s*the Fermi energy is\s*(?P<x_qe_energy_fermi>" + RE_f + ")\s*ev\s*$"),
-                             adHoc=lambda p: LOGGER.error("apply fermi energy"),
+                             startReStr=(r"\s*the Fermi energy is\s*(?P<energy_reference_fermi__eV>" + RE_f + ")\s*ev\s*$"),
                           ),
                           SM(name='e_total',
                              startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total>' + RE_f + ')\s*Ry\s*$',
