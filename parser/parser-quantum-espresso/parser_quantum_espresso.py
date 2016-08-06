@@ -68,6 +68,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def onOpen_section_system(
             self, backend, gIndex, section):
         self.secSystemIndex = gIndex
+        self.secSystem = section
 
     def onClose_x_qe_t_section_pseudopotential(
             self, backend, gIndex, section):
