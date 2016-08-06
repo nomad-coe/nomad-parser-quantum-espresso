@@ -197,6 +197,21 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('stress_tensor', np.array([
                 section['x_qe_t_stress_x'], section['x_qe_t_stress_y'], section['x_qe_t_stress_z']
                 ]).T)
+        HOMO = section['x_qe_t_energy_reference_highest_occupied']
+        if HOMO:
+            if len(HOMO)>1:
+                LOGGER.error('more than one value for HOMO: %s', str(HOMO))
+            backend.addArrayValues('energy_reference_highest_occupied', np.asarray([HOMO[0]]))
+        LUMO = section['x_qe_t_energy_reference_lowest_unoccupied']
+        if LUMO:
+            if len(LUMO)>1:
+                LOGGER.error('more than one value for LUMO: %s', str(LUMO))
+            backend.addArrayValues('energy_reference_lowest_unoccupied', np.asarray([LUMO[0]]))
+        E_Fermi = section['x_qe_t_energy_reference_fermi']
+        if E_Fermi:
+            if len(E_Fermi)>1:
+                LOGGER.error('more than one value for E_Fermi: %s', str(E_Fermi))
+            backend.addArrayValues('energy_reference_fermi', np.asarray([E_Fermi[0]]))
 
     def onClose_section_scf_iteration(
             self, backend, gIndex, section):
@@ -1067,16 +1082,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                               ],
                           ),
                           SM(name='highest_occupied',
-                             startReStr=(r"\s*highest occupied level \(ev\):\s*(?P<energy_reference_highest_occupied__eV>" + RE_f +
+                             startReStr=(r"\s*highest occupied level \(ev\):\s*(?P<x_qe_t_energy_reference_highest_occupied__eV>" + RE_f +
                                          r")\s*$"),
                           ),
                           SM(name='highest_occupied_lowest_unoccupied',
                              startReStr=(r"\s*highest occupied, lowest unoccupied level \(ev\):\s*" +
-                                         r"(?P<energy_reference_highest_occupied__eV>" + RE_f + r")\s*" +
-                                         r"(?P<energy_reference_lowest_unoccupied__eV>" + RE_f + r")\s*$"),
+                                         r"(?P<x_qe_t_energy_reference_highest_occupied__eV>" + RE_f + r")\s*" +
+                                         r"(?P<x_qe_t_energy_reference_lowest_unoccupied__eV>" + RE_f + r")\s*$"),
                           ),
                           SM(name='e_fermi',
-                             startReStr=(r"\s*the Fermi energy is\s*(?P<energy_reference_fermi__eV>" + RE_f + ")\s*ev\s*$"),
+                             startReStr=(r"\s*the Fermi energy is\s*(?P<x_qe_t_energy_reference_fermi__eV>" + RE_f + ")\s*ev\s*$"),
                           ),
                           SM(name='e_total',
                              startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total>' + RE_f + ')\s*Ry\s*$',
