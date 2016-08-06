@@ -212,6 +212,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             if len(E_Fermi)>1:
                 LOGGER.error('more than one value for E_Fermi: %s', str(E_Fermi))
             backend.addArrayValues('energy_reference_fermi', np.asarray([E_Fermi[0]]))
+        if not (E_Fermi or HOMO or self.secSystem['number_of_electrons']):
+            LOGGER.error("Neither HOMO, Fermi energy nor number of electrons are defined")
 
     def onClose_section_scf_iteration(
             self, backend, gIndex, section):
