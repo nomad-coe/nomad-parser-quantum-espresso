@@ -317,6 +317,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('x_qe_vec_supercell', np.array([
                 section['x_qe_t_vec_supercell_x'], section['x_qe_t_vec_supercell_y'], section['x_qe_t_vec_supercell_z']
             ]).T)
+        nelec = section['x_qe_t_number_of_electrons']
+        if nelec is not None:
+            if len(nelec)>1:
+                LOGGER.error("got multiple nelec: %s", str(nelec))
+            backend.addArrayValues('number_of_electrons', np.array([
+                nelec[0]
+            ]))
+        else:
+            LOGGER.error("missing info about number of electrons in system")
 
     def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
         self.tmp['this_k_energies'] = ''
@@ -661,7 +670,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*number of atomic types\s*=\s*(?P<x_qe_number_of_species>" + RE_i + r")\s*$",
                    ),
                    SM(name='nelec', required=True,
-                      startReStr=r"\s*number of electrons\s*=\s*(?P<x_qe_number_of_electrons>" + RE_f + r")\s*$",
+                      startReStr=r"\s*number of electrons\s*=\s*(?P<x_qe_t_number_of_electrons>" + RE_f + r")\s*$",
                    ),
                    SM(name='nbnd', required=True,
                        startReStr=r"\s*number of Kohn-Sham states\s*=\s*(?P<x_qe_number_of_states>" + RE_i + r")\s*$"
