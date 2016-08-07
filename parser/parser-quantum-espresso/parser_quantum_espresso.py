@@ -240,6 +240,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ], dtype=np.float64).T
             k_point_crystal = self.bmat_inv.dot(k_point_cartesian.T).T
             backend.addArrayValues('eigenvalues_kpoints', k_point_crystal)
+            backend.addArrayValues('x_qe_eigenvalues_number_of_planewaves',
+                                   np.array(section['x_qe_t_k_pw']))
         else:
             LOGGER.error("no k-points!")
 
