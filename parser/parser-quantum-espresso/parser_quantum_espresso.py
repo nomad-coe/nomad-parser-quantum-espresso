@@ -403,6 +403,22 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         parser.backend.addValue('x_qe_t_profile_caller_list', self.tmp.get('x_qe_t_profile_caller', ''))
         parser.backend.addValue('x_qe_t_profile_category_list', self.tmp.get('x_qe_t_profile_category', ''))
 
+    def bands_submatchers(self):
+        return [
+            SM(name='bands', repeats=True,
+                sections=['x_qe_t_section_kbands'],
+                startReStr=(r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba', '\s*') +
+                            r'\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i +
+                            r")\s*PWs\s*\)\s*bands\s*\(\s*[eE][vV]\s*\)\s*:?\s*$"),
+                subMatchers=[
+                    SM(name='kbnd', repeats=True,
+                        startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
+                        adHoc=lambda p: self.appendToTmp('this_k_energies', " " + p.lastMatch['x_qe_t_k_point_energies']),
+                    ),
+                ],
+            ),
+        ]
+
     def run_submatchers(self):
         """submatchers of section_run"""
         return [
@@ -1080,19 +1096,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='scf_result', repeats=False,
                        startReStr=r'\s*End of self-consistent calculation\s*$',
                        sections=['section_eigenvalues'],
-                       subMatchers=[
-                          SM(name='bands', repeats=True,
-                              sections=['x_qe_t_section_kbands'],
-                              startReStr=(r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba', '\s*') +
-                                          r'\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i +
-                                          r")\s*PWs\s*\)\s*bands\s*\(\s*[eE][vV]\s*\)\s*:?\s*$"),
-                              subMatchers=[
-                                  SM(name='kbnd', repeats=True,
-                                      startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
-                                      adHoc=lambda p: self.appendToTmp('this_k_energies', " " + p.lastMatch['x_qe_t_k_point_energies']),
-                                  ),
-                              ],
-                          ),
+                       subMatchers=self.bands_submatchers() + [
                           SM(name='highest_occupied',
                              startReStr=(r"\s*highest occupied level \(ev\):\s*(?P<x_qe_t_energy_reference_highest_occupied__eV>" + RE_f +
                                          r")\s*$"),
