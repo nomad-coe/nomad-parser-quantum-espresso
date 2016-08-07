@@ -230,6 +230,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def onOpen_section_eigenvalues(self, backend, gIndex, section):
         self.tmp['k_energies'] = []
         self.section['eigenvalues'] = section
+        self.tmp['kspin'] = {}
 
     def onClose_section_eigenvalues(self, backend, gIndex, section):
         if len(section['x_qe_t_k_x']) > 0:
@@ -394,6 +395,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def adHoc_pp_renorm(self, parser):
         self.cache_t_pp_renorm_wfc[parser.lastMatch[
             'x_qe_t_pp_renormalized_filename']] = parser.lastMatch['x_qe_t_pp_renormalized_wfc']
+
+    def adHoc_bands_spin(self, parser):
+        k_x = self.section['eigenvalues']['x_qe_t_k_x']
+        if k_x is None:
+            nk_current = 0
+        else:
+            nk_current = len(k_x)
+        self.tmp['kspin'][parser.lastMatch['x_qe_t_spin_channel'].lower()] = nk_current
 
     def adHoc_profiling_category(self, parser):
         self.setTmp('x_qe_t_profile_category', parser.lastMatch['x_qe_t_profile_category'])
@@ -1105,7 +1114,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                        subMatchers=self.bands_submatchers() + [
                           SM(name='bands_spin', repeats=True,
                               startReStr=r"\s*-+\s*SPIN\s+(?P<x_qe_t_spin_channel>UP|DOWN)\s*-+\s*$",
-                              adHoc=lambda p: LOGGER.error("do sth with x_qe_t_spin_channel"),
+                              adHoc=self.adHoc_bands_spin,
                               subMatchers=self.bands_submatchers(),
                           ),
                           SM(name='highest_occupied',
