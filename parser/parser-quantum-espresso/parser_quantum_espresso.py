@@ -38,6 +38,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.secSystemDescriptionIndex = None
         self.tmp = {}
         self.alat = None
+        self.section = {}
 
     def startedParsing(self, path, parser):
         """called when parsing starts"""
@@ -228,6 +229,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def onOpen_section_eigenvalues(self, backend, gIndex, section):
         self.tmp['k_energies'] = []
+        self.section['eigenvalues'] = section
 
     def onClose_section_eigenvalues(self, backend, gIndex, section):
         if len(section['x_qe_t_k_x']) > 0:
