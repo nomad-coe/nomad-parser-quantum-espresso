@@ -1097,6 +1097,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                        startReStr=r'\s*End of self-consistent calculation\s*$',
                        sections=['section_eigenvalues'],
                        subMatchers=self.bands_submatchers() + [
+                          SM(name='bands_spin', repeats=True,
+                              startReStr=r"\s*-+\s*SPIN\s+(?P<x_qe_t_spin_channel>UP|DOWN)\s*-+\s*$",
+                              adHoc=lambda p: LOGGER.error("do sth with x_qe_t_spin_channel"),
+                              subMatchers=self.bands_submatchers(),
+                          ),
                           SM(name='highest_occupied',
                              startReStr=(r"\s*highest occupied level \(ev\):\s*(?P<x_qe_t_energy_reference_highest_occupied__eV>" + RE_f +
                                          r")\s*$"),
