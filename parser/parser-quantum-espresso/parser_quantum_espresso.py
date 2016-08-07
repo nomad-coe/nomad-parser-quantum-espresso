@@ -328,6 +328,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ]))
         else:
             LOGGER.error("missing info about number of electrons in system")
+        backend.addArrayValues('configuration_periodic_dimensions', np.asarray([True, True, True]))
 
     def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
         self.tmp['this_k_energies'] = ''
