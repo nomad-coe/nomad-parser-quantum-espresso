@@ -127,14 +127,32 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.cache_t_pp_renorm_wfc[
             section['x_qe_t_pp_warning_filename'][-1]] = section['x_qe_t_pp_warning_wfclabel'][-1]
 
+    def onOpen_x_qe_t_section_input_occupations(
+            self, backend, gIndex, section):
+        self.tmp['occ_spin'] = 'none'
+        self.tmp['occ_vals_spin'] = {}
+        self.tmp['occ_vals_spin']['none'] = []
+        self.tmp['occ_vals'] = self.tmp['occ_vals_spin']['none']
+
+    def adHoc_input_occupations_spin(self, parser):
+        self.tmp['occ_spin'] = parser.lastMatch['x_qe_t_input_occupations_spin']
+        self.tmp['occ_vals_spin'][self.tmp['occ_spin']] = []
+        self.tmp['occ_vals'] = self.tmp['occ_vals_spin'][self.tmp['occ_spin']]
+
     def onClose_x_qe_t_section_input_occupations(
             self, backend, gIndex, section):
-        if section['x_qe_t_input_occupations'] is not None:
-            iocc_joined = ' '.join(section['x_qe_t_input_occupations'])
-            iocc_split = re.findall(RE_f, iocc_joined)
-            LOGGER.error("implement proper output of x_qe_t_section_input_occupations")
+        if len(self.tmp['occ_vals_spin']['none']) > 0:
+            # spin-unpolarized case
+            input_occ = np.array([ self.tmp['occ_vals_spin']['none'] ])
         else:
+            input_occ = np.array([
+                self.tmp['occ_vals_spin']['up'],
+                self.tmp['occ_vals_spin']['down']
+            ])
+        if input_occ.size < 1:
             LOGGER.error("closing x_qe_t_section_input_occupations, but no input occupations parsed")
+        else:
+            LOGGER.error("FIXME: implement proper output of x_qe_t_section_input_occupations (shape %s)", str(input_occ.shape))
 
     def onClose_section_method(
             self, backend, gIndex, section):
@@ -991,8 +1009,19 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*Occupations\s*read\s*from\s*input\s*$",
                       sections=['x_qe_t_section_input_occupations'],
                       subMatchers=[
+                          SM(name='input_occupations_spin', repeats=True,
+                             startReStr=r"\s*Spin-(?P<x_qe_t_input_occupations_spin>up|down)\s*$",
+                             adHoc=self.adHoc_input_occupations_spin,
+                             subMatchers=[
+                                 SM(name='input_occupations_occupations', repeats=True,
+                                     startReStr=r'\s*(?P<x_qe_t_input_occupations>(?:\s*' + RE_f + ')+\s*$)',
+                                     adHoc=lambda p: self.tmp['occ_vals'].extend(cRE_f.findall(p.lastMatch['x_qe_t_input_occupations'])),
+                                 ),
+                             ],
+                          ),
                           SM(name='input_occupations_occupations', repeats=True,
                               startReStr=r'\s*(?P<x_qe_t_input_occupations>(?:\s*' + RE_f + ')+\s*$)',
+                              adHoc=lambda p: self.tmp['occ_vals'].extend(cRE_f.findall(p.lastMatch['x_qe_t_input_occupations']))
                           ),
                       ],
                    ),
