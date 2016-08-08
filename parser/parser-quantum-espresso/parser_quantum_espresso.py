@@ -233,20 +233,55 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.tmp['kspin'] = {}
 
     def onClose_section_eigenvalues(self, backend, gIndex, section):
-        if len(section['x_qe_t_k_x']) > 0:
-            backend.addArrayValues('eigenvalues_values', np.array([
-                self.tmp['k_energies']
-            ], dtype=np.float64))
-            # k-points are in cartesian, but metaInfo specifies crystal
-            k_point_cartesian = np.array([
-                section['x_qe_t_k_x'], section['x_qe_t_k_y'], section['x_qe_t_k_z']
-            ], dtype=np.float64).T
-            k_point_crystal = self.bmat_inv.dot(k_point_cartesian.T).T
-            backend.addArrayValues('eigenvalues_kpoints', k_point_crystal)
-            backend.addArrayValues('x_qe_eigenvalues_number_of_planewaves',
-                                   np.array(section['x_qe_t_k_pw']))
-        else:
+        if len(section['x_qe_t_k_x']) < 1:
             LOGGER.error("no k-points!")
+            return
+        # prepare numpy arrays
+        k_energies= np.array([self.tmp['k_energies']], dtype=np.float64)
+        npw = np.array(section['x_qe_t_k_pw'])
+        k_point_cartesian = np.array([
+            section['x_qe_t_k_x'], section['x_qe_t_k_y'], section['x_qe_t_k_z']
+        ], dtype=np.float64).T
+        # check if we are dealing with spin-polarized data
+        #   QE represents this as 2*k-points, with repeating coordinates
+        nk = len(k_point_cartesian)
+        if (nk & 1):
+            # odd number of k points cannot describe spin-polarized case
+            nspin = 1
+        else:
+            kd = (k_point_cartesian[0:nk/2,:] - k_point_cartesian[nk/2:,:])
+            kd_len = np.sqrt(np.einsum('ij,ij->i', kd, kd))
+            # LOGGER.error("kdl: %s", str(kd_len))
+            # difference in k coordinates
+            # values in 1/m are in the order of 1e+10, so threshold is sufficient
+            if np.all(kd_len<0.1):
+                # first half of k coodinates same as second half -> spin
+                # polarized case
+                nspin = 2
+            else:
+                nspin = 1
+        # sanity checks
+        len_kspin = len(self.tmp['kspin'])
+        if (nspin == 2) and (len_kspin!=2):
+            raise Exception("nspin=2 and kspin!=2")
+        elif (nspin == 1) and (len_kspin>1):
+            raise Exception("nspin=1 and kspin>1")
+        elif (len_kspin>2):
+            raise Exception("total fuckup: kspin=%d" % (len_kspin))
+        # transform spin-polarized case
+        if nspin == 2:
+            k_point_cartesian[0:nk/2,:]
+            npw = npw[0:nk/2]
+            # put spin channel into first dimension
+            k_energies = np.concatenate((
+                k_energies[:,0:nk/2,:],
+                k_energies[:,nk/2:,:]), axis=0)
+        # k-points are in cartesian, but metaInfo specifies crystal
+        k_point_crystal = self.bmat_inv.dot(k_point_cartesian.T).T
+        # emit data
+        backend.addArrayValues('x_qe_eigenvalues_number_of_planewaves', npw)
+        backend.addArrayValues('eigenvalues_kpoints', k_point_crystal)
+        backend.addArrayValues('eigenvalues_values', k_energies)
 
     def onClose_section_system(self, backend, gIndex, section):
         # store direct lattice matrix for transformation crystal -> cartesian
