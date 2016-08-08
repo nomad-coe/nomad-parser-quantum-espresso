@@ -1325,7 +1325,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              ],
                           ),
                           SM(name="force_ethr_warning",
-                             startReStr=r"\s*(?P<x_qe_warning>SCF correction compared to forces is large: reduce conv_thr to get better values)\s*$",
+                             startReStr=r"\s*(?P<x_qe_warning>SCF correction compared to forces is(?:\s+too)?\s+large[:,] reduce conv_thr(?:\s+to get better values)?)\s*$",
                           ),
                           SM(name="stress_tensor",
                              startReStr=r"\s*entering subroutine stress \.\.\.\s*$",
