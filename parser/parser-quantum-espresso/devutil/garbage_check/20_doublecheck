@@ -1,0 +1,2 @@
+#!/bin/bash
+(exec 3<1247594562.garbage ; while read -u 3 basefile ; do grep '    no|' $basefile.annotate; read -p "was it really only garbage ($basefile)?" was_really_garbage ; if [ "$was_really_garbage" == "y" ] ; then echo $basefile >> 1247594562.really_garbage ; fi ; done)

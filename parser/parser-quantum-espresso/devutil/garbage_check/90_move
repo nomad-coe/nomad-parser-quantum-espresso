@@ -1,0 +1,2 @@
+#!/bin/bash
+for b in `<1247594562.really_garbage` ; do echo $b*; done | xargs mv --target-dir /srv/work/tmp/espresso/test-link-possible_garbage/
