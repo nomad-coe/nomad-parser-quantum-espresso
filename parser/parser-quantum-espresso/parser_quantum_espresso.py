@@ -228,8 +228,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             if len(LUMO)>1:
                 LOGGER.error('more than one value for LUMO: %s', str(LUMO))
             backend.addArrayValues('energy_reference_lowest_unoccupied', np.asarray([LUMO[0]]))
+        E_Fermi_up = section['x_qe_t_energy_reference_fermi_up']
         E_Fermi = section['x_qe_t_energy_reference_fermi']
-        if E_Fermi:
+        if E_Fermi_up is not None:
+            if len(E_Fermi_up)>1:
+                LOGGER.error('more than one value for E_Fermi_up: %s', str(E_Fermi_up))
+            backend.addArrayValues('energy_reference_fermi', np.asarray([
+                E_Fermi_up[0], section['x_qe_t_energy_reference_fermi_down'][0]
+            ]))
+            had_energy_reference = True
+        elif E_Fermi is not None:
             if len(E_Fermi)>1:
                 LOGGER.error('more than one value for E_Fermi: %s', str(E_Fermi))
             backend.addArrayValues('energy_reference_fermi', np.asarray([E_Fermi[0]]))
@@ -1200,6 +1208,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name='e_fermi',
                              startReStr=(r"\s*the Fermi energy is\s*(?P<x_qe_t_energy_reference_fermi__eV>" + RE_f + ")\s*ev\s*$"),
+                          ),
+                          SM(name='e_fermi_spin',
+                             startReStr=(r"\s*the spin up/dw Fermi energies are\s*" +
+                                         r"(?P<x_qe_t_energy_reference_fermi_up__eV>" + RE_f + ")\s*" +
+                                         r"(?P<x_qe_t_energy_reference_fermi_down__eV>" + RE_f + ")\s*ev\s*$"),
                           ),
                           SM(name='e_total',
                              startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total>' + RE_f + ')\s*Ry\s*$',
