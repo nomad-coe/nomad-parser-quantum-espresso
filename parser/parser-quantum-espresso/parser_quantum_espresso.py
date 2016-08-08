@@ -1093,6 +1093,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_starting_charge_negative>" + RE_f +
                                   r")\s*$"),
                    ),
+                   SM(name='starting_charge_negative_spin_ignore', repeats=True,
+                      # information is repeated and parsed by SM 'starting_rho'
+                      startReStr=(r"\s*Check: negative starting charge=\(component\d\):?\s*" + RE_f + r"\s*$"),
+                   ),
                    SM(name='initial_charge',
                       startReStr=(r"\s*starting charge\s*(?P<x_qe_starting_charge>" + RE_f +
                                   r")\s*,\s*renormalised to\s*(?P<x_qe_starting_charge_renormalized>" + RE_f +
