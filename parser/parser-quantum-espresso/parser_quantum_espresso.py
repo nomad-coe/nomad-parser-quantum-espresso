@@ -1137,7 +1137,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                ],
             ), # header
-            SM(name='self_consistent_calculation',
+            SM(name='self_consistent_calculation', repeats=True,
                startReStr=r"\s*Self-consistent Calculation\s*$",
                sections = ['section_single_configuration_calculation'],
                subMatchers=[
