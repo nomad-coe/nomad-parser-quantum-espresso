@@ -11,7 +11,7 @@ import math
 import numpy as np
 import QuantumEspressoCommon as QeC
 from nomadcore.parser_backend import valueForStrValue
-from QuantumEspressoCommon import RE_f, RE_i
+from QuantumEspressoCommon import RE_f, RE_i, cRE_f, cRE_i
 from QuantumEspressoXC import translate_qe_xc_num
 from nomadcore.parser_backend import valueForStrValue
 

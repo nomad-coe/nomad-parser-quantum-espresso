@@ -19,8 +19,10 @@ LOGGER = logging.getLogger(__name__)
 
 # fortran float, alternate too-long-for-field fortran marker
 RE_f = r"(?:[+-]?\d+(?:\.\d+)?(?:[eEdD][+-]?\d+)?|\*+)"
+cRE_f = re.compile(RE_f)
 # fortran int, alternate too-long-for-field fortran marker
 RE_i = r"(?:[+-]?\d+|\*+)"
+cRE_i = re.compile(RE_i)
 NAN = float('nan')
 
 def re_vec(name, units='', split="\s+"):
