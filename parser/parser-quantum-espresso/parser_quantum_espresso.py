@@ -669,6 +669,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*gamma-point specific algorithms are used\s*$",
                       adHoc=lambda p: p.backend.addValue('x_qe_gamma_algorithms', True)
                    ),
+                   SM(name='warning_setup',
+                      startReStr=r"\s*Message from routine setup:\s*$",
+                      subMatchers=[
+                         SM(name='warning_metallic',
+                            startReStr=r"\s*(?P<x_qe_warning>the system is metallic, specify occupations)\s*$",
+                         ),
+                      ],
+                   ),
                    SM(name='subspace_diagonalization',
                       startReStr=r"\s*(?:Subspace diagonalization in iterative solution of the eigenvalue problem:|Iterative solution of the eigenvalue problem)\s*$",
                       subMatchers=[
