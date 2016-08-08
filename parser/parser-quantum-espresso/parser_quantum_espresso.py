@@ -237,7 +237,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             LOGGER.error("no k-points!")
             return
         # prepare numpy arrays
-        k_energies= np.array([self.tmp['k_energies']], dtype=np.float64)
+        k_energies = np.array([self.tmp['k_energies']], dtype=np.float64)
+        k_energies = unit_conversion.convert_unit(k_energies, 'eV')
         npw = np.array(section['x_qe_t_k_pw'])
         k_point_cartesian = np.array([
             section['x_qe_t_k_x'], section['x_qe_t_k_y'], section['x_qe_t_k_z']
@@ -373,15 +374,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             LOGGER.error("missing info about number of electrons in system")
         backend.addArrayValues('configuration_periodic_dimensions', np.asarray([True, True, True]))
 
-    def onOpen_x_qe_t_section_kbands(self, backend, gIndex, section):
-        self.tmp['this_k_energies'] = ''
-
-    def onClose_x_qe_t_section_kbands(self, backend, gIndex, section):
-        ek_split = []
-        for energy in re.split(r'\s+', self.tmp['this_k_energies'].strip()):
-            ek_split += [unit_conversion.convert_unit(valueForStrValue(energy, 'f'),'eV')]
-        self.tmp['k_energies'].append(ek_split)
-
     def onOpen_section_run(
             self, backend, gIndex, section):
         """trigger called when section_single_configuration_calculation
@@ -456,14 +448,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def bands_submatchers(self):
         return [
             SM(name='bands', repeats=True,
-                sections=['x_qe_t_section_kbands'],
                 startReStr=(r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba', '\s*') +
                             r'\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i +
                             r")\s*PWs\s*\)\s*bands\s*\(\s*[eE][vV]\s*\)\s*:?\s*$"),
+                # create new empty list for this k point's eigenvalues
+                adHoc=lambda p: self.tmp['k_energies'].append([]),
                 subMatchers=[
                     SM(name='kbnd', repeats=True,
                         startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
-                        adHoc=lambda p: self.appendToTmp('this_k_energies', " " + p.lastMatch['x_qe_t_k_point_energies']),
+                        # extend list by eigenvalues in this line
+                        adHoc=lambda p: self.tmp['k_energies'][-1].extend(cRE_f.findall(p.lastMatch['x_qe_t_k_point_energies'])),
                     ),
                 ],
             ),
