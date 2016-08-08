@@ -381,15 +381,24 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('x_qe_vec_supercell', np.array([
                 section['x_qe_t_vec_supercell_x'], section['x_qe_t_vec_supercell_y'], section['x_qe_t_vec_supercell_z']
             ]).T)
-        nelec = section['x_qe_t_number_of_electrons']
-        if nelec is not None:
-            if len(nelec)>1:
-                LOGGER.error("got multiple nelec: %s", str(nelec))
+        nelec_up = section['x_qe_t_number_of_electrons_up']
+        if nelec_up is not None:
+            # spin polarized case, with explicit up/down electrons
+            if len(nelec_up)>1:
+                LOGGER.error("got multiple nelec_up: %s", str(nelec))
             backend.addArrayValues('number_of_electrons', np.array([
-                nelec[0]
+                nelec_up[0], section['x_qe_t_number_of_electrons_down'][0]
             ]))
         else:
-            LOGGER.error("missing info about number of electrons in system")
+            nelec = section['x_qe_t_number_of_electrons']
+            if nelec is not None:
+                if len(nelec)>1:
+                    LOGGER.error("got multiple nelec: %s", str(nelec))
+                backend.addArrayValues('number_of_electrons', np.array([
+                    nelec[0]
+                ]))
+            else:
+                LOGGER.error("missing info about number of electrons in system")
         backend.addArrayValues('configuration_periodic_dimensions', np.asarray([True, True, True]))
 
     def onOpen_section_run(
@@ -751,7 +760,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*number of atomic types\s*=\s*(?P<x_qe_number_of_species>" + RE_i + r")\s*$",
                    ),
                    SM(name='nelec', required=True,
-                      startReStr=r"\s*number of electrons\s*=\s*(?P<x_qe_t_number_of_electrons>" + RE_f + r")\s*$",
+                      startReStr=(r"\s*number of electrons\s*=\s*(?P<x_qe_t_number_of_electrons>" + RE_f +
+                                  r")(?:\s*\(up:\s*(?P<x_qe_t_number_of_electrons_up>" + RE_f +
+                                  r")\s*,\s*down:\s*(?P<x_qe_t_number_of_electrons_down>" + RE_f + ")\s*\))?\s*$"),
                    ),
                    SM(name='nbnd', required=True,
                        startReStr=r"\s*number of Kohn-Sham states\s*=\s*(?P<x_qe_number_of_states>" + RE_i + r")\s*$"
