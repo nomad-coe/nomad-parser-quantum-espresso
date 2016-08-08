@@ -254,6 +254,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addValue('x_qe_diagonalization_scheme', 'conjugate_gradient')
         if section['x_qe_t_iteration_ethr'] is not None:
             backend.addValue('x_qe_iteration_ethr', section['x_qe_t_iteration_ethr'][-1])
+        if section["x_qe_t_iter_mpersite_idx"] is not None:
+            backend.addArrayValues("x_qe_iter_mpersite_idx", np.asarray(section["x_qe_t_iter_mpersite_idx"]))
+            backend.addArrayValues("x_qe_iter_mpersite_charge", np.asarray(section["x_qe_t_iter_mpersite_charge"]))
+            backend.addArrayValues("x_qe_iter_mpersite_magn", np.asarray(section["x_qe_t_iter_mpersite_magn"]))
+            backend.addArrayValues("x_qe_iter_mpersite_constr", np.asarray(section["x_qe_t_iter_mpersite_constr"]))
         self.tmp['last_iteration'] = section['x_qe_iteration_number'][-1]
 
     def onOpen_section_eigenvalues(self, backend, gIndex, section):
@@ -1143,6 +1148,17 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name='iteration_rho',
                              startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_iteration_charge_negative_up>" + RE_f +
                                          r")\s*(?P<x_qe_iteration_charge_negative_down>" + RE_f + r")\s*$"),
+                          ),
+                          SM(name='iteration_per_site_magnetization_header',
+                             startReStr=(r"\s*Magnetic\s*moment\s*per\s*site:?\s*$"),
+                             subMatchers=[
+                                 SM(name='iteration_per_site_magnetization',
+                                    startReStr=(r"\s*atom:\s*(?P<x_qe_t_iter_mpersite_idx>" + RE_i + r")\s*" +
+                                                r"charge:\s*(?P<x_qe_t_iter_mpersite_charge>" + RE_f + r")\s*" +
+                                                r"magn:\s*(?P<x_qe_t_iter_mpersite_magn>" + RE_f + r")\s*" +
+                                                r"constr:\s*(?P<x_qe_t_iter_mpersite_constr>" + RE_f + r")\s*$"),
+                                 ),
+                             ],
                           ),
                           SM(name='iteration_Efield',
                              startReStr=(r"\s*Expectation value of exp\(iGx\):\s*\(\s*" +
