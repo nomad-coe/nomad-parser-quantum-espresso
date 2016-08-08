@@ -837,6 +837,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                       adHoc=lambda p: p.backend.addValue('x_qe_berry_efield', True),
                    ),
+                   SM(name='assume_isolated',
+                      startReStr=r"\s*Assuming isolated system,\s*(?P<x_qe_isolated_system_method>.*?)\s*method",
+                   ),
                    SM(name='celldm', repeats = True,
                       startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + r")+)\s*$",
                    ),
@@ -1081,6 +1084,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              ),
                           ),
                       ],
+                   ),
+                   SM(name='martyna_tuckerman_parameters',
+                      startReStr=(r"\s*alpha, beta MT =\s*(?P<x_qe_isolated_system_method_martyna_tuckerman_alpha>" + RE_f + r")\s*" +
+                                  r"(?P<x_qe_isolated_system_method_martyna_tuckerman_beta>" + RE_f + r")\s*$"),
+                      fixedStartValues={ 'x_qe_isolated_system_method': 'Martyna-Tuckerman' },
                    ),
                    SM(name='core_charge_check',
                       startReStr=(r"\s*Check: negative/imaginary core charge\s*=\s*(?P<x_qe_core_charge_negative>" +
