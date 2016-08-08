@@ -216,13 +216,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('stress_tensor', np.array([
                 section['x_qe_t_stress_x'], section['x_qe_t_stress_y'], section['x_qe_t_stress_z']
                 ]).T)
+        had_energy_reference = (self.secSystem['number_of_electrons'] is not None)
         HOMO = section['x_qe_t_energy_reference_highest_occupied']
-        if HOMO:
+        if HOMO is not None:
             if len(HOMO)>1:
                 LOGGER.error('more than one value for HOMO: %s', str(HOMO))
+            had_energy_reference = True
             backend.addArrayValues('energy_reference_highest_occupied', np.asarray([HOMO[0]]))
         LUMO = section['x_qe_t_energy_reference_lowest_unoccupied']
-        if LUMO:
+        if LUMO is not None:
             if len(LUMO)>1:
                 LOGGER.error('more than one value for LUMO: %s', str(LUMO))
             backend.addArrayValues('energy_reference_lowest_unoccupied', np.asarray([LUMO[0]]))
@@ -231,7 +233,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             if len(E_Fermi)>1:
                 LOGGER.error('more than one value for E_Fermi: %s', str(E_Fermi))
             backend.addArrayValues('energy_reference_fermi', np.asarray([E_Fermi[0]]))
-        if not (E_Fermi or HOMO or self.secSystem['number_of_electrons']):
+            had_energy_reference = True
+        if not (had_energy_reference):
             LOGGER.error("Neither HOMO, Fermi energy nor number of electrons are defined")
 
     def onClose_section_scf_iteration(
