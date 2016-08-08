@@ -1352,6 +1352,17 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
+                          SM(name="md_step",
+                             startReStr=(r"\s*Entering Dynamics:\s*iteration\s*=\s*(?P<x_qe_md_iteration>" + RE_i +
+                                         r")\s*$"),
+                             subMatchers=[
+                                 SM(name="md_time",
+                                    startReStr=("\s*time\s*=\s*(?P<x_qe_md_time__picoseconds>" + RE_f +
+                                                r")\s*pico-seconds"),
+                                 ),
+                             ],
+                             adHoc=lambda p: LOGGER.error("implement frames for md/relax"),
+                          ),
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
                              subMatchers=[
