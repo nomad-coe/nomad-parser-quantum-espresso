@@ -1360,6 +1360,20 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
+                          SM(name="md_info",
+                             startReStr=r"\s*Molecular Dynamics Calculation\s*$",
+                             subMatchers=[
+                                 SM(name="md_atom", repeats=True,
+                                    startReStr=(r"\s*mass\s*(?P<x_qe_t_md_atom_mass_label>\S+)\s*=\s*" +
+                                                r"(?P<x_qe_t_md_atom_mass_value>" + RE_f + r")\s*$"),
+                                 ),
+                                 SM(name="md_timestep",
+                                    startReStr=(r"\s*Time step\s*=\s*" + RE_f + r"\s*a\.u\.,\s*" +
+                                                r"(?P<x_qe_t_md_timestep_size__femtoseconds>" + RE_f +
+                                                r")\s*femto-seconds\s*$"),
+                                 ),
+                             ],
+                          ),
                           SM(name="md_step",
                              startReStr=(r"\s*Entering Dynamics:\s*iteration\s*=\s*(?P<x_qe_md_iteration>" + RE_i +
                                          r")\s*$"),
