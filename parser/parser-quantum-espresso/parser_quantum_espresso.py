@@ -1433,6 +1433,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                     startReStr=(r"\s*Final enthalpy\s*=\s*(?P<x_qe_t_md_bfgs_final_enthalpy__rydberg>" +
                                                 RE_f + r")\s*Ry\s*$"),
                                  ),
+                                 SM(name="eat_start_final",
+                                    startReStr=r"\s*Begin final coordinates\s*$"
+                                 ),
                                  SM(name="new_cell_volume",
                                     startReStr=(r"\s*new unit-cell volume =\s*" +
                                                 r"(?P<x_qe_t_md_new_volume__bohr3>" + RE_f + r") a\.u\.\^3" +
@@ -1505,6 +1508,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                              adHoc=lambda p: LOGGER.error('do sth with new atposvec')
+                          ),
+                          SM(name="eat_end_final",
+                             startReStr=r"\s*End final coordinates\s*$"
                           ),
                           SM(name="md_ekin",
                              startReStr=(r"\s*kinetic energy\s*\(Ekin\)\s*=\s*(?P<x_qe_t_md_kinetic_energy>" + RE_f +
