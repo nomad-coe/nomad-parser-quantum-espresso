@@ -1382,8 +1382,47 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                     startReStr=(r"\s*time\s*=\s*(?P<x_qe_t_md_time__picoseconds>" + RE_f +
                                                 r")\s*pico-seconds"),
                                  ),
+                                 SM(name="md_nat2_distance",
+                                    startReStr=r"\s*DISTANCE\s*=\s*(?P<x_qe_t_new_nat2_distance__bohr>" + RE_f + r")\s*$"
+                                 ),
                              ],
                              adHoc=lambda p: LOGGER.error("implement frames for md/relax"),
+                          ),
+                          SM(name="md_cellparam",
+                             startReStr="CELL_PARAMETERS\s*\(\s*(?P<x_qe_t_md_vec_a_units>\S+)\s*\)$",
+                             # QE use syntax of its _input_ files here
+                             subMatchers=[
+                                 SM(name='md_cell_vec_a', repeats=True,
+                                    startReStr=r"\s*" + QeC.re_vec('x_qe_t_md_vec_a') + r"\s*$",
+                                 ),
+                             ],
+                             adHoc=lambda p: LOGGER.error('do sth with new cellvec')
+                          ),
+                          SM(name="md_atpos",
+                             startReStr="ATOMIC_POSITIONS\s*\(\s*(?P<x_qe_t_md_atom_positions_units>\S+)\s*\)$",
+                             # QE use syntax of its _input_ files here
+                             subMatchers=[
+                                 SM(name='md_atpos_data', repeats=True,
+                                    startReStr=r"\s*(?P<x_qe_t_md_atom_labels>\S+)\s+" + QeC.re_vec('x_qe_t_md_atom_positions') + r"\s*$",
+                                 ),
+                             ],
+                             adHoc=lambda p: LOGGER.error('do sth with new atposvec')
+                          ),
+                          SM(name="md_ekin",
+                             startReStr=(r"\s*kinetic energy\s*\(Ekin\)\s*=\s*(?P<x_qe_t_md_kinetic_energy>" + RE_f +
+                                         r")\s*Ry\s*$"),
+                          ),
+                          SM(name="md_temperature",
+                             startReStr=(r"\s*temperature\s*=\s*(?P<x_qe_t_md_temperature>" + RE_f +
+                                         r")\s*K\s*$"),
+                          ),
+                          SM(name="md_ekin_etot",
+                             startReStr=(r"\s*Ekin\s*\+\s*Etot\s*\(const\)\s*=\s*(?P<x_qe_t_md_ekin_etot>" + RE_f +
+                                         r")\s*Ry\s*$"),
+                          ),
+                          SM(name="md_linear_momentum",
+                             startReStr=(r"\s*Linear momentum\s*:\s*" + QeC.re_vec('x_qe_t_md_linear_momentum') +
+                                         r"\s*$"),
                           ),
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
