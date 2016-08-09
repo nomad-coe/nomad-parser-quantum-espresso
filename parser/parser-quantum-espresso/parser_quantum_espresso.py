@@ -1380,6 +1380,29 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
+                          # older espresso writes this _before_ 'entering dynamics'
+                          SM(name="md_maxSteps",
+                             startReStr=r"\s*The maximum number of steps has been reached.\s*$",
+                             fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
+                          ),
+                          SM(name="md_end",
+                             startReStr=r"\s*End of molecular dynamics calculation\s*$",
+                             fixedStartValues={ 'x_qe_t_md_end': True },
+                          ),
+                          SM(name="md_diffusion_coefficients_header",
+                             startReStr=r"\s*diffusion coefficients\s*:\s*$",
+                             subMatchers=[
+                                 SM(name="md_diffusion_coeffients", repeats=True,
+                                    startReStr=(r"\s*atom\s*(?P<x_qe_t_md_diffusion_atomidx>\d+)\s*D\s*=\s*" +
+                                                r"(?P<x_qe_t_md_diffusion_coefficient__cm2_s>" + RE_f +
+                                                r")\s*cm\^2/s\s*$"),
+                                 ),
+                                 SM(name="md_diffusion_mean",
+                                    startReStr=(r"\s*<\s*D\s*>\s*=\s*(?P<x_qe_t_md_diffusion_coefficient_mean__cm2_s>" +
+                                                RE_f + r")\s*cm\^2/s\s*$"),
+                                 ),
+                             ],
+                          ),
                           SM(name="md_step",
                              startReStr=(r"\s*Entering Dynamics:\s*iteration\s*=\s*(?P<x_qe_t_md_iteration>" + RE_i +
                                          r")\s*$"),
@@ -1430,6 +1453,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=(r"\s*Linear momentum\s*:\s*" + QeC.re_vec('x_qe_t_md_linear_momentum') +
                                          r"\s*$"),
                           ),
+                          # newer espresso writes this _after_ 'entering dynamics'
                           SM(name="md_maxSteps",
                              startReStr=r"\s*The maximum number of steps has been reached.\s*$",
                              fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
