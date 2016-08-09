@@ -1416,6 +1416,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              # we know the actual numbers already
                              startReStr=r"\s*bfgs converged in\s+\d+\s+scf cycles and\s+\d+\s+bfgs steps",
                              fixedStartValues={ 'x_qe_t_md_bfgs_converged': True},
+                             subMatchers=[
+                                 SM(name="bfgs_converged_criteria",
+                                    startReStr=r"\s*\(criteria:\s*(?P<x_qe_t_md_bfgs_converged_criteria>.*?)\)\s*$",
+                                 ),
+                             ],
                           ),
                           SM(name="bfgs_end",
                              startReStr=r"\s*End of BFGS Geometry Optimization",
