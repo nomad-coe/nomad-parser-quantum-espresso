@@ -1156,7 +1156,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name='david_or_cg', repeats=True,
                              startReStr=r"\s*(?:(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)|(?P<x_qe_t_cg_diag>CG style diagonalization.*))\s*$",
                              subMatchers=[
-                                 SM(name='warn_not_converged', repeats=True,
+                                 SM(name='warn_not_converged', repeats=True, floating=True,
                                     startReStr=(r"\s*WARNING:\s*(?P<x_qe_warn_n_unconverged_eigenvalues>" + RE_i +
                                                 r")\s*eigenvalues not converged(?:\s+in\s+regterg)?\s*$"),
                                  ),
