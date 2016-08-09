@@ -1298,6 +1298,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name="atom_forces",
                              startReStr=r"\s*Forces acting on atoms\s*\(Ry/au\):\s*$",
                              subMatchers=[
+                                 SM(name="negative_rho_atforces",
+                                    # we had this already earlier
+                                    startReStr=r"\s*negative rho \(up, down\):\s*" + RE_f + r"\s*" + RE_f + r"\s*$",
+                                 ),
                                  SM(name="atom_force", repeats=True,
                                     startReStr=(r"\s*atom\s*(?P<x_qe_t_force_atom_idx>\d+)"+
                                                 r"\s*type\s*\d+\s*force\s*=\s*"+
@@ -1333,6 +1337,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name="stress_tensor",
                              startReStr=r"\s*entering subroutine stress \.\.\.\s*$",
                              subMatchers=[
+                                 SM(name="negative_rho_stress",
+                                    # we had this already earlier
+                                    startReStr=r"\s*negative rho \(up, down\):\s*" + RE_f + r"\s*" + RE_f + r"\s*$",
+                                 ),
                                  SM(name="stress_header",
                                     startReStr=(r"\s*total\s*stress\s*\(Ry/bohr\*\*3\)\s*\(kbar\)\s*P=\s*" +
                                                 r"(?P<x_qe_pressure__kilobar>" + RE_f + r")\s*$"),
