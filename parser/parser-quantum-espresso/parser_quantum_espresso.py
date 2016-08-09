@@ -1430,14 +1430,43 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=(r"\s*Linear momentum\s*:\s*" + QeC.re_vec('x_qe_t_md_linear_momentum') +
                                          r"\s*$"),
                           ),
+                          SM(name="md_maxSteps",
+                             startReStr=r"\s*The maximum number of steps has been reached.\s*$",
+                             fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
+                          ),
+                          SM(name="md_end",
+                             startReStr=r"\s*End of molecular dynamics calculation\s*$",
+                             fixedStartValues={ 'x_qe_t_md_end': True },
+                          ),
+                          SM(name="md_diffusion_coefficients_header",
+                             startReStr=r"\s*diffusion coefficients\s*:\s*$",
+                             subMatchers=[
+                                 SM(name="md_diffusion_coeffients", repeats=True,
+                                    startReStr=(r"\s*atom\s*(?P<x_qe_t_md_diffusion_atomidx>\d+)\s*D\s*=\s*" +
+                                                r"(?P<x_qe_t_md_diffusion_coefficient__cm2_s>" + RE_f +
+                                                r")\s*cm\^2/s\s*$"),
+                                 ),
+                                 SM(name="md_diffusion_mean",
+                                    startReStr=(r"\s*<\s*D\s*>\s*=\s*(?P<x_qe_t_md_diffusion_coefficient_mean__cm2_s>" +
+                                                RE_f + r")\s*cm\^2/s\s*$"),
+                                 ),
+                             ],
+                          ),
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
                              subMatchers=[
                                 SM(name="warning_save_mgga2",
                                    startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
                                 ),
-                                ),
                              ],
+                          ),
+                          SM(name="md_new_old_atomic_charge_approximation",
+                             startReStr=r"\s*NEW-OLD atomic charge density approx\. for the potential\s*$",
+                             fixedStartValues={ 'x_qe_t_md_charge_approximation': 'NEW-OLD' }
+                          ),
+                          SM(name="md_write_datafile_cputime",
+                             startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_t_md_write_datafile_cputime>" + RE_f +
+                                         r")\s*secs\s*$"),
                           ),
                        ],
                    ),
