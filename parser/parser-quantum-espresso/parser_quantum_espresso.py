@@ -1158,7 +1158,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              subMatchers=[
                                  SM(name='warn_not_converged', repeats=True,
                                     startReStr=(r"\s*WARNING:\s*(?P<x_qe_warn_n_unconverged_eigenvalues>" + RE_i +
-                                                r")\s*eigenvalues not converged\s*$"),
+                                                r")\s*eigenvalues not converged(?:\s+in\s+regterg)?\s*$"),
                                  ),
                                  SM(name='c_bands_not_converged', repeats=True,
                                     startReStr=(r"\s*c_bands:\s*(?P<x_qe_c_bands_n_unconverged_eigenvalues>" + RE_i +
