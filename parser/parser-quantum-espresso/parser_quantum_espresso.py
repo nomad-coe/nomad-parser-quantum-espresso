@@ -1468,6 +1468,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_t_md_write_datafile_cputime>" + RE_f +
                                          r")\s*secs\s*$"),
                           ),
+                          SM(name="md_write_datafile_mem_dynamical",
+                             startReStr=(
+                                 r"\s*per-process dynamical memory:\s*(?P<x_qe_t_md_write_datafile_mem_dynamical__megabyte>" +
+                                 RE_f + r")\s*Mb\s*$"),
+                          ),
                        ],
                    ),
                ],
