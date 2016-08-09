@@ -803,6 +803,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='ecut_density', required=True,
                       startReStr=r"\s*charge density cutoff\s*=\s*(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
                    ),
+                   SM(name='ecutfock',
+                      startReStr=r"\s*cutoff for Fock operator\s*=\s*(?P<x_qe_fock_operator_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
+                   ),
                    SM(name='convergence_threshold',
                       startReStr=r"\s*convergence threshold\s*=\s*(?P<x_qe_potential_convergence_threshold>" + RE_f + r")\s*$",
                    ),
