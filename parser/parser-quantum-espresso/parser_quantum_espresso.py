@@ -1395,8 +1395,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  SM(name="bfgs_energy_new",
                                     startReStr=r"\s*energy new\s*=\s*(?P<x_qe_t_md_bfgs_energy_new__rydberg>" + RE_f + r")\s*Ry\s*$",
                                  ),
+                                 SM(name="bfgs_enthalpy_old",
+                                    startReStr=r"\s*enthalpy old\s*=\s*(?P<x_qe_t_md_bfgs_enthalpy_old__rydberg>" + RE_f + r")\s*Ry\s*$",
+                                 ),
+                                 SM(name="bfgs_enthalpy_new",
+                                    startReStr=r"\s*enthalpy new\s*=\s*(?P<x_qe_t_md_bfgs_enthalpy_new__rydberg>" + RE_f + r")\s*Ry\s*$",
+                                 ),
                                  SM(name="bfgs_case",
-                                    startReStr=r"\s*CASE:\s*(?P<x_qe_t_md_bfgs_case>energy_new\s*\S+\s*energy_old)\s*$",
+                                    startReStr=r"\s*CASE:\s*(?P<x_qe_t_md_bfgs_case>en.*_new\s*\S+\s*en.*_old)\s*$",
                                  ),
                                  SM(name="bfgs_trust_new",
                                     startReStr=r"\s*new trust radius\s*=\s*(?P<x_qe_t_md_bfgs_trust_new__bohr>" + RE_f + r")\s*bohr\s*$",
@@ -1417,6 +1423,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  SM(name="bfgs_final_energy",
                                     startReStr=(r"\s*Final energy\s*=\s*(?P<x_qe_t_md_bfgs_final_energy__rydberg>" +
                                                 RE_f + r")\s*Ry\s*$"),
+                                 ),
+                                 SM(name="bfgs_final_enthalpy",
+                                    startReStr=(r"\s*Final enthalpy\s*=\s*(?P<x_qe_t_md_bfgs_final_enthalpy__rydberg>" +
+                                                RE_f + r")\s*Ry\s*$"),
+                                 ),
+                                 SM(name="new_cell_volume",
+                                    startReStr=(r"\s*new unit-cell volume =\s*" +
+                                                r"(?P<x_qe_t_md_new_volume__bohr3>" + RE_f + r") a\.u\.\^3" +
+                                                r"\s*\(\s*" + RE_f + "\s*Ang\^3\s*\)\s*$"),
                                  ),
                              ],
                           ),
