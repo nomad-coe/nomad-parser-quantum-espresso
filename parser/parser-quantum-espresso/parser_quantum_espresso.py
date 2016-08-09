@@ -1619,6 +1619,19 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_t_md_starting_charge_negative_new_up>" + RE_f +
                                          r")\s*(?P<x_qe_t_md_starting_charge_negative_new_down>" + RE_f + r")\s*$"),
                           ),
+                          SM(name="md_wave_function_extrapolation2",
+                             startReStr=r"\s*(?P<x_qe_t_md_extrapolation_wfc>\S+ order)\s*wave-functions extrapolation\s*$",
+                             subMatchers=[
+                                 SM(name='warning_header',
+                                    startReStr=r"\s*Message from extrapolate_wfcs:?\s*$",
+                                    subMatchers=[
+                                        SM(name='warning_msg',
+                                           startReStr=r"\s*(?P<x_qe_warning>\S+.*?)\s*$",
+                                        ),
+                                    ],
+                                 ),
+                             ],
+                          ),
                           SM(name="md_write_datafile_cputime",
                              startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_t_md_write_datafile_cputime>" + RE_f +
                                          r")\s*secs\s*$"),
