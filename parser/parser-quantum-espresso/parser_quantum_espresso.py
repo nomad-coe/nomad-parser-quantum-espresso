@@ -1478,7 +1478,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              adHoc=lambda p: LOGGER.error("implement frames for md/relax"),
                           ),
                           SM(name="md_cellparam",
-                             startReStr="CELL_PARAMETERS\s*\(\s*(?P<x_qe_t_md_vec_a_units>\S+)\s*\)$",
+                                  startReStr=(r"CELL_PARAMETERS\s*\(\s*(?P<x_qe_t_md_vec_a_units>\S+?)\s*" +
+                                              r"(?:=\s*(?P<x_qe_t_md_vec_a_alat>" + RE_f + ")\s*)?\)$"),
                              # QE use syntax of its _input_ files here
                              subMatchers=[
                                  SM(name='md_cell_vec_a', repeats=True,
