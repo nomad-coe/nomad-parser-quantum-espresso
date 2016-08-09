@@ -1119,7 +1119,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   r")\s*$"),
                    ),
                    SM(name='starting_charge_negative_spin_ignore', repeats=True,
-                      # information is repeated and parsed by SM 'starting_rho'
                       startReStr=(r"\s*Check: negative starting charge=\(component\d\):?\s*" + RE_f + r"\s*$"),
                    ),
                    SM(name='initial_charge',
@@ -1574,6 +1573,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*second order wave-functions extrapolation\s*$",
                              fixedStartValues={ 'x_qe_t_md_extrapolation_wfc': 'second-order' },
                           ),
+                          SM(name='md_starting_charge_negative_spin_ignore', repeats=True,
+                             startReStr=(r"\s*Check: negative starting charge=\(component\d\):?\s*" + RE_f + r"\s*$"),
+                          ),
                           SM(name="md_new_old_atomic_charge_approximation",
                              startReStr=r"\s*NEW-OLD atomic charge density approx\. for the potential\s*$",
                              fixedStartValues={ 'x_qe_t_md_extrapolation_charge': 'atomic' }
@@ -1586,9 +1588,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*second order charge density extrapolation\s*$",
                              fixedStartValues={ 'x_qe_t_md_extrapolation_charge': 'second-order' }
                           ),
+                          SM(name='md_core_charge_check',
+                             startReStr=(r"\s*Check: negative/imaginary core charge\s*=\s*(?P<x_qe_t_md_core_charge_negative>" +
+                                         RE_f + r")\s*(?P<x_qe_t_md_core_charge_imaginary>" + RE_f + r")\s*$")
+                          ),
                           SM(name='md_starting_charge_negative_new',
                              startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_t_md_starting_charge_negative_new>" + RE_f +
                                          r")\s*$"),
+                          ),
+                          SM(name='md_starting_charge_negative_spin_ignore', repeats=True,
+                             startReStr=(r"\s*Check: negative starting charge=\(component\d\):?\s*" + RE_f + r"\s*$"),
                           ),
                           SM(name='md_starting_rho_new',
                              startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_t_md_starting_charge_negative_new_up>" + RE_f +
@@ -1602,6 +1611,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=(
                                  r"\s*per-process dynamical memory:\s*(?P<x_qe_t_md_write_datafile_mem_dynamical__megabyte>" +
                                  RE_f + r")\s*Mb\s*$"),
+                          ),
+                          SM(name='md_martyna_tuckerman_parameters',
+                             startReStr=(r"\s*alpha, beta MT =\s*(?P<x_qe_t_md_isolated_system_method_martyna_tuckerman_alpha>" + RE_f + r")\s*" +
+                                         r"(?P<x_qe_t_md_isolated_system_method_martyna_tuckerman_beta>" + RE_f + r")\s*$"),
                           ),
                        ],
                    ),
