@@ -1546,7 +1546,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name="md_new_old_atomic_charge_approximation",
                              startReStr=r"\s*NEW-OLD atomic charge density approx\. for the potential\s*$",
-                             fixedStartValues={ 'x_qe_t_md_extrapolation_charge': 'NEW-OLD' }
+                             fixedStartValues={ 'x_qe_t_md_extrapolation_charge': 'atomic' }
                           ),
                           SM(name="md_first_order_charge_approximation",
                              startReStr=r"\s*first order charge density extrapolation\s*$",
