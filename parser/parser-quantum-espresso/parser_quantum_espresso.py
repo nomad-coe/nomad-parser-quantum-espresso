@@ -474,19 +474,25 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             nk_current = len(k_x)
         self.tmp['kspin'][parser.lastMatch['x_qe_t_spin_channel'].lower()] = nk_current
 
-    def adHoc_profiling_category(self, parser):
-        self.setTmp('x_qe_t_profile_category', parser.lastMatch['x_qe_t_profile_category'])
-        self.tmp.pop('x_qe_t_profile_caller', None)
-
     def adHoc_profiling_complete(self, parser):
-        if parser.lastMatch.get('x_qe_t_profile_cputime', None) is None:
-            parser.backend.addValue('x_qe_t_profile_cputime', QeC.NAN)
-        if parser.lastMatch.get('x_qe_t_profile_walltime', None) is None:
-            parser.backend.addValue('x_qe_t_profile_walltime', QeC.NAN)
-        if parser.lastMatch.get('x_qe_t_profile_ncalls', None) is None:
-            parser.backend.addValue('x_qe_t_profile_ncalls', QeC.NAN)
-        parser.backend.addValue('x_qe_t_profile_caller_list', self.tmp.get('x_qe_t_profile_caller', ''))
-        parser.backend.addValue('x_qe_t_profile_category_list', self.tmp.get('x_qe_t_profile_category', ''))
+        # we have effectively 3 SMs in one, split between the 3 cases
+        if parser.lastMatch.get('x_qe_t_profile_caller', None) is not None:
+            # caller info
+            self.setTmp('x_qe_t_profile_caller', parser.lastMatch['x_qe_t_profile_caller'])
+        elif parser.lastMatch.get('x_qe_t_profile_category', None) is not None:
+            # category info
+            self.setTmp('x_qe_t_profile_category', parser.lastMatch['x_qe_t_profile_category'])
+            self.tmp.pop('x_qe_t_profile_caller', None)
+        else:
+            # actual profiling data
+            if parser.lastMatch.get('x_qe_t_profile_cputime', None) is None:
+                parser.backend.addValue('x_qe_t_profile_cputime', QeC.NAN)
+            if parser.lastMatch.get('x_qe_t_profile_walltime', None) is None:
+                parser.backend.addValue('x_qe_t_profile_walltime', QeC.NAN)
+            if parser.lastMatch.get('x_qe_t_profile_ncalls', None) is None:
+                parser.backend.addValue('x_qe_t_profile_ncalls', QeC.NAN)
+            parser.backend.addValue('x_qe_t_profile_caller_list', self.tmp.get('x_qe_t_profile_caller', ''))
+            parser.backend.addValue('x_qe_t_profile_category_list', self.tmp.get('x_qe_t_profile_category', ''))
 
     def bands_submatchers(self):
         return [
@@ -1430,34 +1436,24 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                 SM(name="warning_save_mgga2",
                                    startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
                                 ),
-                                SM(name="profiling", repeats=True,
-                                   # empty line starts/continues profiling info
-                                   startReStr=r"\s*$",
-                                   subMatchers=[
-                                       SM(name="profiling_caller", repeats=True,
-                                          startReStr=r"\s*Called by\s*(?P<x_qe_t_profile_caller>\S+?):?\s*$",
-                                          adHoc=lambda p: self.setTmp('x_qe_t_profile_caller', p.lastMatch['x_qe_t_profile_caller']),
-                                       ),
-                                       SM(name="profiling_category", repeats=True,
-                                          startReStr=r"\s*(?P<x_qe_t_profile_category>.*?)\s*routines:?\s*$",
-                                          adHoc=self.adHoc_profiling_category,
-                                       ),
-                                       SM(name="profiling_complete", repeats=True,
-                                          startReStr=(
-                                              r"\s*(?P<x_qe_t_profile_function>\S+)\s*:\s*" +
-                                              r"(?:(?P<x_qe_t_profile_cputime__strQeTimespan>.*)\s*(?:CPU\s*time\s*,|CPU)\s*)?" +
-                                              r"(?:(?P<x_qe_t_profile_walltime__strQeTimespan>.*)\s*[wW][aA][lL][lL](?:\s*[tT][iI][mM][eE])?\s*)?"
-                                              r"(?:\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls\s*(?:,\s*\S+\s*s\s*avg\s*)?\)\s*)?$"
-                                          ),
-                                          adHoc=self.adHoc_profiling_complete,
-                                       ),
-                                   ],
                                 ),
                              ],
                           ),
                        ],
                    ),
                ],
+            ),
+            SM(name="profiling", repeats=True,
+               # ugly: 3 SMs in one...
+               startReStr=(r"\s*(?:" +
+                           r"Called by\s*(?P<x_qe_t_profile_caller>\S+?):?" + r'|' +
+                           r"(?P<x_qe_t_profile_category>.*?)\s*routines:?" + r'|' +
+                           r"(?P<x_qe_t_profile_function>\S+)\s*:\s*" +
+                           r"(?:(?P<x_qe_t_profile_cputime__strQeTimespan>.*)\s*(?:CPU\s*time\s*,|CPU)\s*)?" +
+                           r"(?:(?P<x_qe_t_profile_walltime__strQeTimespan>.*)\s*[wW][aA][lL][lL](?:\s*[tT][iI][mM][eE])?\s*)?"
+                           r"(?:\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls\s*(?:,\s*\S+\s*s\s*avg\s*)?\)\s*)?" +
+                           r")\s*$"),
+               adHoc=self.adHoc_profiling_complete,
             ),
         ]
 
