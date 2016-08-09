@@ -1488,9 +1488,21 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*first order wave-functions extrapolation\s*$",
                              fixedStartValues={ 'x_qe_t_md_extrapolation_wfc': 'first-order' },
                           ),
+                          SM(name="md_wave_function_extrapolation_second_order",
+                             startReStr=r"\s*second order wave-functions extrapolation\s*$",
+                             fixedStartValues={ 'x_qe_t_md_extrapolation_wfc': 'second-order' },
+                          ),
                           SM(name="md_new_old_atomic_charge_approximation",
                              startReStr=r"\s*NEW-OLD atomic charge density approx\. for the potential\s*$",
                              fixedStartValues={ 'x_qe_t_md_extrapolation_charge': 'NEW-OLD' }
+                          ),
+                          SM(name="md_first_order_charge_approximation",
+                             startReStr=r"\s*first order charge density extrapolation\s*$",
+                             fixedStartValues={ 'x_qe_t_md_extrapolation_charge': 'first-order' }
+                          ),
+                          SM(name="md_second_order_charge_approximation",
+                             startReStr=r"\s*second order charge density extrapolation\s*$",
+                             fixedStartValues={ 'x_qe_t_md_extrapolation_charge': 'second-order' }
                           ),
                           SM(name="md_write_datafile_cputime",
                              startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_t_md_write_datafile_cputime>" + RE_f +
