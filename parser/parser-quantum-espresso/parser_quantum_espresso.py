@@ -1432,7 +1432,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              # QE use syntax of its _input_ files here
                              subMatchers=[
                                  SM(name='md_atpos_data', repeats=True,
-                                    startReStr=r"\s*(?P<x_qe_t_md_atom_labels>\S+)\s+" + QeC.re_vec('x_qe_t_md_atom_positions') + r"\s*$",
+                                    startReStr=(r"\s*(?P<x_qe_t_md_atom_labels>\S+)\s+" +
+                                                QeC.re_vec('x_qe_t_md_atom_positions') +
+                                                r"(?:\s+(?P<x_qe_t_md_atom_free_x>\d)\s+(?P<x_qe_t_md_atom_free_y>\d)\s+(?P<x_qe_t_md_atom_free_z>\d))?" +
+                                                r"\s*$"),
+                                    fixedStartValues={
+                                        'x_qe_t_md_atom_free_x': True,
+                                        'x_qe_t_md_atom_free_y': True,
+                                        'x_qe_t_md_atom_free_z': True,
+                                    },
                                  ),
                              ],
                              adHoc=lambda p: LOGGER.error('do sth with new atposvec')
