@@ -1532,6 +1532,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                 ),
                              ],
                           ),
+                          SM(name='md_starting_charge_negative_old',
+                             startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_t_md_starting_charge_negative_old>" + RE_f +
+                                         r")\s*$"),
+                          ),
                           SM(name="md_wave_function_extrapolation_first_order",
                              startReStr=r"\s*first order wave-functions extrapolation\s*$",
                              fixedStartValues={ 'x_qe_t_md_extrapolation_wfc': 'first-order' },
@@ -1551,6 +1555,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name="md_second_order_charge_approximation",
                              startReStr=r"\s*second order charge density extrapolation\s*$",
                              fixedStartValues={ 'x_qe_t_md_extrapolation_charge': 'second-order' }
+                          ),
+                          SM(name='md_starting_charge_negative_new',
+                             startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_t_md_starting_charge_negative_new>" + RE_f +
+                                         r")\s*$"),
+                          ),
+                          SM(name='md_starting_rho_new',
+                             startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_t_md_starting_charge_negative_new_up>" + RE_f +
+                                         r")\s*(?P<x_qe_t_md_starting_charge_negative_new_down>" + RE_f + r")\s*$"),
                           ),
                           SM(name="md_write_datafile_cputime",
                              startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_t_md_write_datafile_cputime>" + RE_f +
