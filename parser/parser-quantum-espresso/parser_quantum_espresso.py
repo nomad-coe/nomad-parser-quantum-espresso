@@ -1375,11 +1375,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              ],
                           ),
                           SM(name="md_step",
-                             startReStr=(r"\s*Entering Dynamics:\s*iteration\s*=\s*(?P<x_qe_md_iteration>" + RE_i +
+                             startReStr=(r"\s*Entering Dynamics:\s*iteration\s*=\s*(?P<x_qe_t_md_iteration>" + RE_i +
                                          r")\s*$"),
                              subMatchers=[
                                  SM(name="md_time",
-                                    startReStr=("\s*time\s*=\s*(?P<x_qe_md_time__picoseconds>" + RE_f +
+                                    startReStr=(r"\s*time\s*=\s*(?P<x_qe_t_md_time__picoseconds>" + RE_f +
                                                 r")\s*pico-seconds"),
                                  ),
                              ],
