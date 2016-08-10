@@ -530,6 +530,22 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
+    def SMs_kpoints(self, suffix='',
+                    coordinates=r"cart. coord. in units 2pi/(?:alat|a_0)",
+                    units='usrTpiba', target='x_qe_t_k_info'):
+        return [
+            SM(name="kpoint_heading" + suffix,
+               startReStr=r"\s*" + coordinates + r"\s*$",
+               subMatchers=[
+                   SM(name="kpoint_kpoints" + suffix, repeats=True,
+                      startReStr=(
+                          r"\s*k\(\s*(?P<" + target + "_ik>\d+)\s*\)\s*=\s*\(\s*" + QeC.re_vec(target + "_vec", units) +
+                          r"\s*\),\s*wk\s*=\s*(?P<" + target + "_wk>" + RE_f + r")\s*$"),
+                   ),
+               ],
+            ),
+        ]
+
     def run_submatchers(self):
         """submatchers of section_run"""
         return [
@@ -986,65 +1002,25 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name='kpoint_info',
                              startReStr=r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*$",
-                             subMatchers=[
-                                 SM(name="kpoint_heading",
-                                    startReStr=r"\s*cart. coord. in units 2pi/(?:alat|a_0)\s*$",
-                                 ),
-                                 SM(name="kpoint_kpoints", repeats=True,
-                                    startReStr=(r"\s*k\(\s*(?P<x_qe_t_k_info_ik>\d+)\s*\)\s*=\s*\(\s*" +
-                                                QeC.re_vec('x_qe_t_k_info_vec', 'usrAlat') +
-                                                r"\s*\),\s*wk\s*=\s*(?P<x_qe_t_k_info_wk>" + RE_f + r")\s*$"),
-
-                                 ),
-                             ],
+                             subMatchers=self.SMs_kpoints(),
                           ),
                           SM(name='kpoint_info_smearing_old',
                              startReStr=(r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*gaussian broad.\s*\(Ry\)\s*=" +
                                          r"\s*(?P<smearing_width__rydberg>" + RE_f + r")\s*ngauss\s*=" +
                                          r"\s*(?P<x_qe_smearing_ngauss>" + RE_i + ")\s*$"),
                              adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND.get(str(p.lastMatch['x_qe_smearing_ngauss']))),
-                             subMatchers=[
-                                 SM(name="kpoint_heading",
-                                    startReStr=r"\s*cart. coord. in units 2pi/(?:alat|a_0)\s*$",
-                                 ),
-                                 SM(name="kpoint_kpoints", repeats=True,
-                                    startReStr=(r"\s*k\(\s*(?P<x_qe_t_k_info_ik>\d+)\s*\)\s*=\s*\(\s*" +
-                                                QeC.re_vec('x_qe_t_k_info_vec', 'usrAlat') +
-                                                r"\s*\),\s*wk\s*=\s*(?P<x_qe_t_k_info_wk>" + RE_f + r")\s*$"),
-
-                                 ),
-                             ],
+                             subMatchers=self.SMs_kpoints(),
                           ),
                           SM(name='kpoint_info_smearing_new',
                              startReStr=(r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*(?P<x_qe_smearing_kind>.+?)\s*,\s*width\s*\(Ry\)\s*=" +
                                          r"\s*(?P<smearing_width__rydberg>" + RE_f + r")\s*$"),
                              adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND[p.lastMatch['x_qe_smearing_kind']]),
-                             subMatchers=[
-                                 SM(name="kpoint_heading",
-                                    startReStr=r"\s*cart. coord. in units 2pi/(?:alat|a_0)\s*$",
-                                 ),
-                                 SM(name="kpoint_kpoints", repeats=True,
-                                    startReStr=(r"\s*k\(\s*(?P<x_qe_t_k_info_ik>\d+)\s*\)\s*=\s*\(\s*" +
-                                                QeC.re_vec('x_qe_t_k_info_vec', 'usrAlat') +
-                                                r"\s*\),\s*wk\s*=\s*(?P<x_qe_t_k_info_wk>" + RE_f + r")\s*$"),
-
-                                 ),
-                             ],
+                             subMatchers=self.SMs_kpoints(),
                           ),
                           SM(name='kpoint_info_tetrahedra',
                              startReStr=r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*\((?P<x_qe_smearing_kind>tetrahedron method)\)\s*$",
                              adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND[p.lastMatch['x_qe_smearing_kind']]),
-                             subMatchers=[
-                                 SM(name="kpoint_heading",
-                                    startReStr=r"\s*cart. coord. in units 2pi/(?:alat|a_0)\s*$",
-                                 ),
-                                 SM(name="kpoint_kpoints", repeats=True,
-                                    startReStr=(r"\s*k\(\s*(?P<x_qe_t_k_info_ik>\d+)\s*\)\s*=\s*\(\s*" +
-                                                QeC.re_vec('x_qe_t_k_info_vec', 'usrAlat') +
-                                                r"\s*\),\s*wk\s*=\s*(?P<x_qe_t_k_info_wk>" + RE_f + r")\s*$"),
-
-                                 ),
-                             ],
+                             subMatchers=self.SMs_kpoints(),
                           ),
                       ],
                    ),
