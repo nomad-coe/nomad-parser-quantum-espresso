@@ -839,7 +839,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                           SM(name='berry_efield_intensity',
                              # Ry unit is not printed in 4.0
-                             startReStr=(r"\s*Intensity \((?:Ry\s*)?a.u.\)\s*:\s*(?P<x_qe_berry_efield_intensity>" + RE_f +
+                             startReStr=(r"\s*Intensity \((?:Ry\s*)?a.u.\)\s*:\s*(?P<x_qe_berry_efield_intensity__rydberg>" + RE_f +
                                          r")\s*$"),
                           ),
                           SM(name='berry_efield_strings',
@@ -1155,7 +1155,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                subMatchers=[
                    SM(name='iteration', repeats=True,
                       startReStr=(r"\s*iteration\s*#\s*(?P<x_qe_iteration_number>\d+)\s*" +
-                                  r"\s*ecut\s*=\s*(?P<x_qe_iteration_ecutwfc>" + RE_f +r")\s*Ry" +
+                                  r"\s*ecut\s*=\s*(?P<x_qe_iteration_ecutwfc__rydberg>" + RE_f +r")\s*Ry" +
                                   r"\s*beta\s*=\s*(?P<x_qe_iteration_beta>" + RE_f + r")\s*$"),
                       sections=['section_scf_iteration'],
                       subMatchers=[
@@ -1218,15 +1218,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                          r")\s*secs\s*$"),
                           ),
                           SM(name='e_total',
-                             startReStr=(r"\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration>" + RE_f + r")" +
+                             startReStr=(r"\s*!?\s*total\s+energy\s*=\s*(?P<energy_total_scf_iteration__rydberg>" + RE_f + r")" +
                                          r"\s*Ry\s*$"),
                           ),
                           SM(name='harris',
-                             startReStr=(r"\s*Harris-Foulkes estimate\s*=\s*(?P<x_qe_energy_total_harris_foulkes_estimate_iteration>" +
+                             startReStr=(r"\s*Harris-Foulkes estimate\s*=\s*(?P<x_qe_energy_total_harris_foulkes_estimate_iteration__rydberg>" +
                                          RE_f + r")\s*Ry\s*$"),
                           ),
                           SM(name='estimate_accuracy',
-                             startReStr=(r"\s*estimated scf accuracy\s*<\s*(?P<x_qe_energy_total_accuracy_estimate_iteration>" +
+                             startReStr=(r"\s*estimated scf accuracy\s*<\s*(?P<x_qe_energy_total_accuracy_estimate_iteration__rydberg>" +
                                          RE_f + r")\s*Ry\s*$"),
                           ),
                           SM(name='total_magnetization',
@@ -1266,18 +1266,18 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                          r"(?P<x_qe_t_energy_reference_fermi_down__eV>" + RE_f + ")\s*ev\s*$"),
                           ),
                           SM(name='e_total',
-                             startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total>' + RE_f + ')\s*Ry\s*$',
+                             startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total__rydberg>' + RE_f + ')\s*Ry\s*$',
                           ),
                           SM(name='harris',
-                             startReStr=(r"\s*Harris-Foulkes estimate\s*=\s*(?P<x_qe_energy_total_harris_foulkes_estimate>" +
+                             startReStr=(r"\s*Harris-Foulkes estimate\s*=\s*(?P<x_qe_energy_total_harris_foulkes_estimate__rydberg>" +
                                          RE_f + r")\s*Ry\s*$"),
                           ),
                           SM(name='estimate_accuracy',
-                             startReStr=(r"\s*estimated scf accuracy\s*<\s*(?P<x_qe_energy_total_accuracy_estimate>" +
+                             startReStr=(r"\s*estimated scf accuracy\s*<\s*(?P<x_qe_energy_total_accuracy_estimate__rydberg>" +
                                          RE_f + r")\s*Ry\s*$"),
                           ),
                           SM(name='total_AE_energy',
-                             startReStr=(r"\s*total all-electron energy\s*=\s*(?P<x_qe_energy_total_paw_all_electron>" +
+                             startReStr=(r"\s*total all-electron energy\s*=\s*(?P<x_qe_energy_total_paw_all_electron__rydberg>" +
                                          RE_f + r")\s*Ry\s*$"),
                           ),
                           SM(name='energy_decomposition',
@@ -1526,15 +1526,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*End final coordinates\s*$"
                           ),
                           SM(name="md_ekin",
-                             startReStr=(r"\s*kinetic energy\s*\(Ekin\)\s*=\s*(?P<x_qe_t_md_kinetic_energy>" + RE_f +
+                             startReStr=(r"\s*kinetic energy\s*\(Ekin\)\s*=\s*(?P<x_qe_t_md_kinetic_energy__rydberg>" + RE_f +
                                          r")\s*Ry\s*$"),
                           ),
                           SM(name="md_temperature",
-                             startReStr=(r"\s*temperature\s*=\s*(?P<x_qe_t_md_temperature>" + RE_f +
+                             startReStr=(r"\s*temperature\s*=\s*(?P<x_qe_t_md_temperature__kelvin>" + RE_f +
                                          r")\s*K\s*$"),
                           ),
                           SM(name="md_ekin_etot",
-                             startReStr=(r"\s*Ekin\s*\+\s*Etot\s*\(const\)\s*=\s*(?P<x_qe_t_md_ekin_etot>" + RE_f +
+                             startReStr=(r"\s*Ekin\s*\+\s*Etot\s*\(const\)\s*=\s*(?P<x_qe_t_md_ekin_etot__rydberg>" + RE_f +
                                          r")\s*Ry\s*$"),
                           ),
                           SM(name="md_linear_momentum",
