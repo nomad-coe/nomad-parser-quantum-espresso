@@ -500,16 +500,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             parser.backend.addValue('x_qe_t_profile_caller_list', self.tmp.get('x_qe_t_profile_caller', ''))
             parser.backend.addValue('x_qe_t_profile_category_list', self.tmp.get('x_qe_t_profile_category', ''))
 
-    def bands_submatchers(self):
+    def SMs_bands(self, suffix=''):
         return [
-            SM(name='bands', repeats=True,
+            SM(name='bands' + suffix, repeats=True,
                 startReStr=(r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba', '\s*') +
                             r'\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i +
                             r")\s*PWs\s*\)\s*bands\s*\(\s*[eE][vV]\s*\)\s*:?\s*$"),
                 # create new empty list for this k point's eigenvalues
                 adHoc=lambda p: self.tmp['k_energies'].append([]),
                 subMatchers=[
-                    SM(name='kbnd', repeats=True,
+                    SM(name='kbnd' + suffix, repeats=True,
                         startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
                         # extend list by eigenvalues in this line
                         adHoc=lambda p: self.tmp['k_energies'][-1].extend(cRE_f.findall(p.lastMatch['x_qe_t_k_point_energies'])),
@@ -1334,11 +1334,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='scf_result', repeats=False,
                        startReStr=r'\s*End of self-consistent calculation\s*$',
                        sections=['section_eigenvalues'],
-                       subMatchers=self.bands_submatchers() + [
+                       subMatchers=self.SMs_bands() + [
                           SM(name='bands_spin', repeats=True,
                               startReStr=r"\s*-+\s*SPIN\s+(?P<x_qe_t_spin_channel>UP|DOWN)\s*-+\s*$",
                               adHoc=self.adHoc_bands_spin,
-                              subMatchers=self.bands_submatchers(),
+                              subMatchers=self.SMs_bands(suffix='_spin'),
                           ),
                           SM(name='highest_occupied',
                              startReStr=(r"\s*highest occupied level \(ev\):\s*(?P<x_qe_t_energy_reference_highest_occupied__eV>" + RE_f +
