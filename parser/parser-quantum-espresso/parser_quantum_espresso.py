@@ -1605,11 +1605,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                 ),
                              ],
                           ),
-                          SM(name='exx_refine',
-                             startReStr=r"\s*EXX: now go back to refine exchange calculation\s*$",
-                             # this applies to the _next_ single_config_calc, need to write it there
-                             adHoc=lambda p: self.setTmp('exx_refine', True)
-                          ),
                           SM(name='md_starting_charge_negative_old',
                              startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_t_md_starting_charge_negative_old>" + RE_f +
                                          r")\s*$"),
@@ -1669,6 +1664,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                     ],
                                  ),
                              ],
+                          ),
+                          SM(name='exx_refine',
+                             startReStr=r"\s*EXX: now go back to refine exchange calculation\s*$",
+                             # this applies to the _next_ single_config_calc, need to write it there
+                             adHoc=lambda p: self.setTmp('exx_refine', True)
                           ),
                           SM(name="md_write_datafile_cputime",
                              startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_t_md_write_datafile_cputime>" + RE_f +
