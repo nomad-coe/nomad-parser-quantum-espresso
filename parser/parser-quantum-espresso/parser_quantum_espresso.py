@@ -546,6 +546,76 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
+    def SMs_relax_bfgs(self, suffix=''):
+        return [
+            SM(name="bfgs_info",
+               startReStr=r"\s*BFGS Geometry Optimization\s*$",
+            ),
+            SM(name="bfgs_scf_cycles",
+               startReStr=r"\s*number of scf cycles\s*=\s*(?P<x_qe_t_md_bfgs_scf_cycles>\d+)\s*$",
+               subMatchers=[
+                   SM(name="bfgs_steps",
+                      startReStr=r"\s*number of bfgs steps\s*=\s*(?P<x_qe_t_md_bfgs_steps>\d+)\s*$",
+                   ),
+                   SM(name="bfgs_energy_old",
+                      startReStr=r"\s*energy\s+old\s*=\s*(?P<x_qe_t_md_bfgs_energy_old__rydberg>" + RE_f + r")\s*Ry\s*$",
+                   ),
+                   SM(name="bfgs_energy_new",
+                      startReStr=r"\s*energy\s+new\s*=\s*(?P<x_qe_t_md_bfgs_energy_new__rydberg>" + RE_f + r")\s*Ry\s*$",
+                   ),
+                   SM(name="bfgs_enthalpy_old",
+                      startReStr=r"\s*enthalpy\s+old\s*=\s*(?P<x_qe_t_md_bfgs_enthalpy_old__rydberg>" + RE_f + r")\s*Ry\s*$",
+                   ),
+                   SM(name="bfgs_enthalpy_new",
+                      startReStr=r"\s*enthalpy\s+new\s*=\s*(?P<x_qe_t_md_bfgs_enthalpy_new__rydberg>" + RE_f + r")\s*Ry\s*$",
+                   ),
+                   SM(name="bfgs_case",
+                      startReStr=r"\s*CASE:\s*(?P<x_qe_t_md_bfgs_case>en.*_new\s*\S+\s*en.*_old)\s*$",
+                   ),
+                   SM(name="bfgs_warning",
+                      startReStr=r"\s*WARNING:\s*(?P<x_qe_warning>bfgs curvature condition failed, Theta=\s*\S+)\s*$",
+                   ),
+                   SM(name="bfgs_trust_new",
+                      startReStr=r"\s*new trust radius\s*=\s*(?P<x_qe_t_md_bfgs_trust_new__bohr>" + RE_f + r")\s*bohr\s*$",
+                   ),
+                   SM(name="bfgs_conv_thr_new",
+                      startReStr=r"\s*new conv_thr\s*=\s*(?P<x_qe_t_md_bfgs_conv_thr_new__rydberg>" + RE_f + r")\s*Ry\s*$",
+                   ),
+               ],
+            ),
+            SM(name="bfgs_converged",
+               # we know the actual numbers already
+               startReStr=r"\s*bfgs converged in\s+\d+\s+scf cycles and\s+\d+\s+bfgs steps",
+               fixedStartValues={ 'x_qe_t_md_bfgs_converged': True},
+               subMatchers=[
+                   SM(name="bfgs_converged_criteria",
+                      startReStr=r"\s*\(criteria:\s*(?P<x_qe_t_md_bfgs_converged_criteria>.*?)\)\s*$",
+                   ),
+               ],
+            ),
+            SM(name="bfgs_end",
+               startReStr=r"\s*End of BFGS Geometry Optimization",
+               subMatchers=[
+                   SM(name="bfgs_final_energy",
+                      startReStr=(r"\s*Final energy\s*=\s*(?P<x_qe_t_md_bfgs_final_energy__rydberg>" +
+                                  RE_f + r")\s*Ry\s*$"),
+                   ),
+                   SM(name="bfgs_final_enthalpy",
+                      startReStr=(r"\s*Final enthalpy\s*=\s*(?P<x_qe_t_md_bfgs_final_enthalpy__rydberg>" +
+                                  RE_f + r")\s*Ry\s*$"),
+                   ),
+                   SM(name="eat_start_final",
+                      startReStr=r"\s*Begin final coordinates\s*$"
+                   ),
+                   SM(name="new_cell_volume",
+                      startReStr=(r"\s*new unit-cell volume =\s*" +
+                                  r"(?P<x_qe_t_md_new_volume__bohr3>" + RE_f + r") a\.u\.\^3" +
+                                  r"\s*\(\s*" + RE_f + "\s*Ang\^3\s*\)\s*$"),
+                   ),
+               ],
+            ),
+        ]
+
     def run_submatchers(self):
         """submatchers of section_run"""
         return [
@@ -1399,72 +1469,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
-                          SM(name="bfgs_info",
-                             startReStr=r"\s*BFGS Geometry Optimization\s*$",
-                          ),
-                          SM(name="bfgs_scf_cycles",
-                             startReStr=r"\s*number of scf cycles\s*=\s*(?P<x_qe_t_md_bfgs_scf_cycles>\d+)\s*$",
-                             subMatchers=[
-                                 SM(name="bfgs_steps",
-                                    startReStr=r"\s*number of bfgs steps\s*=\s*(?P<x_qe_t_md_bfgs_steps>\d+)\s*$",
-                                 ),
-                                 SM(name="bfgs_energy_old",
-                                    startReStr=r"\s*energy\s+old\s*=\s*(?P<x_qe_t_md_bfgs_energy_old__rydberg>" + RE_f + r")\s*Ry\s*$",
-                                 ),
-                                 SM(name="bfgs_energy_new",
-                                    startReStr=r"\s*energy\s+new\s*=\s*(?P<x_qe_t_md_bfgs_energy_new__rydberg>" + RE_f + r")\s*Ry\s*$",
-                                 ),
-                                 SM(name="bfgs_enthalpy_old",
-                                    startReStr=r"\s*enthalpy\s+old\s*=\s*(?P<x_qe_t_md_bfgs_enthalpy_old__rydberg>" + RE_f + r")\s*Ry\s*$",
-                                 ),
-                                 SM(name="bfgs_enthalpy_new",
-                                    startReStr=r"\s*enthalpy\s+new\s*=\s*(?P<x_qe_t_md_bfgs_enthalpy_new__rydberg>" + RE_f + r")\s*Ry\s*$",
-                                 ),
-                                 SM(name="bfgs_case",
-                                    startReStr=r"\s*CASE:\s*(?P<x_qe_t_md_bfgs_case>en.*_new\s*\S+\s*en.*_old)\s*$",
-                                 ),
-                                 SM(name="bfgs_warning",
-                                    startReStr=r"\s*WARNING:\s*(?P<x_qe_warning>bfgs curvature condition failed, Theta=\s*\S+)\s*$",
-                                 ),
-                                 SM(name="bfgs_trust_new",
-                                    startReStr=r"\s*new trust radius\s*=\s*(?P<x_qe_t_md_bfgs_trust_new__bohr>" + RE_f + r")\s*bohr\s*$",
-                                 ),
-                                 SM(name="bfgs_conv_thr_new",
-                                    startReStr=r"\s*new conv_thr\s*=\s*(?P<x_qe_t_md_bfgs_conv_thr_new__rydberg>" + RE_f + r")\s*Ry\s*$",
-                                 ),
-                             ],
-                          ),
-                          SM(name="bfgs_converged",
-                             # we know the actual numbers already
-                             startReStr=r"\s*bfgs converged in\s+\d+\s+scf cycles and\s+\d+\s+bfgs steps",
-                             fixedStartValues={ 'x_qe_t_md_bfgs_converged': True},
-                             subMatchers=[
-                                 SM(name="bfgs_converged_criteria",
-                                    startReStr=r"\s*\(criteria:\s*(?P<x_qe_t_md_bfgs_converged_criteria>.*?)\)\s*$",
-                                 ),
-                             ],
-                          ),
-                          SM(name="bfgs_end",
-                             startReStr=r"\s*End of BFGS Geometry Optimization",
-                             subMatchers=[
-                                 SM(name="bfgs_final_energy",
-                                    startReStr=(r"\s*Final energy\s*=\s*(?P<x_qe_t_md_bfgs_final_energy__rydberg>" +
-                                                RE_f + r")\s*Ry\s*$"),
-                                 ),
-                                 SM(name="bfgs_final_enthalpy",
-                                    startReStr=(r"\s*Final enthalpy\s*=\s*(?P<x_qe_t_md_bfgs_final_enthalpy__rydberg>" +
-                                                RE_f + r")\s*Ry\s*$"),
-                                 ),
-                                 SM(name="eat_start_final",
-                                    startReStr=r"\s*Begin final coordinates\s*$"
-                                 ),
-                                 SM(name="new_cell_volume",
-                                    startReStr=(r"\s*new unit-cell volume =\s*" +
-                                                r"(?P<x_qe_t_md_new_volume__bohr3>" + RE_f + r") a\.u\.\^3" +
-                                                r"\s*\(\s*" + RE_f + "\s*Ang\^3\s*\)\s*$"),
-                                 ),
-                             ],
-                          ),
+                      ] + self.SMs_relax_bfgs() + [
                           # older espresso writes this _before_ 'entering dynamics'
                           SM(name="md_maxSteps",
                              startReStr=r"\s*The maximum number of steps has been reached.\s*$",
