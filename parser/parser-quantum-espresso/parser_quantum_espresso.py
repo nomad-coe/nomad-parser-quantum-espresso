@@ -1488,6 +1488,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
+                      ] + self.SMs_relax_bfgs() + [
                           SM(name="md_info",
                              startReStr=r"\s*Molecular Dynamics Calculation\s*$",
                              subMatchers=[
@@ -1502,7 +1503,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
-                      ] + self.SMs_relax_bfgs() + [
                           # older espresso writes this _before_ 'entering dynamics'
                           SM(name="md_maxSteps",
                              startReStr=r"\s*The maximum number of steps has been reached.\s*$",
