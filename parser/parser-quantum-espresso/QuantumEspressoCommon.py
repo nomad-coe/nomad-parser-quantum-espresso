@@ -106,6 +106,7 @@ class ParserQuantumEspresso(object):
             r"\s*Diagonalizing with lowered threshold\s*$",
             # initialization info
             r"\s*Initializing real-space augmentation for DENSE grid\s*$",
+            r"\s*SMOOTH grid -> DENSE grid\s*$",
             r"\s*Checking if some PAW data can be deallocated\.\.\.\s*$",
             r"\s*ierr\s*=\s*\d+",
             # table separators
