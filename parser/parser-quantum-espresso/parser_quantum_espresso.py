@@ -1307,6 +1307,26 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name="warning_save_mgga",
                              startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
                           ),
+                          # EXX writes them here
+                          SM(name='e_totalEXX',
+                             startReStr=r'\s*!?\s*total\s+energy\s*=\s*(?P<energy_total__rydberg>' + RE_f + ')\s*Ry\s*$',
+                          ),
+                          SM(name='harrisEXX',
+                             startReStr=(r"\s*Harris-Foulkes estimate\s*=\s*(?P<x_qe_energy_total_harris_foulkes_estimate__rydberg>" +
+                                         RE_f + r")\s*Ry\s*$"),
+                          ),
+                          SM(name='exchange_errorEXX',
+                             startReStr=(r"\s*est. exchange err \(dexx\)\s*=\s*(?P<x_qe_energy_exchange_error_estimate__rydberg>" +
+                                         RE_f + r")\s*Ry\s*$"),
+                          ),
+                          SM(name='fock_averageEXX',
+                             startReStr=(r"\s*- averaged Fock potential\s*=\s*(?P<x_qe_energy_exchange_average_fock_potential__rydberg>" +
+                                         RE_f + r")\s*Ry\s*$"),
+                          ),
+                          SM(name='fock_energyEXX',
+                             startReStr=(r"\s*\+ Fock energy\s*=\s*(?P<x_qe_energy_fock__rydberg>" +
+                                         RE_f + r")\s*Ry\s*$"),
+                          ),
                           SM(name="exx_self_consistency",
                              startReStr=r"\s*EXX self-consistency reached\s*$",
                              fixedStartValues={ "x_qe_exx_self_consistency": True },
