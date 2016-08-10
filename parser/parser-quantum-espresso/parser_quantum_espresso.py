@@ -192,6 +192,12 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             else:
                 backend.addValue('x_qe_spin_noncollinear', noncollinear)
 
+    def onOpen_section_single_configuration_calculation(
+            self, backend, gIndex, section):
+        exx_refine = self.tmp.pop('exx_refine', None)
+        if exx_refine:
+            backend.addValue('x_qe_exx_refine', True)
+
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
         """trigger called when section_single_configuration_calculation
@@ -1591,6 +1597,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                    startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
                                 ),
                              ],
+                          ),
+                          SM(name='exx_refine',
+                             startReStr=r"\s*EXX: now go back to refine exchange calculation\s*$",
+                             # this applies to the _next_ single_config_calc, need to write it there
+                             adHoc=lambda p: self.setTmp('exx_refine', True)
                           ),
                           SM(name='md_starting_charge_negative_old',
                              startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_t_md_starting_charge_negative_old>" + RE_f +
