@@ -518,6 +518,18 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
+    def SMs_read_input_file(self, suffix=''):
+        return [
+            SM(name='read_input_file' + suffix,
+               startReStr=r"\s*Reading input from\s*(?P<x_qe_input_filename>.*?)\s*$",
+               subMatchers=[
+                   SM(name="warning_input_card_ignored" + suffix, repeats=True,
+                       startReStr=r"\s*Warning:\s*(?P<x_qe_warning>card.*ignored)\s*$",
+                   ),
+               ],
+            ),
+        ]
+
     def run_submatchers(self):
         """submatchers of section_run"""
         return [
@@ -548,9 +560,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
-                   SM(name='qe_input_filename',
-                      startReStr=r"\s*Reading input from\s*(?P<x_qe_input_filename>.*?)\s*$",
-                   ),
+              ] + self.SMs_read_input_file() + [
                    SM(name='qe_dimensions',
                       startReStr=r"\s*Current dimensions of program\s*\S+\s*are:\s*$",
                       sections=['x_qe_section_compile_options'],
@@ -575,10 +585,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
-                   SM(name='qe_input_filename2',
-                      # second possible location for input filename
-                      startReStr=r"\s*Reading input from\s*(?P<x_qe_input_filename>.*?)\s*$",
-                   ),
+              ] + self.SMs_read_input_file(suffix='2') + [
                    SM(name='supercell1',
                       startReStr=r"\s*Found symmetry operation:\s*I\s*\+\s*\(\s*" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*\)\s*$",
                    ),
