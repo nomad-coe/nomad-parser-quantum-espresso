@@ -546,7 +546,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
-    def SMs_relax_bfgs(self, suffix=''):
+    def SMs_relax_bfgs(self):
         return [
             SM(name="bfgs_info",
                startReStr=r"\s*BFGS Geometry Optimization\s*$",
