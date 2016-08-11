@@ -1581,6 +1581,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                 ),
                              ],
                           ),
+                          # The following belongs actually to the 'next' scf calculation!
                           SM(name='md_starting_charge_negative_old',
                              startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_t_md_starting_charge_negative_old>" + RE_f +
                                          r")\s*$"),
