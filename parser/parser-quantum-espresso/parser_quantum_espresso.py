@@ -676,6 +676,67 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
+    def SMs_molecular_dynamics(self):
+        return [
+            SM(name="md_info",
+               startReStr=r"\s*Molecular Dynamics Calculation\s*$",
+               subMatchers=[
+                   SM(name="md_atom", repeats=True,
+                      startReStr=(r"\s*mass\s*(?P<x_qe_t_md_atom_mass_label>\S+)\s*=\s*" +
+                                  r"(?P<x_qe_t_md_atom_mass_value>" + RE_f + r")\s*$"),
+                   ),
+                   SM(name="md_timestep",
+                      startReStr=(r"\s*Time step\s*=\s*" + RE_f + r"\s*a\.u\.,\s*" +
+                                  r"(?P<x_qe_t_md_timestep_size__femtoseconds>" + RE_f +
+                                  r")\s*femto-seconds\s*$"),
+                   ),
+               ],
+            ),
+            # older espresso writes this _before_ 'entering dynamics'
+            SM(name="md_maxSteps1",
+               startReStr=r"\s*The maximum number of steps has been reached.\s*$",
+               fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
+               subMatchers=self.SMs_molecular_dynamics_end(suffix='1')
+            ),
+            SM(name="md_step",
+               startReStr=(r"\s*Entering Dynamics:\s*iteration\s*=\s*(?P<x_qe_t_md_iteration>" + RE_i +
+                           r")\s*$"),
+               subMatchers=[
+                   SM(name="md_time",
+                      startReStr=(r"\s*time\s*=\s*(?P<x_qe_t_md_time__picoseconds>" + RE_f +
+                                  r")\s*pico-seconds"),
+                   ),
+                   SM(name="md_nat2_distance",
+                      startReStr=r"\s*DISTANCE\s*=\s*(?P<x_qe_t_new_nat2_distance__bohr>" + RE_f + r")\s*$"
+                   ),
+               ] + self.SMs_md_system_new(suffix='MD') + [
+                   SM(name="md_ekin",
+                      startReStr=(r"\s*kinetic energy\s*\(Ekin\)\s*=\s*(?P<x_qe_t_md_kinetic_energy__rydberg>" + RE_f +
+                                  r")\s*Ry\s*$"),
+                   ),
+                   SM(name="md_temperature",
+                      startReStr=(r"\s*temperature\s*=\s*(?P<x_qe_t_md_temperature__kelvin>" + RE_f +
+                                  r")\s*K\s*$"),
+                   ),
+                   SM(name="md_ekin_etot",
+                      startReStr=(r"\s*Ekin\s*\+\s*Etot\s*\(const\)\s*=\s*(?P<x_qe_t_md_ekin_etot__rydberg>" + RE_f +
+                                  r")\s*Ry\s*$"),
+                   ),
+                   SM(name="md_linear_momentum",
+                      startReStr=(r"\s*Linear momentum\s*:\s*" + QeC.re_vec('x_qe_t_md_linear_momentum') +
+                                  r"\s*$"),
+                   ),
+                   # newer espresso writes this _after_ 'entering dynamics'
+                   SM(name="md_maxSteps2",
+                      startReStr=r"\s*The maximum number of steps has been reached.\s*$",
+                      fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
+                      subMatchers=self.SMs_molecular_dynamics_end(suffix='2'),
+                   ),
+               ],
+               adHoc=lambda p: LOGGER.error("implement frames for md/relax"),
+            ),
+        ]
+
     def run_submatchers(self):
         """submatchers of section_run"""
         return [
@@ -1516,63 +1577,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              ],
                           ),
                       ] + self.SMs_relax_bfgs() + [
-                          SM(name="md_info",
-                             startReStr=r"\s*Molecular Dynamics Calculation\s*$",
-                             subMatchers=[
-                                 SM(name="md_atom", repeats=True,
-                                    startReStr=(r"\s*mass\s*(?P<x_qe_t_md_atom_mass_label>\S+)\s*=\s*" +
-                                                r"(?P<x_qe_t_md_atom_mass_value>" + RE_f + r")\s*$"),
-                                 ),
-                                 SM(name="md_timestep",
-                                    startReStr=(r"\s*Time step\s*=\s*" + RE_f + r"\s*a\.u\.,\s*" +
-                                                r"(?P<x_qe_t_md_timestep_size__femtoseconds>" + RE_f +
-                                                r")\s*femto-seconds\s*$"),
-                                 ),
-                             ],
-                          ),
-                          # older espresso writes this _before_ 'entering dynamics'
-                          SM(name="md_maxSteps",
-                             startReStr=r"\s*The maximum number of steps has been reached.\s*$",
-                             fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
-                          ),
-                      ] + self.SMs_molecular_dynamics_end(suffix='1') + [
-                          SM(name="md_step",
-                             startReStr=(r"\s*Entering Dynamics:\s*iteration\s*=\s*(?P<x_qe_t_md_iteration>" + RE_i +
-                                         r")\s*$"),
-                             subMatchers=[
-                                 SM(name="md_time",
-                                    startReStr=(r"\s*time\s*=\s*(?P<x_qe_t_md_time__picoseconds>" + RE_f +
-                                                r")\s*pico-seconds"),
-                                 ),
-                                 SM(name="md_nat2_distance",
-                                    startReStr=r"\s*DISTANCE\s*=\s*(?P<x_qe_t_new_nat2_distance__bohr>" + RE_f + r")\s*$"
-                                 ),
-                             ] + self.SMs_md_system_new(suffix='MD') + [
-                                 SM(name="md_ekin",
-                                    startReStr=(r"\s*kinetic energy\s*\(Ekin\)\s*=\s*(?P<x_qe_t_md_kinetic_energy__rydberg>" + RE_f +
-                                                r")\s*Ry\s*$"),
-                                 ),
-                                 SM(name="md_temperature",
-                                    startReStr=(r"\s*temperature\s*=\s*(?P<x_qe_t_md_temperature__kelvin>" + RE_f +
-                                                r")\s*K\s*$"),
-                                 ),
-                                 SM(name="md_ekin_etot",
-                                    startReStr=(r"\s*Ekin\s*\+\s*Etot\s*\(const\)\s*=\s*(?P<x_qe_t_md_ekin_etot__rydberg>" + RE_f +
-                                                r")\s*Ry\s*$"),
-                                 ),
-                                 SM(name="md_linear_momentum",
-                                    startReStr=(r"\s*Linear momentum\s*:\s*" + QeC.re_vec('x_qe_t_md_linear_momentum') +
-                                                r"\s*$"),
-                                 ),
-                                 # newer espresso writes this _after_ 'entering dynamics'
-                                 SM(name="md_maxSteps2",
-                                    startReStr=r"\s*The maximum number of steps has been reached.\s*$",
-                                    fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
-                                    subMatchers=self.SMs_molecular_dynamics_end(suffix='2'),
-                                 ),
-                             ],
-                             adHoc=lambda p: LOGGER.error("implement frames for md/relax"),
-                          ),
+                      ] + self.SMs_molecular_dynamics() + [
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
                              subMatchers=[
