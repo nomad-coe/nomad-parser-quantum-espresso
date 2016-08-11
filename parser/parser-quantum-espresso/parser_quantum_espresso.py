@@ -548,30 +548,30 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def SMs_md_system_new(self, suffix=''):
         return [
-            SM(name="eat_start_final",
+            SM(name="eat_start_final" + suffix,
                startReStr=r"\s*Begin final coordinates\s*$"
             ),
-            SM(name="new_cell_volume",
+            SM(name="new_cell_volume" + suffix,
                startReStr=(r"\s*new unit-cell volume =\s*" +
                            r"(?P<x_qe_t_md_new_volume__bohr3>" + RE_f + r") a\.u\.\^3" +
                            r"\s*\(\s*" + RE_f + "\s*Ang\^3\s*\)\s*$"),
             ),
-            SM(name="md_cellparam",
+            SM(name="cellparam" + suffix,
                startReStr=(r"CELL_PARAMETERS\s*\(\s*(?P<x_qe_t_md_vec_a_units>\S+?)\s*" +
                            r"(?:=\s*(?P<x_qe_t_md_vec_a_alat>" + RE_f + ")\s*)?\)$"),
                # QE use syntax of its _input_ files here
                subMatchers=[
-                   SM(name='md_cell_vec_a', repeats=True,
+                   SM(name='md_cell_vec_a' + suffix, repeats=True,
                       startReStr=r"\s*" + QeC.re_vec('x_qe_t_md_vec_a') + r"\s*$",
                    ),
                ],
                adHoc=lambda p: LOGGER.error('do sth with new cellvec')
             ),
-            SM(name="md_atpos",
+            SM(name="atpos" + suffix,
                startReStr="ATOMIC_POSITIONS\s*\(\s*(?P<x_qe_t_md_atom_positions_units>\S+)\s*\)$",
                # QE use syntax of its _input_ files here
                subMatchers=[
-                   SM(name='md_atpos_data', repeats=True,
+                   SM(name='atpos_data' + suffix, repeats=True,
                       startReStr=(r"\s*(?P<x_qe_t_md_atom_labels>\S+)\s+" +
                                   QeC.re_vec('x_qe_t_md_atom_positions') +
                                   r"(?:\s+(?P<x_qe_t_md_atom_free_x>\d)\s+(?P<x_qe_t_md_atom_free_y>\d)\s+(?P<x_qe_t_md_atom_free_z>\d))?" +
@@ -585,7 +585,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                ],
                adHoc=lambda p: LOGGER.error('do sth with new atposvec')
             ),
-            SM(name="eat_end_final",
+            SM(name="eat_end_final" + suffix,
                startReStr=r"\s*End final coordinates\s*$"
             ),
         ]
