@@ -1547,24 +1547,25 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  SM(name="md_nat2_distance",
                                     startReStr=r"\s*DISTANCE\s*=\s*(?P<x_qe_t_new_nat2_distance__bohr>" + RE_f + r")\s*$"
                                  ),
-                             ] + self.SMs_md_system_new(suffix='MD'),
+                             ] + self.SMs_md_system_new(suffix='MD') + [
+                                 SM(name="md_ekin",
+                                    startReStr=(r"\s*kinetic energy\s*\(Ekin\)\s*=\s*(?P<x_qe_t_md_kinetic_energy__rydberg>" + RE_f +
+                                                r")\s*Ry\s*$"),
+                                 ),
+                                 SM(name="md_temperature",
+                                    startReStr=(r"\s*temperature\s*=\s*(?P<x_qe_t_md_temperature__kelvin>" + RE_f +
+                                                r")\s*K\s*$"),
+                                 ),
+                                 SM(name="md_ekin_etot",
+                                    startReStr=(r"\s*Ekin\s*\+\s*Etot\s*\(const\)\s*=\s*(?P<x_qe_t_md_ekin_etot__rydberg>" + RE_f +
+                                                r")\s*Ry\s*$"),
+                                 ),
+                                 SM(name="md_linear_momentum",
+                                    startReStr=(r"\s*Linear momentum\s*:\s*" + QeC.re_vec('x_qe_t_md_linear_momentum') +
+                                                r"\s*$"),
+                                 ),
+                             ],
                              adHoc=lambda p: LOGGER.error("implement frames for md/relax"),
-                          ),
-                          SM(name="md_ekin",
-                             startReStr=(r"\s*kinetic energy\s*\(Ekin\)\s*=\s*(?P<x_qe_t_md_kinetic_energy__rydberg>" + RE_f +
-                                         r")\s*Ry\s*$"),
-                          ),
-                          SM(name="md_temperature",
-                             startReStr=(r"\s*temperature\s*=\s*(?P<x_qe_t_md_temperature__kelvin>" + RE_f +
-                                         r")\s*K\s*$"),
-                          ),
-                          SM(name="md_ekin_etot",
-                             startReStr=(r"\s*Ekin\s*\+\s*Etot\s*\(const\)\s*=\s*(?P<x_qe_t_md_ekin_etot__rydberg>" + RE_f +
-                                         r")\s*Ry\s*$"),
-                          ),
-                          SM(name="md_linear_momentum",
-                             startReStr=(r"\s*Linear momentum\s*:\s*" + QeC.re_vec('x_qe_t_md_linear_momentum') +
-                                         r"\s*$"),
                           ),
                           # newer espresso writes this _after_ 'entering dynamics'
                           SM(name="md_maxSteps",
