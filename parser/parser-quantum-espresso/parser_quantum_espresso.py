@@ -1535,7 +1535,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*The maximum number of steps has been reached.\s*$",
                              fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
                           ),
-                      ] + self.SMs_molecular_dynamics_end() + [
+                      ] + self.SMs_molecular_dynamics_end(suffix='1') + [
                           SM(name="md_step",
                              startReStr=(r"\s*Entering Dynamics:\s*iteration\s*=\s*(?P<x_qe_t_md_iteration>" + RE_i +
                                          r")\s*$"),
@@ -1564,15 +1564,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                     startReStr=(r"\s*Linear momentum\s*:\s*" + QeC.re_vec('x_qe_t_md_linear_momentum') +
                                                 r"\s*$"),
                                  ),
+                                 # newer espresso writes this _after_ 'entering dynamics'
+                                 SM(name="md_maxSteps2",
+                                    startReStr=r"\s*The maximum number of steps has been reached.\s*$",
+                                    fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
+                                    subMatchers=self.SMs_molecular_dynamics_end(suffix='2'),
+                                 ),
                              ],
                              adHoc=lambda p: LOGGER.error("implement frames for md/relax"),
                           ),
-                          # newer espresso writes this _after_ 'entering dynamics'
-                          SM(name="md_maxSteps",
-                             startReStr=r"\s*The maximum number of steps has been reached.\s*$",
-                             fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
-                          ),
-                      ] + self.SMs_molecular_dynamics_end(suffix='2') + [
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
                              subMatchers=[
