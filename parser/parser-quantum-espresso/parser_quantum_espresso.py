@@ -625,7 +625,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name="bfgs_conv_thr_new",
                       startReStr=r"\s*new conv_thr\s*=\s*(?P<x_qe_t_md_bfgs_conv_thr_new__rydberg>" + RE_f + r")\s*Ry\s*$",
                    ),
-               ],
+               ] + self.SMs_md_system_new(suffix='BFGS1'),
             ),
             SM(name="bfgs_converged",
                # we know the actual numbers already
@@ -648,7 +648,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=(r"\s*Final enthalpy\s*=\s*(?P<x_qe_t_md_bfgs_final_enthalpy__rydberg>" +
                                   RE_f + r")\s*Ry\s*$"),
                    ),
-               ],
+               ] + self.SMs_md_system_new(suffix='BFGS2'),
             ),
         ]
 
@@ -1547,10 +1547,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  SM(name="md_nat2_distance",
                                     startReStr=r"\s*DISTANCE\s*=\s*(?P<x_qe_t_new_nat2_distance__bohr>" + RE_f + r")\s*$"
                                  ),
-                             ],
+                             ] + self.SMs_md_system_new(suffix='MD'),
                              adHoc=lambda p: LOGGER.error("implement frames for md/relax"),
                           ),
-                      ] + self.SMs_md_system_new() + [
                           SM(name="md_ekin",
                              startReStr=(r"\s*kinetic energy\s*\(Ekin\)\s*=\s*(?P<x_qe_t_md_kinetic_energy__rydberg>" + RE_f +
                                          r")\s*Ry\s*$"),
