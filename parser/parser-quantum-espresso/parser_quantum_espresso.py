@@ -679,6 +679,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def SMs_molecular_dynamics(self):
         return [
             SM(name="md_info",
+               # This is only shown after first SCF
                startReStr=r"\s*Molecular Dynamics Calculation\s*$",
                subMatchers=[
                    SM(name="md_atom", repeats=True,
@@ -1647,6 +1648,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
+                          # this does not belong to next scf!
                           SM(name='exx_refine',
                              startReStr=r"\s*EXX: now go back to refine exchange calculation\s*$",
                              # this applies to the _next_ single_config_calc, need to write it there
