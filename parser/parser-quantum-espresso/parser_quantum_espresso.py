@@ -1358,7 +1358,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
-                          SM(name="iter_warning_save_mgga",
+                          SM(name="iter_warning_save_mggaI",
                              startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
                           ),
                           SM(name='iteration_rho',
@@ -1485,7 +1485,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*convergence has been achieved\s*$",
                              adHoc=lambda p: p.backend.addValue('x_qe_convergence_iterations', p.superContext.tmp['last_iteration'])
                           ),
-                          SM(name="warning_save_mgga",
+                          SM(name="warning_save_mgga1",
                              startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
                           ),
                           # EXX writes them here
