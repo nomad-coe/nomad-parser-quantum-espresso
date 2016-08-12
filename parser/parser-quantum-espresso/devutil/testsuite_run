@@ -23,6 +23,13 @@ RE_NO = re.compile(r"[^\|]+      no\|")
 RE_GREPC = re.compile(r"(.*):(\d+)\S*$")
 RE_WCL = re.compile(r"\s*(\d+)\s+(.*)$")
 
+ANNOTATE = True
+
+CMDLINE_PARSER = ['python', 'parser_quantum_espresso.py', '--stream']
+
+if ANNOTATE:
+    CMDLINE_PARSER.append('--annotate')
+
 def run_tests(testsuite_dir, testsuite_base):
     annotated = []
     input_files = [] 
@@ -41,8 +48,8 @@ def run_tests(testsuite_dir, testsuite_base):
             annotated.append(src_file + ".annotate")
             input_files.append(src_file)
     with open(testsuite_list_file, "r") as input_stream, open(testsuite_out, "w") as input_stdout, open(testsuite_log, "w") as input_stderr:
-        subprocess.call([
-            'python', 'parser_quantum_espresso.py', '--annotate', '--stream'],
+        subprocess.call(
+            CMDLINE_PARSER,
             stdin=input_stream, stdout=input_stdout, stderr=input_stderr
         )
     input_nlines = {}
@@ -57,39 +64,40 @@ def run_tests(testsuite_dir, testsuite_base):
                 LOGGER.warning("skipping wc -l output: %s", line)
                 continue
             input_nlines[m.group(2)] = int(m.group(1))
-    annotated_nlines = {}
-    with subprocess.Popen([
-            'wc', '-l' ] + annotated, stdout=subprocess.PIPE) as wcl:
-        for line in io.TextIOWrapper(wcl.stdout, encoding="utf-8"):
-            if line == '':
-                break
-            line = line.rstrip()
-            m = RE_WCL.match(line)
-            if m is None:
-                LOGGER.warning("skipping wc -l output: %s", line)
-                continue
-            annotated_nlines[m.group(2)] = int(m.group(1))
-    with open(testsuite_parsed_missing, "w") as parsed_missing:
-        pm = []
+    if ANNOTATE:
+        annotated_nlines = {}
         with subprocess.Popen([
-                'grep', '-c', '     no|'] + annotated, stdout=subprocess.PIPE) as grepc:
-            for line in io.TextIOWrapper(grepc.stdout, encoding="utf-8"):
+                'wc', '-l' ] + annotated, stdout=subprocess.PIPE) as wcl:
+            for line in io.TextIOWrapper(wcl.stdout, encoding="utf-8"):
                 if line == '':
                     break
-                m = RE_GREPC.match(line)
-                if not m:
-                    LOGGER.error("unrecognized grep output: %s",line.rstrip())
+                line = line.rstrip()
+                m = RE_WCL.match(line)
+                if m is None:
+                    LOGGER.warning("skipping wc -l output: %s", line)
                     continue
-                fname = m.group(1)
-                input_fname = re.sub(r"\.annotate",r"", fname)
-                aborted_parse = (input_nlines[input_fname] > (annotated_nlines[fname]-1))
-                if aborted_parse:
-                    count_missing = -1
-                else:
-                    count_missing =int(m.group(2))
-                pm.append( (count_missing, fname) )
-        for num, fname in sorted(pm):
-            parsed_missing.write("%5d %s\n" % (num, fname))
+                annotated_nlines[m.group(2)] = int(m.group(1))
+        with open(testsuite_parsed_missing, "w") as parsed_missing:
+            pm = []
+            with subprocess.Popen([
+                    'grep', '-c', '     no|'] + annotated, stdout=subprocess.PIPE) as grepc:
+                for line in io.TextIOWrapper(grepc.stdout, encoding="utf-8"):
+                    if line == '':
+                        break
+                    m = RE_GREPC.match(line)
+                    if not m:
+                        LOGGER.error("unrecognized grep output: %s",line.rstrip())
+                        continue
+                    fname = m.group(1)
+                    input_fname = re.sub(r"\.annotate",r"", fname)
+                    aborted_parse = (input_nlines[input_fname] > (annotated_nlines[fname]-1))
+                    if aborted_parse:
+                        count_missing = -1
+                    else:
+                        count_missing =int(m.group(2))
+                    pm.append( (count_missing, fname) )
+            for num, fname in sorted(pm):
+                parsed_missing.write("%5d %s\n" % (num, fname))
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
