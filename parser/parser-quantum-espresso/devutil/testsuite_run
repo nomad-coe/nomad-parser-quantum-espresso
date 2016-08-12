@@ -4,6 +4,7 @@ import sys
 import re
 import subprocess
 import io
+import argparse
 import logging
 
 
@@ -25,10 +26,7 @@ RE_WCL = re.compile(r"\s*(\d+)\s+(.*)$")
 
 ANNOTATE = True
 
-CMDLINE_PARSER = ['python', 'parser_quantum_espresso.py', '--stream']
-
-if ANNOTATE:
-    CMDLINE_PARSER.append('--annotate')
+CALL_QEPARSER = ['python', 'parser_quantum_espresso.py', '--stream']
 
 def run_tests(testsuite_dir, testsuite_base):
     annotated = []
@@ -49,7 +47,7 @@ def run_tests(testsuite_dir, testsuite_base):
             input_files.append(src_file)
     with open(testsuite_list_file, "r") as input_stream, open(testsuite_out, "w") as input_stdout, open(testsuite_log, "w") as input_stderr:
         subprocess.call(
-            CMDLINE_PARSER,
+            CALL_QEPARSER,
             stdin=input_stream, stdout=input_stdout, stderr=input_stderr
         )
     input_nlines = {}
@@ -100,12 +98,19 @@ def run_tests(testsuite_dir, testsuite_base):
                 parsed_missing.write("%5d %s\n" % (num, fname))
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        TESTSUITE_BASE = 'testsuite'
+    CMDLINE_PARSER = argparse.ArgumentParser(
+        description='run QE parser over testsuite')
+    CMDLINE_PARSER.add_argument(
+        '--no_annotate', action='store_true', default=False)
+    CMDLINE_PARSER.add_argument(
+        'file_base', default='testsuite', nargs='?')
+    CMDLINE_PARSER.add_argument(
+        'testsuite_dir', default='/srv/work/tmp/espresso/test-link', nargs='?')
+    CMDLINE_ARGS = CMDLINE_PARSER.parse_args()
+
+    if CMDLINE_ARGS.no_annotate:
+        ANNOTATE = False
     else:
-        TESTSUITE_BASE = sys.argv[1]
-    if len(sys.argv) < 3:
-        TESTSUITE_DIR = '/srv/work/tmp/espresso/test-link'
-    else:
-        TESTSUITE_DIR = sys.argv[2]
-    run_tests(TESTSUITE_DIR, TESTSUITE_BASE)
+        CALL_QEPARSER.append('--annotate')
+
+    run_tests(CMDLINE_ARGS.testsuite_dir, CMDLINE_ARGS.file_base)
