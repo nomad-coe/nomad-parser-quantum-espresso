@@ -1028,332 +1028,330 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def run_submatchers(self):
         """submatchers of section_run"""
         return [
-            SM(name='header',
-               startReStr=r"^\s*$",
+            SM(name='serial',
+               startReStr=r"\s*(?P<x_qe_compile_parallel_version>Serial) version\s*$",
+            ),
+            SM(name='serial_multithread',
+               startReStr=r"\s*(?P<x_qe_compile_parallel_version>Serial multi-threaded) version, running on\s*(?P<x_qe_nthreads>\d+)\s*processor cores\s*$",
+            ),
+            SM(name='parallel_mpi',
+               startReStr=r"\s*(?P<x_qe_compile_parallel_version>Parallel version \(MPI\)), running on\s*(?P<x_qe_nproc>\d+)\s*processors\s*$",
                subMatchers=[
-                   SM(name='serial',
-                      startReStr=r"\s*(?P<x_qe_compile_parallel_version>Serial) version\s*$",
+                   SM(name='npool',
+                       startReStr=r"\s*K-points division:\s*npool\s*=\s*(?P<x_qe_npool>\d+)\s*$",
                    ),
-                   SM(name='serial_multithread',
-                      startReStr=r"\s*(?P<x_qe_compile_parallel_version>Serial multi-threaded) version, running on\s*(?P<x_qe_nthreads>\d+)\s*processor cores\s*$",
+               ],
+            ),
+            SM(name='parallel_mpi_old',
+               startReStr=r"\s*(?P<x_qe_compile_parallel_version>Parallel version \(MPI\))\s*$",
+               subMatchers=[
+                   SM(name='nproc',
+                       startReStr=r"\s*Number of processors in use:\s*(?P<x_qe_nproc>\d+)\s*$",
                    ),
-                   SM(name='parallel_mpi',
-                      startReStr=r"\s*(?P<x_qe_compile_parallel_version>Parallel version \(MPI\)), running on\s*(?P<x_qe_nproc>\d+)\s*processors\s*$",
+               ],
+            ),
+        ] + self.SMs_read_input_file() + [
+            SM(name='qe_dimensions',
+               startReStr=r"\s*Current dimensions of program\s*\S+\s*are:\s*$",
+               sections=['x_qe_section_compile_options'],
+               subMatchers=[
+                   SM(name="qe_dim_ancient1",
+                      startReStr=r"\s*ntypx\s*=\s*(?P<x_qe_ntypx>\d+)\s*npk\s*=\s*(?P<x_qe_npk>\d+)\s*lmax\s*=\s*(?P<x_qe_lmaxx>\d+)\s*$"
+                   ),
+                   SM(name="qe_dim_ancient2",
+                      startReStr=r"\s*nchix\s*=\s*(?P<x_qe_nchix>\d+)\s*ndmx\s*=\s*(?P<x_qe_ndmx>\d+)\s*nbrx\s*=\s*(?P<x_qe_nbrx>\d+)\s*nqfx\s*=\s*(?P<x_qe_nqfx>\d+)\s*$",
+                   ),
+                   SM(name="qe_dim_old",
+                      startReStr=r"\s*ntypx\s*=\s*(?P<x_qe_ntypx>\d+)\s*npk\s*=\s*(?P<x_qe_npk>\d+)\s*lmax\s*=\s*(?P<x_qe_lmaxx>\d+)\s*\s*ndmx\s*=\s*(?P<x_qe_ndmx>\d+)\s*$",
+                   ),
+                   SM(name="qe_dim_ntypx",
+                      startReStr=r"\s*Max number of different atomic species \(ntypx\)\s*=\s*(?P<x_qe_ntypx>\d+)\s*$",
+                   ),
+                   SM(name="qe_dim_npk",
+                      startReStr=r"\s*Max number of k-points \(npk\)\s*=\s*(?P<x_qe_npk>\d+)\s*$",
+                   ),
+                   SM(name="qe_dim_lmaxx",
+                      startReStr=r"\s*Max angular momentum in pseudopotentials \(lmaxx?\)\s*=\s*(?P<x_qe_lmaxx>\d+)\s*$",
+                   ),
+               ],
+            ),
+        ] + self.SMs_read_input_file(suffix='2') + [
+            SM(name='supercell1',
+               startReStr=r"\s*Found symmetry operation:\s*I\s*\+\s*\(\s*" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*\)\s*$",
+            ),
+            SM(name='supercell2',
+               startReStr=r"\s*This is a supercell, fractional translations? are disabled\s*$",
+               adHoc=lambda p: p.backend.addValue('x_qe_supercell', True)
+            ),
+            SM(name='supercell3', repeats=True,
+               # observed in PWSCF 4.0
+               # "     Found additional translation:   -0.5000   -0.5000    0.0000"
+               startReStr=r"\s*Found additional translation:\s*" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*$",
+               adHoc=lambda p: p.backend.addValue('x_qe_supercell', True),
+            ),
+            SM(name='supercell41', repeats=True,
+               # observed in PWSCF 4.1
+               # "     Fractionary translation:   -0.5000   -0.5000    0.0000is a symmetry operation:"
+               startReStr=r"\s*Fractionary\s+translation:\s+" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*is a symmetry operation:\s*$",
+               subMatchers=[
+                   SM(name="supercell41_ft_disabled",
+                      startReStr=r"\s*This is a supercell, fractionary translation are disabled:\s*$",
+                   ),
+               ],
+               adHoc=lambda p: p.backend.addValue('x_qe_supercell', True),
+            ),
+            SM(name='pseudopotential_report', repeats=True,
+               startReStr=r"\s*\|\s*pseudopotential report for atomic species\s*:\s*(?P<x_qe_t_pp_report_species>\d+)\s*\|\s*$",
+               endReStr=r"\s*={4,}\s*$",
+               sections=['x_qe_t_section_pp_report'],
+               subMatchers=[
+                   SM(name='ppr_version',
+                      startReStr=r"\s*\|\s*pseudo potential version(?P<x_qe_t_pp_report_version>(?:\s+\d+)+)\s*\|\s*$",
+                   ),
+                   SM(name='ppr_separator',
+                      startReStr=r"\s*-{4,}\s*$",
+                   ),
+                   SM(name='ppr_line', repeats=True,
+                      startReStr=r"\s*\|  (?P<x_qe_t_pp_report_line>.*?)\s*\|\s*$",
+                   ),
+               ],
+            ),
+            SM(name='enforced_XC',
+               startReStr=r"\s*IMPORTANT: XC functional enforced from input\s*:\s*",
+               subMatchers=[
+                   SM(name='xc_functional_enforced', required=True, # details are parsed in xc_functional
+                      startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_t_xc_functional_shortname_enforced>\S+)\s*\([^\(]+\)\s*$"
+                   ),
+                   SM(name='exx_fraction_enforced',
+                      startReStr=r"\s*EXX-fraction\s*=\s*" + RE_f + r"\s*$",
+                   ),
+               ],
+            ),
+            SM(name='renormalized_pseudo_wavefunction', repeats=True,
+               startReStr=r"\s*file\s*(?P<x_qe_t_pp_renormalized_filename>.*?)\s*:\s*wavefunction\(s\)\s*(?P<x_qe_t_pp_renormalized_wfc>.*?)\s*renormalized\s*$",
+               adHoc=self.adHoc_pp_renorm,
+            ),
+            SM(name='pseudopotential_warning', repeats=True,
+               # same as 'renormalized_pseudo_wavefunction', but seen in QE 4.1
+               startReStr=(r"\s*WARNING: Pseudopotential #\s*(?P<x_qe_t_pp_warning_idx>\d+)\s*"+
+                           r"file\s*:\s*(?P<x_qe_t_pp_warning_filename>.+?)\s*$"),
+               subMatchers=[
+                   SM(name='pp_warning_not_normalized', repeats=True,
+                      startReStr=(r"\s*WARNING: WFC #\s*(?P<x_qe_t_pp_warning_wfcidx>\d+)\s*" +
+                                  r"\((?P<x_qe_t_pp_warning_wfclabel>[^\)]+)\) IS NOT CORRECTLY NORMALIZED:\s*" +
+                                  r"norm=\s*(?P<x_qe_t_pp_warning_wfcnorm>" + RE_f + r")\s*$"),
                       subMatchers=[
-                          SM(name='npool',
-                              startReStr=r"\s*K-points division:\s*npool\s*=\s*(?P<x_qe_npool>\d+)\s*$",
+                          SM(name='pp_warning_normalization_msg', repeats=True,
+                             startReStr=r"\s*WARNING: WFC HAS BEEN NOW RENORMALIZED\s*$",
                           ),
                       ],
                    ),
-                   SM(name='parallel_mpi_old',
-                      startReStr=r"\s*(?P<x_qe_compile_parallel_version>Parallel version \(MPI\))\s*$",
+               ],
+               sections=['x_qe_t_section_pp_warning'],
+            ),
+            SM(name='dispersion_correction_obsolete_iosys',
+               startReStr=r"\s*Message from routine iosys:\s*$",
+               subMatchers=[
+                   SM(name='dispersion_correction_obsolete',
+                      startReStr=r"\s*(?P<x_qe_warning>london is obsolete, use \"vdw_corr='grimme-d2'\" instead)\s*$",
+                   )
+               ],
+            ),
+            SM(name='dispersion_correction',
+               startReStr=r"\s*Parameters for Dispersion Correction:\s*$",
+               subMatchers=[
+                   SM(name='dispersion_correction_header',
+                      startReStr=r"\s*atom\s*VdW radius\s*C_6\s*$",
                       subMatchers=[
-                          SM(name='nproc',
-                              startReStr=r"\s*Number of processors in use:\s*(?P<x_qe_nproc>\d+)\s*$",
+                          SM(name='dispersion_correction_values', repeats=True,
+                             startReStr=(r"\s*(?P<x_qe_t_species_dispersion_correction_label>.+?)\s+" +
+                                         r"(?P<x_qe_t_species_dispersion_correction_vdw_radius>" + RE_f + r")" +
+                                         r"\s*(?P<x_qe_t_species_dispersion_correction_C6>" + RE_f + r")\s*$"),
+                             adHoc=self.adHoc_dispersion_correction_values,
                           ),
                       ],
                    ),
-              ] + self.SMs_read_input_file() + [
-                   SM(name='qe_dimensions',
-                      startReStr=r"\s*Current dimensions of program\s*\S+\s*are:\s*$",
-                      sections=['x_qe_section_compile_options'],
+               ],
+               adHoc=lambda p: p.backend.addValue('x_qe_dispersion_correction', True)
+            ),
+            SM(name='gamma_algorithms',
+               startReStr=r"\s*gamma-point specific algorithms are used\s*$",
+               adHoc=lambda p: p.backend.addValue('x_qe_gamma_algorithms', True)
+            ),
+            SM(name='warning_setup',
+               startReStr=r"\s*Message from routine setup:\s*$",
+               subMatchers=[
+                  SM(name='warning_metallic',
+                     startReStr=r"\s*(?P<x_qe_warning>the system is metallic, specify occupations)\s*$",
+                  ),
+               ],
+            ),
+            SM(name='exx_grid_same',
+               startReStr=r"\s*EXX: grid of k\+q points same as grid of k-points",
+               fixedStartValues={ "x_qe_exx_grid_same_as_k_grid": True },
+            ),
+            SM(name='subspace_diagonalization',
+               startReStr=r"\s*(?:Subspace diagonalization in iterative solution of the eigenvalue problem:|Iterative solution of the eigenvalue problem)\s*$",
+               subMatchers=[
+                   SM(name='too_few_procs',
+                      startReStr=r"\s*Too few procs for parallel algorithm\s*$",
                       subMatchers=[
-                          SM(name="qe_dim_ancient1",
-                             startReStr=r"\s*ntypx\s*=\s*(?P<x_qe_ntypx>\d+)\s*npk\s*=\s*(?P<x_qe_npk>\d+)\s*lmax\s*=\s*(?P<x_qe_lmaxx>\d+)\s*$"
-                          ),
-                          SM(name="qe_dim_ancient2",
-                             startReStr=r"\s*nchix\s*=\s*(?P<x_qe_nchix>\d+)\s*ndmx\s*=\s*(?P<x_qe_ndmx>\d+)\s*nbrx\s*=\s*(?P<x_qe_nbrx>\d+)\s*nqfx\s*=\s*(?P<x_qe_nqfx>\d+)\s*$",
-                          ),
-                          SM(name="qe_dim_old",
-                             startReStr=r"\s*ntypx\s*=\s*(?P<x_qe_ntypx>\d+)\s*npk\s*=\s*(?P<x_qe_npk>\d+)\s*lmax\s*=\s*(?P<x_qe_lmaxx>\d+)\s*\s*ndmx\s*=\s*(?P<x_qe_ndmx>\d+)\s*$",
-                          ),
-                          SM(name="qe_dim_ntypx",
-                             startReStr=r"\s*Max number of different atomic species \(ntypx\)\s*=\s*(?P<x_qe_ntypx>\d+)\s*$",
-                          ),
-                          SM(name="qe_dim_npk",
-                             startReStr=r"\s*Max number of k-points \(npk\)\s*=\s*(?P<x_qe_npk>\d+)\s*$",
-                          ),
-                          SM(name="qe_dim_lmaxx",
-                             startReStr=r"\s*Max angular momentum in pseudopotentials \(lmaxx?\)\s*=\s*(?P<x_qe_lmaxx>\d+)\s*$",
-                          ),
-                      ],
-                   ),
-              ] + self.SMs_read_input_file(suffix='2') + [
-                   SM(name='supercell1',
-                      startReStr=r"\s*Found symmetry operation:\s*I\s*\+\s*\(\s*" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*\)\s*$",
-                   ),
-                   SM(name='supercell2',
-                      startReStr=r"\s*This is a supercell, fractional translations? are disabled\s*$",
-                      adHoc=lambda p: p.backend.addValue('x_qe_supercell', True)
-                   ),
-                   SM(name='supercell3', repeats=True,
-                      # observed in PWSCF 4.0
-                      # "     Found additional translation:   -0.5000   -0.5000    0.0000"
-                      startReStr=r"\s*Found additional translation:\s*" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*$",
-                      adHoc=lambda p: p.backend.addValue('x_qe_supercell', True),
-                   ),
-                   SM(name='supercell41', repeats=True,
-                      # observed in PWSCF 4.1
-                      # "     Fractionary translation:   -0.5000   -0.5000    0.0000is a symmetry operation:"
-                      startReStr=r"\s*Fractionary\s+translation:\s+" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*is a symmetry operation:\s*$",
-                      subMatchers=[
-                          SM(name="supercell41_ft_disabled",
-                             startReStr=r"\s*This is a supercell, fractionary translation are disabled:\s*$",
-                          ),
-                      ],
-                      adHoc=lambda p: p.backend.addValue('x_qe_supercell', True),
-                   ),
-                   SM(name='pseudopotential_report', repeats=True,
-                      startReStr=r"\s*\|\s*pseudopotential report for atomic species\s*:\s*(?P<x_qe_t_pp_report_species>\d+)\s*\|\s*$",
-                      endReStr=r"\s*={4,}\s*$",
-                      sections=['x_qe_t_section_pp_report'],
-                      subMatchers=[
-                          SM(name='ppr_version',
-                             startReStr=r"\s*\|\s*pseudo potential version(?P<x_qe_t_pp_report_version>(?:\s+\d+)+)\s*\|\s*$",
-                          ),
-                          SM(name='ppr_separator',
-                             startReStr=r"\s*-{4,}\s*$",
-                          ),
-                          SM(name='ppr_line', repeats=True,
-                             startReStr=r"\s*\|  (?P<x_qe_t_pp_report_line>.*?)\s*\|\s*$",
-                          ),
-                      ],
-                   ),
-                   SM(name='enforced_XC',
-                      startReStr=r"\s*IMPORTANT: XC functional enforced from input\s*:\s*",
-                      subMatchers=[
-                          SM(name='xc_functional_enforced', required=True, # details are parsed in xc_functional
-                             startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_t_xc_functional_shortname_enforced>\S+)\s*\([^\(]+\)\s*$"
-                          ),
-                          SM(name='exx_fraction_enforced',
-                             startReStr=r"\s*EXX-fraction\s*=\s*" + RE_f + r"\s*$",
-                          ),
-                      ],
-                   ),
-                   SM(name='renormalized_pseudo_wavefunction', repeats=True,
-                      startReStr=r"\s*file\s*(?P<x_qe_t_pp_renormalized_filename>.*?)\s*:\s*wavefunction\(s\)\s*(?P<x_qe_t_pp_renormalized_wfc>.*?)\s*renormalized\s*$",
-                      adHoc=self.adHoc_pp_renorm,
-                   ),
-                   SM(name='pseudopotential_warning', repeats=True,
-                      # same as 'renormalized_pseudo_wavefunction', but seen in QE 4.1
-                      startReStr=(r"\s*WARNING: Pseudopotential #\s*(?P<x_qe_t_pp_warning_idx>\d+)\s*"+
-                                  r"file\s*:\s*(?P<x_qe_t_pp_warning_filename>.+?)\s*$"),
-                      subMatchers=[
-                          SM(name='pp_warning_not_normalized', repeats=True,
-                             startReStr=(r"\s*WARNING: WFC #\s*(?P<x_qe_t_pp_warning_wfcidx>\d+)\s*" +
-                                         r"\((?P<x_qe_t_pp_warning_wfclabel>[^\)]+)\) IS NOT CORRECTLY NORMALIZED:\s*" +
-                                         r"norm=\s*(?P<x_qe_t_pp_warning_wfcnorm>" + RE_f + r")\s*$"),
-                             subMatchers=[
-                                 SM(name='pp_warning_normalization_msg', repeats=True,
-                                    startReStr=r"\s*WARNING: WFC HAS BEEN NOW RENORMALIZED\s*$",
-                                 ),
-                             ],
-                          ),
-                      ],
-                      sections=['x_qe_t_section_pp_warning'],
-                   ),
-                   SM(name='dispersion_correction_obsolete_iosys',
-                      startReStr=r"\s*Message from routine iosys:\s*$",
-                      subMatchers=[
-                          SM(name='dispersion_correction_obsolete',
-                             startReStr=r"\s*(?P<x_qe_warning>london is obsolete, use \"vdw_corr='grimme-d2'\" instead)\s*$",
+                          SM(name='min_procs',
+                             startReStr=r"\s*we need at least \d+ procs per pool\s*$",
                           )
                       ],
                    ),
-                   SM(name='dispersion_correction',
-                      startReStr=r"\s*Parameters for Dispersion Correction:\s*$",
-                      subMatchers=[
-                          SM(name='dispersion_correction_header',
-                             startReStr=r"\s*atom\s*VdW radius\s*C_6\s*$",
-                             subMatchers=[
-                                 SM(name='dispersion_correction_values', repeats=True,
-                                    startReStr=(r"\s*(?P<x_qe_t_species_dispersion_correction_label>.+?)\s+" +
-                                                r"(?P<x_qe_t_species_dispersion_correction_vdw_radius>" + RE_f + r")" +
-                                                r"\s*(?P<x_qe_t_species_dispersion_correction_C6>" + RE_f + r")\s*$"),
-                                    adHoc=self.adHoc_dispersion_correction_values,
-                                 ),
-                             ],
-                          ),
-                      ],
-                      adHoc=lambda p: p.backend.addValue('x_qe_dispersion_correction', True)
+                   SM(name='too_few_proc_42',
+                      # fallback for 4.2, msg on one line
+                      startReStr=r"\s*Too few procs for parallel algorithm: we need at least \d* procs per pool\s*$",
                    ),
-                   SM(name='gamma_algorithms',
-                      startReStr=r"\s*gamma-point specific algorithms are used\s*$",
-                      adHoc=lambda p: p.backend.addValue('x_qe_gamma_algorithms', True)
-                   ),
-                   SM(name='warning_setup',
-                      startReStr=r"\s*Message from routine setup:\s*$",
-                      subMatchers=[
-                         SM(name='warning_metallic',
-                            startReStr=r"\s*(?P<x_qe_warning>the system is metallic, specify occupations)\s*$",
-                         ),
-                      ],
-                   ),
-                   SM(name='exx_grid_same',
-                      startReStr=r"\s*EXX: grid of k\+q points same as grid of k-points",
-                      fixedStartValues={ "x_qe_exx_grid_same_as_k_grid": True },
-                   ),
-                   SM(name='subspace_diagonalization',
-                      startReStr=r"\s*(?:Subspace diagonalization in iterative solution of the eigenvalue problem:|Iterative solution of the eigenvalue problem)\s*$",
-                      subMatchers=[
-                          SM(name='too_few_procs',
-                             startReStr=r"\s*Too few procs for parallel algorithm\s*$",
-                             subMatchers=[
-                                 SM(name='min_procs',
-                                    startReStr=r"\s*we need at least \d+ procs per pool\s*$",
-                                 )
-                             ],
-                          ),
-                          SM(name='too_few_proc_42',
-                             # fallback for 4.2, msg on one line
-                             startReStr=r"\s*Too few procs for parallel algorithm: we need at least \d* procs per pool\s*$",
-                          ),
-                          SM(name='serial_algorithm',
-                             startReStr=r"\s*a serial algorithm will be used\s*$",
-                             adHoc=lambda p: p.backend.addValue('x_qe_diagonalization_algorithm', 'serial')
-                          ),
-                      ],
-                   ),
-                   SM(name='mesh_sticks',
-                      startReStr=r"\s*G-vector sticks info\s*$",
-                      subMatchers=[
-                          SM(name="sticks_separator",
-                             startReStr=r"\s*-+\s*$",
-                          ),
-                          SM(name="sticks_heading", required=True,
-                             startReStr=r"\s*sticks:\s*dense\s+smooth\s+PW\s+G-vecs:\s+dense\s+smooth\s+PW\s*$"
-                          ),
-                          SM(name='sticks_sum', required=True,
-                             startReStr=(
-                                 r"\s*Sum\s+(?P<x_qe_sticks_sum_dense>\d+)\s+(?P<x_qe_sticks_sum_smooth>\d+)\s+(?P<x_qe_sticks_sum_PW>\d+)" +
-                                 r"\s+(?P<x_qe_sticks_sum_G_dense>\d+)\s+(?P<x_qe_sticks_sum_G_smooth>\d+)\s+(?P<x_qe_sticks_sum_G_PW>\d+)\s*$"
-                             ),
-                          ),
-                          SM(name='sticks_tot',
-                             startReStr=r"\s*Tot\s+(?P<x_qe_sticks_tot_dense>\d+)\s+(?P<x_qe_sticks_tot_smooth>\d+)\s+(?P<x_qe_sticks_tot_PW>\d+)\s*$",
-                          ),
-                      ],
-                   ),
-                   SM(name='mesh_sticks43',
-                      startReStr=r"\s*Stick Mesh\s*$",
-                      adHoc=lambda p: LOGGER.error("parse 4.3 sticks mesh properly"),
-                      subMatchers=[
-                          SM(name="sticks_separator43",
-                             startReStr=r"\s*-+\s*$",
-                          ),
-                          SM(name="sticks_summary43",
-                             startReStr=r"\s*(?P<x_qe_sticks_old>nst =.*)\s*$",
-                          ),
-                          SM(name="sticks_header43",
-                             startReStr=r"\s*(?P<x_qe_sticks_old>n\.st\s+n\.stw\s+n\.sts\s+n\.g\s+n\.gw\s+n\.gs)\s*$",
-                          ),
-                          SM(name='sticks_line43', repeats=True,
-                             startReStr=r"\s*(?P<x_qe_sticks_old>(?:min|max|)(?:\s+\d+){6})\s*$",
-                          ),
-                      ],
-                   ),
-                   SM(name='mesh_sticks40',
-                      startReStr=r"\s*(?P<x_qe_sticks_old>Planes per process \(thick\)\s*:.*?)\s*$",
-                      adHoc=lambda p: LOGGER.error("parse <= 4.0 sticks mesh properly"),
-                      subMatchers=[
-                          SM(name="sticks_smooth40",
-                             startReStr=r"\s*(?P<x_qe_sticks_old>Planes per process \(smooth\)\s*:.*?)\s*$",
-                          ),
-                          SM(name="sticks_header40", required=True,
-                             startReStr=r"\s*(?P<x_qe_sticks_old>Proc/\D+)\s*$",
-                          ),
-                          SM(name="sticks_header40_2", required=True,
-                             startReStr=r"\s*(?P<x_qe_sticks_old>Pool\D+)\s*$",
-                          ),
-                          SM(name='sticks_line40', repeats=True,
-                             startReStr=r"\s*(?P<x_qe_sticks_old>(?:\s+\d+){9})\s*$",
-                          ),
-                      ],
-                   ),
-                   SM(name='atom_radii',
-                      startReStr=r"\s*Generating pointlists\s*\.\.\.\s*$",
-                      subMatchers=[
-                          SM(name='new_r_m', repeats=True,
-                             # radius is in alat units, but they are not yet defined.
-                             # convert manually in onClose hook...
-                             startReStr=(r"\s*new\s+r_m\s*:\s*(?P<x_qe_t_species_integration_radius>" + RE_f + r")\s*" +
-                                         r"(?:\((?:alat|a0)\s*units\)\s*" + RE_f + r"\s*\(a\.u\.\)\s*for type\s*" +
-                                         r"(?P<x_qe_t_species_integration_radius_idx>" + RE_i + r"))?\s*$"
-                             ),
-                          ),
-                      ],
-                   ),
-               ] + self.SMs_summaryf90() + [
-                   SM(name='allocated_arrays',
-                      startReStr=r"\s*Largest allocated arrays\s*est. size \(Mb\)\s*dimensions\s*$",
-                      subMatchers=[
-                          SM(name='allocated_array', repeats=True,
-                             startReStr=(
-                                 r"\s*(?P<x_qe_t_allocated_array_name>.*?)\s*(?P<x_qe_t_allocated_array_size__mebibyte>" +
-                                 RE_f + r")\s*Mb\s*\(\s*(?P<x_qe_t_allocated_array_dimensions>(?:\s*\d+\s*,?)+)\s*\)\s*$"
-                             ),
-                          ),
-                      ],
-                   ),
-                   SM(name='temporary_arrays',
-                      startReStr=r"\s*Largest temporary arrays\s*est. size \(Mb\)\s*dimensions\s*$",
-                      subMatchers=[
-                          SM(name='temporary_array', repeats=True,
-                             startReStr=(
-                                 r"\s*(?P<x_qe_t_temporary_array_name>.*?)\s*(?P<x_qe_t_temporary_array_size__mebibyte>" +
-                                 RE_f + r")\s*Mb\s*\(\s*(?P<x_qe_t_temporary_array_dimensions>(?:\s*\d+\s*,?)+)\s*\)\s*$"
-                             ),
-                          ),
-                      ],
-                   ),
-                   SM(name='martyna_tuckerman_parameters',
-                      startReStr=(r"\s*alpha, beta MT =\s*(?P<x_qe_isolated_system_method_martyna_tuckerman_alpha>" + RE_f + r")\s*" +
-                                  r"(?P<x_qe_isolated_system_method_martyna_tuckerman_beta>" + RE_f + r")\s*$"),
-                      fixedStartValues={ 'x_qe_isolated_system_method': 'Martyna-Tuckerman' },
-                   ),
-                   SM(name='core_charge_check',
-                      startReStr=(r"\s*Check: negative/imaginary core charge\s*=\s*(?P<x_qe_core_charge_negative>" +
-                                  RE_f + r")\s*(?P<x_qe_core_charge_imaginary>" + RE_f + r")\s*$")
-                   ),
-                   SM(name='initial_density_from_file',
-                      startReStr=r"\s*The initial density is read from file\s*:\s*$",
-                      subMatchers=[
-                          SM(name='initial_density_file',
-                             startReStr=r"\s*(?P<x_qe_starting_density_file>.+\.(?:dat|xml))\s*$",
-                          ),
-                      ],
-                   ),
-                   SM(name='initial_potential',
-                      startReStr=r"\s*Initial potential from\s*(?P<x_qe_starting_potential>.*?)\s*$",
-                   ),
-                   SM(name='starting_charge_negative',
-                      startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_starting_charge_negative>" + RE_f +
-                                  r")\s*$"),
-                   ),
-                   SM(name='starting_charge_negative_spin_ignore', repeats=True,
-                      startReStr=(r"\s*Check: negative starting charge=\(component\d\):?\s*" + RE_f + r"\s*$"),
-                   ),
-                   SM(name='initial_charge',
-                      startReStr=(r"\s*starting charge\s*(?P<x_qe_starting_charge>" + RE_f +
-                                  r")\s*,\s*renormalised to\s*(?P<x_qe_starting_charge_renormalized>" + RE_f +
-                                  r")\s*$"),
-                   ),
-                   SM(name='starting_rho',
-                      startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_starting_charge_negative_up>" + RE_f +
-                                  r")\s*(?P<x_qe_starting_charge_negative_down>" + RE_f + r")\s*$"),
-                   ),
-                   SM(name='starting_wfc',
-                      startReStr=r"\s*Starting wfc\s*(?P<x_qe_starting_wfc>.*?)\s*$",
-                   ),
-                   SM(name='cputime_msg',
-                      startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_time_setup_cpu1_end>" + RE_f +
-                                  r")\s*secs\s*$"),
-                   ),
-                   SM(name='per_process_mem',
-                      startReStr=r"\s*per-process dynamical memory:\s*(?P<x_qe_per_process_mem__mebibyte>" + RE_f + ")\s*Mb\s*$",
+                   SM(name='serial_algorithm',
+                      startReStr=r"\s*a serial algorithm will be used\s*$",
+                      adHoc=lambda p: p.backend.addValue('x_qe_diagonalization_algorithm', 'serial')
                    ),
                ],
-            ), # header
+            ),
+            SM(name='mesh_sticks',
+               startReStr=r"\s*G-vector sticks info\s*$",
+               subMatchers=[
+                   SM(name="sticks_separator",
+                      startReStr=r"\s*-+\s*$",
+                   ),
+                   SM(name="sticks_heading", required=True,
+                      startReStr=r"\s*sticks:\s*dense\s+smooth\s+PW\s+G-vecs:\s+dense\s+smooth\s+PW\s*$"
+                   ),
+                   SM(name='sticks_sum', required=True,
+                      startReStr=(
+                          r"\s*Sum\s+(?P<x_qe_sticks_sum_dense>\d+)\s+(?P<x_qe_sticks_sum_smooth>\d+)\s+(?P<x_qe_sticks_sum_PW>\d+)" +
+                          r"\s+(?P<x_qe_sticks_sum_G_dense>\d+)\s+(?P<x_qe_sticks_sum_G_smooth>\d+)\s+(?P<x_qe_sticks_sum_G_PW>\d+)\s*$"
+                      ),
+                   ),
+                   SM(name='sticks_tot',
+                      startReStr=r"\s*Tot\s+(?P<x_qe_sticks_tot_dense>\d+)\s+(?P<x_qe_sticks_tot_smooth>\d+)\s+(?P<x_qe_sticks_tot_PW>\d+)\s*$",
+                   ),
+               ],
+            ),
+            SM(name='mesh_sticks43',
+               startReStr=r"\s*Stick Mesh\s*$",
+               adHoc=lambda p: LOGGER.error("parse 4.3 sticks mesh properly"),
+               subMatchers=[
+                   SM(name="sticks_separator43",
+                      startReStr=r"\s*-+\s*$",
+                   ),
+                   SM(name="sticks_summary43",
+                      startReStr=r"\s*(?P<x_qe_sticks_old>nst =.*)\s*$",
+                   ),
+                   SM(name="sticks_header43",
+                      startReStr=r"\s*(?P<x_qe_sticks_old>n\.st\s+n\.stw\s+n\.sts\s+n\.g\s+n\.gw\s+n\.gs)\s*$",
+                   ),
+                   SM(name='sticks_line43', repeats=True,
+                      startReStr=r"\s*(?P<x_qe_sticks_old>(?:min|max|)(?:\s+\d+){6})\s*$",
+                   ),
+               ],
+            ),
+            SM(name='mesh_sticks40',
+               startReStr=r"\s*(?P<x_qe_sticks_old>Planes per process \(thick\)\s*:.*?)\s*$",
+               adHoc=lambda p: LOGGER.error("parse <= 4.0 sticks mesh properly"),
+               subMatchers=[
+                   SM(name="sticks_smooth40",
+                      startReStr=r"\s*(?P<x_qe_sticks_old>Planes per process \(smooth\)\s*:.*?)\s*$",
+                   ),
+                   SM(name="sticks_header40", required=True,
+                      startReStr=r"\s*(?P<x_qe_sticks_old>Proc/\D+)\s*$",
+                   ),
+                   SM(name="sticks_header40_2", required=True,
+                      startReStr=r"\s*(?P<x_qe_sticks_old>Pool\D+)\s*$",
+                   ),
+                   SM(name='sticks_line40', repeats=True,
+                      startReStr=r"\s*(?P<x_qe_sticks_old>(?:\s+\d+){9})\s*$",
+                   ),
+               ],
+            ),
+            SM(name='atom_radii',
+               startReStr=r"\s*Generating pointlists\s*\.\.\.\s*$",
+               subMatchers=[
+                   SM(name='new_r_m', repeats=True,
+                      # radius is in alat units, but they are not yet defined.
+                      # convert manually in onClose hook...
+                      startReStr=(r"\s*new\s+r_m\s*:\s*(?P<x_qe_t_species_integration_radius>" + RE_f + r")\s*" +
+                                  r"(?:\((?:alat|a0)\s*units\)\s*" + RE_f + r"\s*\(a\.u\.\)\s*for type\s*" +
+                                  r"(?P<x_qe_t_species_integration_radius_idx>" + RE_i + r"))?\s*$"
+                      ),
+                   ),
+               ],
+            ),
+        ] + self.SMs_summaryf90() + [
+            SM(name='allocated_arrays',
+               startReStr=r"\s*Largest allocated arrays\s*est. size \(Mb\)\s*dimensions\s*$",
+               subMatchers=[
+                   SM(name='allocated_array', repeats=True,
+                      startReStr=(
+                          r"\s*(?P<x_qe_t_allocated_array_name>.*?)\s*(?P<x_qe_t_allocated_array_size__mebibyte>" +
+                          RE_f + r")\s*Mb\s*\(\s*(?P<x_qe_t_allocated_array_dimensions>(?:\s*\d+\s*,?)+)\s*\)\s*$"
+                      ),
+                   ),
+               ],
+            ),
+            SM(name='temporary_arrays',
+               startReStr=r"\s*Largest temporary arrays\s*est. size \(Mb\)\s*dimensions\s*$",
+               subMatchers=[
+                   SM(name='temporary_array', repeats=True,
+                      startReStr=(
+                          r"\s*(?P<x_qe_t_temporary_array_name>.*?)\s*(?P<x_qe_t_temporary_array_size__mebibyte>" +
+                          RE_f + r")\s*Mb\s*\(\s*(?P<x_qe_t_temporary_array_dimensions>(?:\s*\d+\s*,?)+)\s*\)\s*$"
+                      ),
+                   ),
+               ],
+            ),
+            SM(name='martyna_tuckerman_parameters',
+               startReStr=(r"\s*alpha, beta MT =\s*(?P<x_qe_isolated_system_method_martyna_tuckerman_alpha>" + RE_f + r")\s*" +
+                           r"(?P<x_qe_isolated_system_method_martyna_tuckerman_beta>" + RE_f + r")\s*$"),
+               fixedStartValues={ 'x_qe_isolated_system_method': 'Martyna-Tuckerman' },
+            ),
+            SM(name='core_charge_check',
+               startReStr=(r"\s*Check: negative/imaginary core charge\s*=\s*(?P<x_qe_core_charge_negative>" +
+                           RE_f + r")\s*(?P<x_qe_core_charge_imaginary>" + RE_f + r")\s*$")
+            ),
+            SM(name='initial_density_from_file',
+               startReStr=r"\s*The initial density is read from file\s*:\s*$",
+               subMatchers=[
+                   SM(name='initial_density_file',
+                      startReStr=r"\s*(?P<x_qe_starting_density_file>.+\.(?:dat|xml))\s*$",
+                   ),
+               ],
+            ),
+            SM(name='initial_potential',
+               startReStr=r"\s*Initial potential from\s*(?P<x_qe_starting_potential>.*?)\s*$",
+            ),
+            SM(name='starting_charge_negative',
+               startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_starting_charge_negative>" + RE_f +
+                           r")\s*$"),
+            ),
+            SM(name='starting_charge_negative_spin_ignore', repeats=True,
+               startReStr=(r"\s*Check: negative starting charge=\(component\d\):?\s*" + RE_f + r"\s*$"),
+            ),
+            SM(name='initial_charge',
+               startReStr=(r"\s*starting charge\s*(?P<x_qe_starting_charge>" + RE_f +
+                           r")\s*,\s*renormalised to\s*(?P<x_qe_starting_charge_renormalized>" + RE_f +
+                           r")\s*$"),
+            ),
+            SM(name='starting_rho',
+               startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_starting_charge_negative_up>" + RE_f +
+                           r")\s*(?P<x_qe_starting_charge_negative_down>" + RE_f + r")\s*$"),
+            ),
+            SM(name='starting_wfc',
+               startReStr=r"\s*Starting wfc\s*(?P<x_qe_starting_wfc>.*?)\s*$",
+            ),
+            SM(name='cputime_msg',
+               startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_time_setup_cpu1_end>" + RE_f +
+                           r")\s*secs\s*$"),
+            ),
+            SM(name='per_process_mem',
+               startReStr=r"\s*per-process dynamical memory:\s*(?P<x_qe_per_process_mem__mebibyte>" + RE_f + ")\s*Mb\s*$",
+            ),
+            # ------------------------------------------
+            # end of header
+            # ------------------------------------------
             SM(name='self_consistent_calculation', repeats=True,
                startReStr=r"\s*Self-consistent Calculation\s*$",
                sections = ['section_single_configuration_calculation'],
