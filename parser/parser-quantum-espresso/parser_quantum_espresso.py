@@ -505,6 +505,276 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             parser.backend.addValue('x_qe_t_profile_caller_list', self.tmp.get('x_qe_t_profile_caller', ''))
             parser.backend.addValue('x_qe_t_profile_category_list', self.tmp.get('x_qe_t_profile_category', ''))
 
+    def SMs_summaryf90(self):
+        return [
+            SM(name='ibrav', required=True,
+               # first line printed by summary.f90
+               startReStr=r"\s*bravais-lattice index\s*=\s*(?P<x_qe_ibrav>" + RE_i + r")\s*$",
+               subMatchers=[
+                   # other info coming from/triggered by summary.f90
+                   SM(name='alat', required=True,
+                      startReStr=r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*(?P<x_qe_alat__bohr>" + RE_f + r")\s*a\.u\.\s*$",
+                      adHoc=self.adHoc_alat,
+                   ),
+                   SM(name='cell_volume', required=True,
+                      startReStr=r"\s*unit-cell volume\s*=\s*(?P<x_qe_cell_volume__bohr3>" + RE_f + r")\s*\(a\.u\.\)\^3\s*$",
+                   ),
+                   SM(name='nat', required=True,
+                      startReStr=r"\s*number of atoms/cell\s*=\s*(?P<number_of_atoms>\d+)\s*$",
+                   ),
+                   SM(name='nsp', required=True,
+                      startReStr=r"\s*number of atomic types\s*=\s*(?P<x_qe_number_of_species>" + RE_i + r")\s*$",
+                   ),
+                   SM(name='nelec', required=True,
+                      startReStr=(r"\s*number of electrons\s*=\s*(?P<x_qe_t_number_of_electrons>" + RE_f +
+                                  r")(?:\s*\(up:\s*(?P<x_qe_t_number_of_electrons_up>" + RE_f +
+                                  r")\s*,\s*down:\s*(?P<x_qe_t_number_of_electrons_down>" + RE_f + ")\s*\))?\s*$"),
+                   ),
+                   SM(name='nbnd', required=True,
+                       startReStr=r"\s*number of Kohn-Sham states\s*=\s*(?P<x_qe_number_of_states>" + RE_i + r")\s*$"
+                   ),
+                   SM(name='ecutwfc', required=True,
+                      startReStr=r"\s*kinetic-energy cutoff\s*=\s*(?P<basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
+                   ),
+                   SM(name='ecut_density', required=True,
+                      startReStr=r"\s*charge density cutoff\s*=\s*(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
+                   ),
+                   SM(name='ecutfock',
+                      startReStr=r"\s*cutoff for Fock operator\s*=\s*(?P<x_qe_fock_operator_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
+                   ),
+                   SM(name='convergence_threshold',
+                      startReStr=r"\s*convergence threshold\s*=\s*(?P<x_qe_potential_convergence_threshold>" + RE_f + r")\s*$",
+                   ),
+                   SM(name='mixing_beta',
+                      startReStr=r"\s*mixing beta\s*=\s*(?P<x_qe_potential_mixing_beta>" + RE_f + r")\s*$",
+                   ),
+                   SM(name='mixing_scheme',
+                      startReStr=r"\s*number of iterations used\s*=\s*(?P<x_qe_potential_mixing_iterations>\d+)\s*(?P<x_qe_potential_mixing_scheme>.*?)\s+mixing\s*$",
+                   ),
+                   SM(name='xc_functional', required=True,
+                      startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>.*?)\s*\((?P<x_qe_xc_functional_num>[^\)]*)\s*\)\s*$"
+                   ),
+                   SM(name='exx_fraction',
+                      startReStr=r"\s*EXX-fraction\s*=\s*(?P<x_qe_t_exact_exchange_fraction>" + RE_f + r")\s*$",
+                   ),
+                   SM(name='nstep',
+                      startReStr=r"\s*nstep\s*=\s*(?P<x_qe_dynamics_max_steps>" + RE_i + r")\s*$",
+                   ),
+                   SM(name='spin_orbit_mode',
+                      startReStr=r"\s*(?P<x_qe_t_spin_orbit_magn>.*?)\s*calculation\s*(?P<x_qe_t_spin_orbit_mode>with(?:out)?)\s*spin-orbit\s*$",
+                   ),
+                   SM(name='berry_efield',
+                      startReStr=r"\s*Using Berry phase electric field\s*$",
+                      subMatchers=[
+                          SM(name='berry_efield_direction',
+                             startReStr=r"\s*Direction\s*:\s*(?P<x_qe_berry_efield_direction>\d+)\s*$",
+                          ),
+                          SM(name='berry_efield_intensity',
+                             # Ry unit is not printed in 4.0
+                             startReStr=(r"\s*Intensity \((?:Ry\s*)?a.u.\)\s*:\s*(?P<x_qe_berry_efield_intensity__rydberg>" + RE_f +
+                                         r")\s*$"),
+                          ),
+                          SM(name='berry_efield_strings',
+                             startReStr=(r"\s*Strings composed by\s*:\s*(?P<x_qe_berry_efield_strings_nk>" + RE_i +
+                                         r")\s*k-points\s*$"),
+                          ),
+                          SM(name='berry_efield_niter',
+                             startReStr=(r"\s*Number of iterative cycles:\s*(?P<x_qe_berry_efield_niter>" + RE_i +
+                                         r")\s*$"),
+                          ),
+                      ],
+                      adHoc=lambda p: p.backend.addValue('x_qe_berry_efield', True),
+                   ),
+                   SM(name='assume_isolated',
+                      startReStr=r"\s*Assuming isolated system,\s*(?P<x_qe_isolated_system_method>.*?)\s*method",
+                   ),
+                   SM(name='celldm', repeats = True,
+                      startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + r")+)\s*$",
+                   ),
+                   SM(name='simulation_cell',
+                      startReStr=r"\s*crystal axes: \(cart. coord.\s*in units of (?:a_0|alat)\s*\)\s*$",
+                      subMatchers=[
+                          SM(name='cell_vec_a', repeats=True,
+                             startReStr=r"\s*a\(\d\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_vec_a', 'usrAlat') + r"\s*\)\s*$",
+                          ),
+                      ],
+                   ),
+                   SM(name='reciprocal_cell',
+                      startReStr=r"\s*reciprocal axes: \(cart. coord. in units 2 pi/(?:alat|a_0)\)\s*$",
+                      subMatchers=[
+                          SM(name='cell_vec_b', repeats=True,
+                             startReStr=r"\s*b\(\d\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_vec_b', 'usrTpiba') + r"\s*\)\s*$",
+                          ),
+                      ],
+                   ),
+                   SM(name='pseudopotential', repeats=True,
+                      startReStr=(r"\s*PseudoPot\.\s*#\s*(?P<x_qe_t_pp_idx>" + RE_i + r") for\s+(?P<x_qe_t_pp_label>\S+)\s+read from file" +
+                                  r"(?::|\s*(?P<x_qe_t_pp_filename>\S+))\s*"),
+                      sections=['x_qe_t_section_pseudopotential'],
+                      subMatchers=[
+                          SM(name='new_pp_filename',
+                             startReStr=r"^\s*(?P<x_qe_t_pp_filename>\S+)\s*$",
+                          ),
+                          SM(name='pp_md5',
+                             startReStr=r"\s*MD5 check sum:\s*(?P<x_qe_t_pp_md5sum>\S+)\s*$",
+                          ),
+                          SM(name='pp_type_val',
+                             startReStr=r"\s*Pseudo is\s*(?P<x_qe_t_pp_type>.*?),\s*Zval\s*=\s*(?P<x_qe_t_pp_valence>" + RE_f + r")\s*$",
+                          ),
+                          SM(name='pp_comment',
+                             startReStr=r"\s*(?P<x_qe_t_pp_comment>.*?)\s*$",
+                          ),
+                          SM(name='pp_integral_directions',
+                             startReStr=(r"\s*Setup to integrate on\s*" +
+                                         r"(?P<x_qe_t_pp_integral_ndirections>\d+)\s+directions:\s*" +
+                                         r"integral exact up to l =\s*(?P<x_qe_t_pp_integral_lmax_exact>\d+)\s*$"),
+                          ),
+                          SM(name='pp_augmentation_shape',
+                             startReStr=r"\s*Shape of augmentation charge:\s*(?P<x_qe_t_pp_augmentation_shape>.*?)\s*$",
+                          ),
+                          SM(name='pp_dimensions',
+                             startReStr=r"\s*Using radial grid of\s*(?P<x_qe_t_pp_ndmx>\d+) points,\s*(?P<x_qe_t_pp_nbeta>\d+) beta functions with\s*:\s*$",
+                          ),
+                          SM(name='pp_beta', repeats=True,
+                             startReStr=r"\s*l\(\s*(?P<x_qe_t_pp_l_idx>\d+)\s*\)\s*=\s*(?P<x_qe_t_pp_l>\d+)\s*$",
+                          ),
+                          SM(name='pp_coefficients',
+                             startReStr=r"\s*Q\(r\) pseudized with\s*(?P<x_qe_t_pp_ncoefficients>\d+)\s*coefficients,\s*rinner\s*=\s*(?P<x_qe_t_rinner>(?:\s*" + RE_f + r")+)\s*$",
+                             subMatchers=[
+                                 SM(name='pp_coefficients2',
+                                    startReStr=r"\s*(?P<x_qe_t_rinner>(?:\s*" + RE_f + r")+)\s*$",
+                                 ),
+                             ],
+                          ),
+                          SM(name='pp_coefficients3',
+                             startReStr=r"\s*Q\(r\) pseudized with\s*(?P<x_qe_t_pp_ncoefficients>\d+)\s*coefficients\s*$",
+                          ),
+                       ],
+                   ),
+                   SM(name='pp_atom_kind_map',
+                      startReStr=r"\s*atomic species\s+valence\s+mass\s+pseudopotential\s*$",
+                      subMatchers=[
+                          SM(name='atom_kind', repeats=True,
+                             startReStr=r"\s*(?P<method_atom_kind_label>\S+)\s+(?P<x_qe_pp_valence>" + RE_f + r")" +
+                                        r"\s+(?P<x_qe_kind_mass>" + RE_f + r")\s+(?P<x_qe_pp_label>[^\s\(]+)\s*" +
+                                        r"\(\s*(?P<x_qe_pp_weight>" + RE_f + r")\s*\)\s*$",
+                             sections=['section_method_atom_kind'],
+                          ),
+                      ],
+                   ),
+                   SM(name='starting_magnetization',
+                      startReStr=r"\s*Starting magnetic structure\s*$",
+                      subMatchers=[
+                          SM(name='starting_magnetization_header',
+                             startReStr=r"\s*atomic species\s+magnetization\s*$",
+                             subMatchers=[
+                                 SM(name='starting_magnetization_data', repeats=True,
+                                    startReStr=(r"\s*(?P<x_qe_t_starting_magnetization_species>.*?)\s*" +
+                                                r"(?P<x_qe_t_starting_magnetization_value>" + RE_f + r")\s*$"),
+                                 ),
+                             ],
+                          ),
+                      ],
+                   ),
+                   SM(name='nsymm',
+                      startReStr=(r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.\s*[\(,]\s*(?P<x_qe_t_symm_inversion>\S+) inversion\s*[\),]\s*(?:found)?\s*"
+                                  r"(?:\(\s*(?P<x_qe_nsymm_with_fractional_translation>\d+)\s*have fractional translation\s*\))?\s*$"),
+                      adHoc=lambda p: p.backend.addValue('x_qe_symm_inversion', (p.lastMatch['x_qe_t_symm_inversion'] == 'with')),
+                      subMatchers=[
+                          SM(name='nsymm_ignored',
+                             startReStr=r"\s*\(note:\s*(?P<x_qe_nsymm_ignored>\d+)\s*additional sym.ops. were found but ignored\s*$",
+                          ),
+                      ],
+                   ),
+                   SM(name='nosymm',
+                      startReStr=r"\s*No symmetry\s*(?:found|!)\s*$",
+                      adHoc=lambda p: p.backend.addValue('x_qe_nsymm', 0)
+                   ),
+                   SM(name='atom_pos_cart_list',
+                      startReStr=r"\s*Cartesian axes\s*$",
+                      subMatchers=[
+                          SM(name='cart_heading',
+                             startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)\s*$",
+                          ),
+                          SM(name='atom_pos_cart', repeats=True,
+                             startReStr=(
+                                 r"\s*(?P<x_qe_t_atom_idx>" + RE_i + r")" +
+                                 r"\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*" + RE_i + "\)\s*"
+                                 r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat') +
+                                 r"\s*\)\s*$"),
+                          ),
+                      ],
+                   ),
+                   SM(name='kpoint_info',
+                      startReStr=r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*$",
+                      subMatchers=self.SMs_kpoints(),
+                   ),
+                   SM(name='kpoint_info_smearing_old',
+                      startReStr=(r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*gaussian broad.\s*\(Ry\)\s*=" +
+                                  r"\s*(?P<smearing_width__rydberg>" + RE_f + r")\s*ngauss\s*=" +
+                                  r"\s*(?P<x_qe_smearing_ngauss>" + RE_i + ")\s*$"),
+                      adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND.get(str(p.lastMatch['x_qe_smearing_ngauss']))),
+                      subMatchers=self.SMs_kpoints(),
+                   ),
+                   SM(name='kpoint_info_smearing_new',
+                      startReStr=(r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*(?P<x_qe_smearing_kind>.+?)\s*,\s*width\s*\(Ry\)\s*=" +
+                                  r"\s*(?P<smearing_width__rydberg>" + RE_f + r")\s*$"),
+                      adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND[p.lastMatch['x_qe_smearing_kind']]),
+                      subMatchers=self.SMs_kpoints(),
+                   ),
+                   SM(name='kpoint_info_tetrahedra',
+                      startReStr=r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*\((?P<x_qe_smearing_kind>tetrahedron method)\)\s*$",
+                      adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND[p.lastMatch['x_qe_smearing_kind']]),
+                      subMatchers=self.SMs_kpoints(),
+                   ),
+                   SM(name='dense_grid',
+                      startReStr=(r"\s*Dense\s+grid:\s*(?P<x_qe_dense_g_vectors>\d+)\s*G-vectors\s*FFT\s+dimensions:\s*\(\s*" +
+                                  QeC.re_vec("x_qe_t_dense_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$")
+                   ),
+                   SM(name='dense_grid_old',
+                      startReStr=(r"\s*G\s+cutoff\s*=\s*(?P<x_qe_dense_g_cutoff>" + RE_f + r")\s*" +
+                                  r"\(\s*(?P<x_qe_dense_g_vectors>\d+)\s*G-vectors\s*\)\s*FFT\s+grid:\s*\(\s*" +
+                                  QeC.re_vec("x_qe_t_dense_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$"
+                      ),
+                   ),
+                   SM(name='smooth_grid',
+                      startReStr=(r"\s*Smooth\s+grid:\s*(?P<x_qe_smooth_g_vectors>\d+)\s*G-vectors\s*FFT\s+dimensions:\s*\(\s*" +
+                                  QeC.re_vec("x_qe_t_smooth_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$")
+                   ),
+                   SM(name='smooth_grid_old',
+                      startReStr=(r"\s*G\s+cutoff\s*=\s*(?P<x_qe_smooth_g_cutoff>" + RE_f + r")\s*" +
+                                  r"\(\s*(?P<x_qe_smooth_g_vectors>\d+)\s*G-vectors\s*\)\s*smooth\s+grid:\s*\(\s*" +
+                                  QeC.re_vec("x_qe_t_smooth_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$"
+                      ),
+                   ),
+                   SM(name='core_charge_realspace',
+                      startReStr=r"\s*Real space treatment of Q\(r\)\s*",
+                      adHoc=lambda p: p.backend.addValue('x_qe_core_charge_realspace', True)
+                   ),
+                   SM(name='input_occupations',
+                      startReStr=r"\s*Occupations\s*read\s*from\s*input\s*$",
+                      sections=['x_qe_t_section_input_occupations'],
+                      subMatchers=[
+                          SM(name='input_occupations_spin', repeats=True,
+                             startReStr=r"\s*Spin-(?P<x_qe_t_input_occupations_spin>up|down)\s*$",
+                             adHoc=self.adHoc_input_occupations_spin,
+                             subMatchers=[
+                                 SM(name='input_occupations_occupations', repeats=True,
+                                     startReStr=r'\s*(?P<x_qe_t_input_occupations>(?:\s*' + RE_f + ')+\s*$)',
+                                     adHoc=lambda p: self.tmp['occ_vals'].extend(cRE_f.findall(p.lastMatch['x_qe_t_input_occupations'])),
+                                 ),
+                             ],
+                          ),
+                          SM(name='input_occupations_occupations', repeats=True,
+                              startReStr=r'\s*(?P<x_qe_t_input_occupations>(?:\s*' + RE_f + ')+\s*$)',
+                              adHoc=lambda p: self.tmp['occ_vals'].extend(cRE_f.findall(p.lastMatch['x_qe_t_input_occupations']))
+                          ),
+                      ],
+                   ),
+               ],
+            ),
+        ]
+
     def SMs_bands(self, suffix=''):
         return [
             SM(name='bands' + suffix, repeats=True,
@@ -1013,268 +1283,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
-                   SM(name='ibrav', required=True,
-                      startReStr=r"\s*bravais-lattice index\s*=\s*(?P<x_qe_ibrav>" + RE_i + r")\s*$",
-                   ),
-                   SM(name='alat', required=True,
-                      startReStr=r"\s*lattice parameter \((?:a_0|alat)\)\s*=\s*(?P<x_qe_alat__bohr>" + RE_f + r")\s*a\.u\.\s*$",
-                      adHoc=self.adHoc_alat,
-                   ),
-                   SM(name='cell_volume', required=True,
-                      startReStr=r"\s*unit-cell volume\s*=\s*(?P<x_qe_cell_volume__bohr3>" + RE_f + r")\s*\(a\.u\.\)\^3\s*$",
-                   ),
-                   SM(name='nat', required=True,
-                      startReStr=r"\s*number of atoms/cell\s*=\s*(?P<number_of_atoms>\d+)\s*$",
-                   ),
-                   SM(name='nsp', required=True,
-                      startReStr=r"\s*number of atomic types\s*=\s*(?P<x_qe_number_of_species>" + RE_i + r")\s*$",
-                   ),
-                   SM(name='nelec', required=True,
-                      startReStr=(r"\s*number of electrons\s*=\s*(?P<x_qe_t_number_of_electrons>" + RE_f +
-                                  r")(?:\s*\(up:\s*(?P<x_qe_t_number_of_electrons_up>" + RE_f +
-                                  r")\s*,\s*down:\s*(?P<x_qe_t_number_of_electrons_down>" + RE_f + ")\s*\))?\s*$"),
-                   ),
-                   SM(name='nbnd', required=True,
-                       startReStr=r"\s*number of Kohn-Sham states\s*=\s*(?P<x_qe_number_of_states>" + RE_i + r")\s*$"
-                   ),
-                   SM(name='ecutwfc', required=True,
-                      startReStr=r"\s*kinetic-energy cutoff\s*=\s*(?P<basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
-                   ),
-                   SM(name='ecut_density', required=True,
-                      startReStr=r"\s*charge density cutoff\s*=\s*(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
-                   ),
-                   SM(name='ecutfock',
-                      startReStr=r"\s*cutoff for Fock operator\s*=\s*(?P<x_qe_fock_operator_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
-                   ),
-                   SM(name='convergence_threshold',
-                      startReStr=r"\s*convergence threshold\s*=\s*(?P<x_qe_potential_convergence_threshold>" + RE_f + r")\s*$",
-                   ),
-                   SM(name='mixing_beta',
-                      startReStr=r"\s*mixing beta\s*=\s*(?P<x_qe_potential_mixing_beta>" + RE_f + r")\s*$",
-                   ),
-                   SM(name='mixing_scheme',
-                      startReStr=r"\s*number of iterations used\s*=\s*(?P<x_qe_potential_mixing_iterations>\d+)\s*(?P<x_qe_potential_mixing_scheme>.*?)\s+mixing\s*$",
-                   ),
-                   SM(name='xc_functional', required=True,
-                      startReStr=r"\s*Exchange-correlation\s*=\s*(?P<x_qe_xc_functional_shortname>.*?)\s*\((?P<x_qe_xc_functional_num>[^\)]*)\s*\)\s*$"
-                   ),
-                   SM(name='exx_fraction',
-                      startReStr=r"\s*EXX-fraction\s*=\s*(?P<x_qe_t_exact_exchange_fraction>" + RE_f + r")\s*$",
-                   ),
-                   SM(name='nstep',
-                      startReStr=r"\s*nstep\s*=\s*(?P<x_qe_dynamics_max_steps>" + RE_i + r")\s*$",
-                   ),
-                   SM(name='spin_orbit_mode',
-                      startReStr=r"\s*(?P<x_qe_t_spin_orbit_magn>.*?)\s*calculation\s*(?P<x_qe_t_spin_orbit_mode>with(?:out)?)\s*spin-orbit\s*$",
-                   ),
-                   SM(name='berry_efield',
-                      startReStr=r"\s*Using Berry phase electric field\s*$",
-                      subMatchers=[
-                          SM(name='berry_efield_direction',
-                             startReStr=r"\s*Direction\s*:\s*(?P<x_qe_berry_efield_direction>\d+)\s*$",
-                          ),
-                          SM(name='berry_efield_intensity',
-                             # Ry unit is not printed in 4.0
-                             startReStr=(r"\s*Intensity \((?:Ry\s*)?a.u.\)\s*:\s*(?P<x_qe_berry_efield_intensity__rydberg>" + RE_f +
-                                         r")\s*$"),
-                          ),
-                          SM(name='berry_efield_strings',
-                             startReStr=(r"\s*Strings composed by\s*:\s*(?P<x_qe_berry_efield_strings_nk>" + RE_i +
-                                         r")\s*k-points\s*$"),
-                          ),
-                          SM(name='berry_efield_niter',
-                             startReStr=(r"\s*Number of iterative cycles:\s*(?P<x_qe_berry_efield_niter>" + RE_i +
-                                         r")\s*$"),
-                          ),
-                      ],
-                      adHoc=lambda p: p.backend.addValue('x_qe_berry_efield', True),
-                   ),
-                   SM(name='assume_isolated',
-                      startReStr=r"\s*Assuming isolated system,\s*(?P<x_qe_isolated_system_method>.*?)\s*method",
-                   ),
-                   SM(name='celldm', repeats = True,
-                      startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + r")+)\s*$",
-                   ),
-                   SM(name='simulation_cell',
-                      startReStr=r"\s*crystal axes: \(cart. coord.\s*in units of (?:a_0|alat)\s*\)\s*$",
-                      subMatchers=[
-                          SM(name='cell_vec_a', repeats=True,
-                             startReStr=r"\s*a\(\d\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_vec_a', 'usrAlat') + r"\s*\)\s*$",
-                          ),
-                      ],
-                   ),
-                   SM(name='reciprocal_cell',
-                      startReStr=r"\s*reciprocal axes: \(cart. coord. in units 2 pi/(?:alat|a_0)\)\s*$",
-                      subMatchers=[
-                          SM(name='cell_vec_b', repeats=True,
-                             startReStr=r"\s*b\(\d\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_vec_b', 'usrTpiba') + r"\s*\)\s*$",
-                          ),
-                      ],
-                   ),
-                   SM(name='pseudopotential', repeats=True,
-                      startReStr=(r"\s*PseudoPot\.\s*#\s*(?P<x_qe_t_pp_idx>" + RE_i + r") for\s+(?P<x_qe_t_pp_label>\S+)\s+read from file" +
-                                  r"(?::|\s*(?P<x_qe_t_pp_filename>\S+))\s*"),
-                      sections=['x_qe_t_section_pseudopotential'],
-                      subMatchers=[
-                          SM(name='new_pp_filename',
-                             startReStr=r"^\s*(?P<x_qe_t_pp_filename>\S+)\s*$",
-                          ),
-                          SM(name='pp_md5',
-                             startReStr=r"\s*MD5 check sum:\s*(?P<x_qe_t_pp_md5sum>\S+)\s*$",
-                          ),
-                          SM(name='pp_type_val',
-                             startReStr=r"\s*Pseudo is\s*(?P<x_qe_t_pp_type>.*?),\s*Zval\s*=\s*(?P<x_qe_t_pp_valence>" + RE_f + r")\s*$",
-                          ),
-                          SM(name='pp_comment',
-                             startReStr=r"\s*(?P<x_qe_t_pp_comment>.*?)\s*$",
-                          ),
-                          SM(name='pp_integral_directions',
-                             startReStr=(r"\s*Setup to integrate on\s*" +
-                                         r"(?P<x_qe_t_pp_integral_ndirections>\d+)\s+directions:\s*" +
-                                         r"integral exact up to l =\s*(?P<x_qe_t_pp_integral_lmax_exact>\d+)\s*$"),
-                          ),
-                          SM(name='pp_augmentation_shape',
-                             startReStr=r"\s*Shape of augmentation charge:\s*(?P<x_qe_t_pp_augmentation_shape>.*?)\s*$",
-                          ),
-                          SM(name='pp_dimensions',
-                             startReStr=r"\s*Using radial grid of\s*(?P<x_qe_t_pp_ndmx>\d+) points,\s*(?P<x_qe_t_pp_nbeta>\d+) beta functions with\s*:\s*$",
-                          ),
-                          SM(name='pp_beta', repeats=True,
-                             startReStr=r"\s*l\(\s*(?P<x_qe_t_pp_l_idx>\d+)\s*\)\s*=\s*(?P<x_qe_t_pp_l>\d+)\s*$",
-                          ),
-                          SM(name='pp_coefficients',
-                             startReStr=r"\s*Q\(r\) pseudized with\s*(?P<x_qe_t_pp_ncoefficients>\d+)\s*coefficients,\s*rinner\s*=\s*(?P<x_qe_t_rinner>(?:\s*" + RE_f + r")+)\s*$",
-                             subMatchers=[
-                                 SM(name='pp_coefficients2',
-                                    startReStr=r"\s*(?P<x_qe_t_rinner>(?:\s*" + RE_f + r")+)\s*$",
-                                 ),
-                             ],
-                          ),
-                          SM(name='pp_coefficients3',
-                             startReStr=r"\s*Q\(r\) pseudized with\s*(?P<x_qe_t_pp_ncoefficients>\d+)\s*coefficients\s*$",
-                          ),
-                       ],
-                   ),
-                   SM(name='pp_atom_kind_map',
-                      startReStr=r"\s*atomic species\s+valence\s+mass\s+pseudopotential\s*$",
-                      subMatchers=[
-                          SM(name='atom_kind', repeats=True,
-                             startReStr=r"\s*(?P<method_atom_kind_label>\S+)\s+(?P<x_qe_pp_valence>" + RE_f + r")" +
-                                        r"\s+(?P<x_qe_kind_mass>" + RE_f + r")\s+(?P<x_qe_pp_label>[^\s\(]+)\s*" +
-                                        r"\(\s*(?P<x_qe_pp_weight>" + RE_f + r")\s*\)\s*$",
-                             sections=['section_method_atom_kind'],
-                          ),
-                      ],
-                   ),
-                   SM(name='starting_magnetization',
-                      startReStr=r"\s*Starting magnetic structure\s*$",
-                      subMatchers=[
-                          SM(name='starting_magnetization_header',
-                             startReStr=r"\s*atomic species\s+magnetization\s*$",
-                             subMatchers=[
-                                 SM(name='starting_magnetization_data', repeats=True,
-                                    startReStr=(r"\s*(?P<x_qe_t_starting_magnetization_species>.*?)\s*" +
-                                                r"(?P<x_qe_t_starting_magnetization_value>" + RE_f + r")\s*$"),
-                                 ),
-                             ],
-                          ),
-                      ],
-                   ),
-                   SM(name='nsymm',
-                      startReStr=(r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.\s*[\(,]\s*(?P<x_qe_t_symm_inversion>\S+) inversion\s*[\),]\s*(?:found)?\s*"
-                                  r"(?:\(\s*(?P<x_qe_nsymm_with_fractional_translation>\d+)\s*have fractional translation\s*\))?\s*$"),
-                      adHoc=lambda p: p.backend.addValue('x_qe_symm_inversion', (p.lastMatch['x_qe_t_symm_inversion'] == 'with')),
-                      subMatchers=[
-                          SM(name='nsymm_ignored',
-                             startReStr=r"\s*\(note:\s*(?P<x_qe_nsymm_ignored>\d+)\s*additional sym.ops. were found but ignored\s*$",
-                          ),
-                      ],
-                   ),
-                   SM(name='nosymm',
-                      startReStr=r"\s*No symmetry\s*(?:found|!)\s*$",
-                      adHoc=lambda p: p.backend.addValue('x_qe_nsymm', 0)
-                   ),
-                   SM(name='atom_pos_cart_list',
-                      startReStr=r"\s*Cartesian axes\s*$",
-                      subMatchers=[
-                          SM(name='cart_heading',
-                             startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)\s*$",
-                          ),
-                          SM(name='atom_pos_cart', repeats=True,
-                             startReStr=(
-                                 r"\s*(?P<x_qe_t_atom_idx>" + RE_i + r")" +
-                                 r"\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*" + RE_i + "\)\s*"
-                                 r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat') +
-                                 r"\s*\)\s*$"),
-                          ),
-                      ],
-                   ),
-                   SM(name='kpoint_info',
-                      startReStr=r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*$",
-                      subMatchers=self.SMs_kpoints(),
-                   ),
-                   SM(name='kpoint_info_smearing_old',
-                      startReStr=(r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*gaussian broad.\s*\(Ry\)\s*=" +
-                                  r"\s*(?P<smearing_width__rydberg>" + RE_f + r")\s*ngauss\s*=" +
-                                  r"\s*(?P<x_qe_smearing_ngauss>" + RE_i + ")\s*$"),
-                      adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND.get(str(p.lastMatch['x_qe_smearing_ngauss']))),
-                      subMatchers=self.SMs_kpoints(),
-                   ),
-                   SM(name='kpoint_info_smearing_new',
-                      startReStr=(r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*(?P<x_qe_smearing_kind>.+?)\s*,\s*width\s*\(Ry\)\s*=" +
-                                  r"\s*(?P<smearing_width__rydberg>" + RE_f + r")\s*$"),
-                      adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND[p.lastMatch['x_qe_smearing_kind']]),
-                      subMatchers=self.SMs_kpoints(),
-                   ),
-                   SM(name='kpoint_info_tetrahedra',
-                      startReStr=r"\s*number of k points=\s*(?P<x_qe_nk>\d+)\s*\((?P<x_qe_smearing_kind>tetrahedron method)\)\s*$",
-                      adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND[p.lastMatch['x_qe_smearing_kind']]),
-                      subMatchers=self.SMs_kpoints(),
-                   ),
-                   SM(name='dense_grid',
-                      startReStr=(r"\s*Dense\s+grid:\s*(?P<x_qe_dense_g_vectors>\d+)\s*G-vectors\s*FFT\s+dimensions:\s*\(\s*" +
-                                  QeC.re_vec("x_qe_t_dense_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$")
-                   ),
-                   SM(name='dense_grid_old',
-                      startReStr=(r"\s*G\s+cutoff\s*=\s*(?P<x_qe_dense_g_cutoff>" + RE_f + r")\s*" +
-                                  r"\(\s*(?P<x_qe_dense_g_vectors>\d+)\s*G-vectors\s*\)\s*FFT\s+grid:\s*\(\s*" +
-                                  QeC.re_vec("x_qe_t_dense_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$"
-                      ),
-                   ),
-                   SM(name='smooth_grid',
-                      startReStr=(r"\s*Smooth\s+grid:\s*(?P<x_qe_smooth_g_vectors>\d+)\s*G-vectors\s*FFT\s+dimensions:\s*\(\s*" +
-                                  QeC.re_vec("x_qe_t_smooth_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$")
-                   ),
-                   SM(name='smooth_grid_old',
-                      startReStr=(r"\s*G\s+cutoff\s*=\s*(?P<x_qe_smooth_g_cutoff>" + RE_f + r")\s*" +
-                                  r"\(\s*(?P<x_qe_smooth_g_vectors>\d+)\s*G-vectors\s*\)\s*smooth\s+grid:\s*\(\s*" +
-                                  QeC.re_vec("x_qe_t_smooth_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$"
-                      ),
-                   ),
-                   SM(name='core_charge_realspace',
-                      startReStr=r"\s*Real space treatment of Q\(r\)\s*",
-                      adHoc=lambda p: p.backend.addValue('x_qe_core_charge_realspace', True)
-                   ),
-                   SM(name='input_occupations',
-                      startReStr=r"\s*Occupations\s*read\s*from\s*input\s*$",
-                      sections=['x_qe_t_section_input_occupations'],
-                      subMatchers=[
-                          SM(name='input_occupations_spin', repeats=True,
-                             startReStr=r"\s*Spin-(?P<x_qe_t_input_occupations_spin>up|down)\s*$",
-                             adHoc=self.adHoc_input_occupations_spin,
-                             subMatchers=[
-                                 SM(name='input_occupations_occupations', repeats=True,
-                                     startReStr=r'\s*(?P<x_qe_t_input_occupations>(?:\s*' + RE_f + ')+\s*$)',
-                                     adHoc=lambda p: self.tmp['occ_vals'].extend(cRE_f.findall(p.lastMatch['x_qe_t_input_occupations'])),
-                                 ),
-                             ],
-                          ),
-                          SM(name='input_occupations_occupations', repeats=True,
-                              startReStr=r'\s*(?P<x_qe_t_input_occupations>(?:\s*' + RE_f + ')+\s*$)',
-                              adHoc=lambda p: self.tmp['occ_vals'].extend(cRE_f.findall(p.lastMatch['x_qe_t_input_occupations']))
-                          ),
-                      ],
-                   ),
+               ] + self.SMs_summaryf90() + [
                    SM(name='allocated_arrays',
                       startReStr=r"\s*Largest allocated arrays\s*est. size \(Mb\)\s*dimensions\s*$",
                       subMatchers=[
