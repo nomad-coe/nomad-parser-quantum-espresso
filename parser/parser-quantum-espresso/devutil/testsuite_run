@@ -15,7 +15,7 @@ baseDir = os.path.dirname(os.path.abspath(__file__))
 qeDir = os.path.normpath(os.path.join(baseDir,"../"))
 
 if not qeDir in sys.path:
-        sys.path.insert(0, qeDir)
+    sys.path.insert(0, qeDir)
 
 import parser_quantum_espresso
 
@@ -26,9 +26,10 @@ RE_WCL = re.compile(r"\s*(\d+)\s+(.*)$")
 
 ANNOTATE = True
 
-CALL_QEPARSER = ['python', 'parser_quantum_espresso.py', '--stream']
+CALL_PYTHON = ['python']
+CALL_QEPARSER = [ qeDir + '/parser_quantum_espresso.py', '--stream']
 
-def run_tests(testsuite_dir, testsuite_base):
+def run_tests(testsuite_dir, testsuite_base, profile=False):
     annotated = []
     input_files = [] 
     testsuite_list_file = testsuite_base + ".input.json"
@@ -45,9 +46,13 @@ def run_tests(testsuite_dir, testsuite_base):
                     src_file, src_file, src_file + ".stream.json"))
             annotated.append(src_file + ".annotate")
             input_files.append(src_file)
+    CALL_CMD = CALL_PYTHON
+    if profile:
+        CALL_CMD += ['-m', 'cProfile', '-o',  testsuite_base + '.profile']
+    CALL_CMD += CALL_QEPARSER
     with open(testsuite_list_file, "r") as input_stream, open(testsuite_out, "w") as input_stdout, open(testsuite_log, "w") as input_stderr:
         subprocess.call(
-            CALL_QEPARSER,
+            CALL_CMD,
             stdin=input_stream, stdout=input_stdout, stderr=input_stderr
         )
     input_nlines = {}
@@ -103,6 +108,8 @@ if __name__ == '__main__':
     CMDLINE_PARSER.add_argument(
         '--no_annotate', action='store_true', default=False)
     CMDLINE_PARSER.add_argument(
+        '--profile', action='store_true', default=False)
+    CMDLINE_PARSER.add_argument(
         'file_base', default='testsuite', nargs='?')
     CMDLINE_PARSER.add_argument(
         'testsuite_dir', default='/srv/work/tmp/espresso/test-link', nargs='?')
@@ -113,4 +120,5 @@ if __name__ == '__main__':
     else:
         CALL_QEPARSER.append('--annotate')
 
-    run_tests(CMDLINE_ARGS.testsuite_dir, CMDLINE_ARGS.file_base)
+    run_tests(CMDLINE_ARGS.testsuite_dir, CMDLINE_ARGS.file_base,
+              CMDLINE_ARGS.profile)
