@@ -34,8 +34,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def initialize_values(self):
         """allows to reset values if the same superContext is used to parse
         different files"""
-        self.secMethodIndex = None
-        self.secSystemDescriptionIndex = None
+        self.sectionIdx = {}
         self.tmp = {}
         self.alat = None
         self.section = {}
@@ -59,7 +58,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def onOpen_section_method(
             self, backend, gIndex, section):
-        self.secMethodIndex = gIndex
+        self.sectionIdx['section_method'] = gIndex
         self.cache_t_pseudopotential = {}
         self.cache_t_pp_report = {}
         self.cache_t_pp_renorm_wfc = {}
@@ -68,8 +67,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def onOpen_section_system(
             self, backend, gIndex, section):
-        self.secSystemIndex = gIndex
-        self.secSystem = section
+        self.sectionIdx['section_system'] = gIndex
+        self.section['section_system'] = section
 
     def onClose_x_qe_t_section_pseudopotential(
             self, backend, gIndex, section):
@@ -202,8 +201,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             self, backend, gIndex, section):
         """trigger called when section_single_configuration_calculation
         is closed"""
-        backend.addValue('single_configuration_to_calculation_method_ref', self.secMethodIndex)
-        backend.addValue('single_configuration_calculation_to_system_ref', self.secSystemIndex)
+        backend.addValue('single_configuration_to_calculation_method_ref', self.sectionIdx['section_method'])
+        backend.addValue('single_configuration_calculation_to_system_ref', self.sectionIdx['section_system'])
         if section['x_qe_t_energy_decomposition_name'] is not None:
             backend.addArrayValues('x_qe_energy_decomposition_name', np.asarray(
                 section['x_qe_t_energy_decomposition_name']))
@@ -222,7 +221,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('stress_tensor', np.array([
                 section['x_qe_t_stress_x'], section['x_qe_t_stress_y'], section['x_qe_t_stress_z']
                 ]).T)
-        had_energy_reference = (self.secSystem['number_of_electrons'] is not None)
+        had_energy_reference = (self.section['section_system']['number_of_electrons'] is not None)
         HOMO = section['x_qe_t_energy_reference_highest_occupied']
         if HOMO is not None:
             if len(HOMO)>1:
