@@ -35,6 +35,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         """allows to reset values if the same superContext is used to parse
         different files"""
         self.sectionIdx = {}
+        self.openSectionIdx = {}
         self.tmp = {}
         self.alat = None
         self.section = {}
@@ -196,6 +197,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         exx_refine = self.tmp.pop('exx_refine', None)
         if exx_refine:
             backend.addValue('x_qe_exx_refine', True)
+        self.close_header_sections(backend)
 
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
@@ -428,6 +430,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         is closed"""
         self.tmp.pop('x_qe_t_profile_caller', None)
         self.tmp.pop('x_qe_t_profile_category', None)
+        # manually open header sections, closed at the beginning of scf
+        for sec in self.header_sections():
+            gIndex = backend.openSection(sec)
+            self.openSectionIdx[sec] = gIndex
 
     def onClose_section_run(
             self, backend, gIndex, section):
@@ -737,13 +743,23 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
+    def header_sections(self):
+        return ['section_basis_set_cell_dependent', 'section_method',
+                'section_system', 'x_qe_section_parallel',
+                'x_qe_section_compile_options']
+
+    def close_header_sections(self, backend):
+        # close header sections if they are open
+        for sec in self.header_sections():
+            sec_gIndex = self.openSectionIdx.pop(sec,None)
+            if sec_gIndex is not None:
+                backend.closeSection(sec, sec_gIndex)
+
     def run_submatchers(self):
         """submatchers of section_run"""
         return [
             SM(name='header',
                startReStr=r"^\s*$",
-               sections = ['section_basis_set_cell_dependent', 'section_method', 'section_system',
-                           'x_qe_section_parallel', 'x_qe_section_compile_options'],
                subMatchers=[
                    SM(name='serial',
                       startReStr=r"\s*(?P<x_qe_compile_parallel_version>Serial) version\s*$",
