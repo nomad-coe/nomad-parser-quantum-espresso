@@ -108,6 +108,8 @@ if __name__ == '__main__':
     CMDLINE_PARSER.add_argument(
         '--no_annotate', action='store_true', default=False)
     CMDLINE_PARSER.add_argument(
+        '--matchTelemetry', action='store_true', default=False)
+    CMDLINE_PARSER.add_argument(
         '--profile', action='store_true', default=False)
     CMDLINE_PARSER.add_argument(
         'file_base', default='testsuite', nargs='?')
@@ -119,6 +121,9 @@ if __name__ == '__main__':
         ANNOTATE = False
     else:
         CALL_QEPARSER.append('--annotate')
+
+    if CMDLINE_ARGS.matchTelemetry:
+        CALL_QEPARSER.append('--matchTelemetry')
 
     run_tests(CMDLINE_ARGS.testsuite_dir, CMDLINE_ARGS.file_base,
               CMDLINE_ARGS.profile)
