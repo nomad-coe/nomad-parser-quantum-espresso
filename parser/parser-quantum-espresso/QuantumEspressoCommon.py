@@ -85,14 +85,6 @@ class ParserQuantumEspresso(object):
         self.coverageIgnoreList = [
             # ignore empty lines
             r"\s*",
-            # ignore copyright/citation msg
-            r"\s*This program is part of the open-source Quantum ESPRESSO suite",
-            r"\s*for quantum simulation of materials; please (?:cite|acknowledge)",
-            r"\s*\"P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 \(2009\);\s*",
-            r"\s*URL http://www.quantum-espresso.org\",\s*",
-            r"\s*in publications or presentations arising from this work. More details at",
-            r"\s*http://www.quantum-espresso.org/quote(?:\.php)?",
-            r"\s*http://www.quantum-espresso.org/wiki/index.php/Citing_Quantum-ESPRESSO\s*",
             # pure informational msg about how code was compiled
             r"\s*Ultrasoft \(Vanderbilt\) Pseudopotentials\s*(?:and PAW)?\s*",
             r"\s*For Norm-Conserving or Ultrasoft \(Vanderbilt\) Pseudopotentials or PAW\s*",
@@ -146,6 +138,30 @@ class ParserQuantumEspresso(object):
                        # older espresso versions have start date on separate line
                        SM(name='run_date',
                           startReStr=r"\s*Today is\s*(?P<time_run_date_start__strQeDate>.+?)\s*$"
+                       ),
+                       SM(name='copyright_msg', coverageIgnore=True,
+                          # ignore copyright/citation msg
+                          startReStr=r"\s*This program is part of the open-source Quantum ESPRESSO suite",
+                          subMatchers=[
+                              SM(name='copyright_msg010', coverageIgnore=True,
+                                 startReStr=r"\s*for quantum simulation of materials; please (?:cite|acknowledge)",
+                              ),
+                              SM(name='copyright_msg020', coverageIgnore=True,
+                                 startReStr=r"\s*\"P. Giannozzi et al., J. Phys.:Condens. Matter 21 395502 \(2009\);\s*",
+                              ),
+                              SM(name='copyright_msg030', coverageIgnore=True,
+                                 startReStr=r"\s*URL http://www.quantum-espresso.org\",\s*",
+                              ),
+                              SM(name='copyright_msg040', coverageIgnore=True,
+                                 startReStr=r"\s*in publications or presentations arising from this work. More details at",
+                              ),
+                              SM(name='copyright_msg050', coverageIgnore=True,
+                                 startReStr=r"\s*http://www.quantum-espresso.org/quote(?:\.php)?",
+                              ),
+                              SM(name='copyright_msg055', coverageIgnore=True,
+                                 startReStr=r"\s*http://www.quantum-espresso.org/wiki/index.php/Citing_Quantum-ESPRESSO\s*",
+                              ),
+                          ],
                        ),
                    ] + self.run_submatchers() + [
                        SM(name='end_date',
