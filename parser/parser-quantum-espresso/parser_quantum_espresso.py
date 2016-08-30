@@ -684,6 +684,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       subMatchers=[
                           SM(name='nsymm_ignored',
                              startReStr=r"\s*\(note:\s*(?P<x_qe_nsymm_ignored>\d+)\s*additional sym.ops. were found but ignored\s*$",
+                             subMatchers=[
+                                 SM(name='nsymm_ignored_cIgnore', coverageIgnore=True,
+                                    startReStr=r"\s*their fractional transl?ations are incommensurate with FFT grid\)\s*$",
+                                 ),
+                             ],
                           ),
                       ],
                    ),

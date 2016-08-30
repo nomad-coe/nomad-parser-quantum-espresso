@@ -87,7 +87,6 @@ class ParserQuantumEspresso(object):
             # ignore empty lines
             r"\s*",
             # warning msg is parsed before hints
-            r"\s*their fractional transl?ations are incommensurate with FFT grid\)\s*$",
             r"\s*Threshold \(ethr\) on eigenvalues was too large:\s*$",
             r"\s*Diagonalizing with lowered threshold\s*$",
             # initialization info
