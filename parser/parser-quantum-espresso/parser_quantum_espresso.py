@@ -29,7 +29,8 @@ QE_SPIN_NONCOLLINEAR = {
 class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     """main place to keep the parser status, open ancillary files,..."""
     def __init__(self):
-        QeC.ParserQuantumEspresso.__init__(self)
+        QeC.ParserQuantumEspresso.__init__(
+            self, re_program_name=re.compile(r"^PWSCF$"))
 
     def initialize_values(self):
         """allows to reset values if the same superContext is used to parse
