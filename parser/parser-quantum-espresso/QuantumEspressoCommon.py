@@ -92,8 +92,6 @@ class ParserQuantumEspresso(object):
             # when input is read from stdin...
             r"\s*Waiting for input\.\.\.\s*",
             # warning msg is parsed before hints
-            r"\s*Any further DFT definition will be discarded",
-            r"\s*Please, verify this is what you really want",
             r"\s*their fractional transl?ations are incommensurate with FFT grid\)\s*$",
             r"\s*Threshold \(ethr\) on eigenvalues was too large:\s*$",
             r"\s*Diagonalizing with lowered threshold\s*$",
