@@ -212,7 +212,19 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 method_gIndex = backend.openSection('section_method')
                 backend.addValue('x_qe_xc_functional_num', self.tmp.pop('xc_functional_num'))
                 backend.addValue('x_qe_exact_exchange_fraction',  exx_fraction)
+                self.addSectionDict(
+                    backend, 'section_method_to_method_refs', {
+                        'method_to_method_ref': (method_gIndex-1),
+                        'method_to_method_kind': 'starting_point',
+                    }
+                )
                 backend.closeSection('section_method', method_gIndex)
+            self.addSectionDict(
+                backend, 'section_calculation_to_calculation_refs', {
+                    'calculation_to_calculation_ref': (gIndex-1),
+                    'calculation_to_calculation_kind': 'starting_point',
+                }
+            )
         self.close_header_sections(backend)
 
     def onClose_section_single_configuration_calculation(
