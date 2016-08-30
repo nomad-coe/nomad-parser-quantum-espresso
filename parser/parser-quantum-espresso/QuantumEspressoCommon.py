@@ -86,9 +86,6 @@ class ParserQuantumEspresso(object):
         self.coverageIgnoreList = [
             # ignore empty lines
             r"\s*",
-            # warning msg is parsed before hints
-            r"\s*Threshold \(ethr\) on eigenvalues was too large:\s*$",
-            r"\s*Diagonalizing with lowered threshold\s*$",
             # initialization info
             r"\s*Initializing real-space augmentation for DENSE grid\s*$",
             r"\s*SMOOTH grid -> DENSE grid\s*$",

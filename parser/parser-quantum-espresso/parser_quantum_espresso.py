@@ -1396,6 +1396,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                     startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
                                                 r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_t_iteration_avg>" + RE_f +
                                                 r")\s*$"),
+                                    subMatchers=[
+                                        SM(name='redo_with_lower_ethr_cIgn1', coverageIgnore=True,
+                                           startReStr=r"\s*Threshold \(ethr\) on eigenvalues was too large:\s*$",
+                                           subMatchers=[
+                                               SM(name='redo_with_lower_ethr_cIgn2', coverageIgnore=True,
+                                                  startReStr=r"\s*Diagonalizing with lowered threshold\s*$",
+                                               ),
+                                           ],
+                                        ),
+                                    ],
                                  ),
                              ],
                           ),
