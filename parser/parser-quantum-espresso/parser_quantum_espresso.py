@@ -1051,6 +1051,12 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                ],
             ),
+            # pure informational msg about how code was compiled
+            SM(name='cIgn_pp_compiletype', coverageIgnore=True,
+               startReStr=(
+                   r"\s*(?:For Norm-Conserving or\s*)?Ultrasoft \(Vanderbilt\) Pseudopotentials\s*(?:(?:and|or) PAW)?\s*"
+               ),
+            ),
         ] + self.SMs_read_input_file() + [
             SM(name='qe_dimensions',
                startReStr=r"\s*Current dimensions of program\s*\S+\s*are:\s*$",

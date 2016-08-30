@@ -86,9 +86,6 @@ class ParserQuantumEspresso(object):
         self.coverageIgnoreList = [
             # ignore empty lines
             r"\s*",
-            # pure informational msg about how code was compiled
-            r"\s*Ultrasoft \(Vanderbilt\) Pseudopotentials\s*(?:and PAW)?\s*",
-            r"\s*For Norm-Conserving or Ultrasoft \(Vanderbilt\) Pseudopotentials or PAW\s*",
             # when input is read from stdin...
             r"\s*Waiting for input\.\.\.\s*",
             # warning msg is parsed before hints
