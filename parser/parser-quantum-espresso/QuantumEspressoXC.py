@@ -42,7 +42,8 @@ def parse_qe_xc_num(xc_functional_num):
 
 def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
     xf_num = parse_qe_xc_num(xc_functional_num)
-    LOGGER.debug('num <- input: %s <- %s',  str(xf_num), xc_functional_num)
+    LOGGER.debug('num <- input: %s <- %s, exx_fraction: %s',  str(xf_num),
+                 xc_functional_num, str(exact_exchange_fraction))
     # use dictionary to ensure uniqueness:
     #   exchange/correlation functionals may be combined into _XC_, and we
     #   only want to emit such combinations once
