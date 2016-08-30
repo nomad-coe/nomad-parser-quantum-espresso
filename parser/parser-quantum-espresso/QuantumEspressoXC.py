@@ -74,9 +74,9 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
                 if sub_component.get('XC_functional_name', None) == 'HF_X':
                     if exact_exchange_fraction is not None:
                         # we are at HF_X component, with explicit exact_exchange_fraction
-                        sub_component['XC_functional_weight'] = exact_exchange_fraction[-1]
+                        sub_component['XC_functional_weight'] = exact_exchange_fraction
                         # assume max. 2 components
-                        other_exchange_fraction = 1.0 - exact_exchange_fraction[-1]
+                        other_exchange_fraction = 1.0 - exact_exchange_fraction
                 elif (other_exchange_fraction is not None):
                     # assign remainder to weight of remaining component
                     sub_component['XC_functional_weight'] = other_exchange_fraction

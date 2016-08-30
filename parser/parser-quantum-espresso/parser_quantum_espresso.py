@@ -164,7 +164,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         xc_functionals = None
         if section['x_qe_xc_functional_num'] is not None:
             xc_functional_num = section['x_qe_xc_functional_num'][-1]
-            xc_functionals = translate_qe_xc_num(xc_functional_num, section['x_qe_t_exact_exchange_fraction'])
+            xc_functionals = translate_qe_xc_num(xc_functional_num, section['x_qe_t_exact_exchange_fraction'][-1])
         else:
             LOGGER.error("x_qe_xc_functional_num is not set")
         if xc_functionals is not None:
