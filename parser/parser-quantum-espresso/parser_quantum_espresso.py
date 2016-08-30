@@ -1335,6 +1335,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                startReStr=(r"\s*Check: negative/imaginary core charge\s*=\s*(?P<x_qe_core_charge_negative>" +
                            RE_f + r")\s*(?P<x_qe_core_charge_imaginary>" + RE_f + r")\s*$")
             ),
+            SM(name='init_aug_dense_cIgn', coverageIgnore=True,
+               startReStr=r"\s*Initializing real-space augmentation for DENSE grid\s*$",
+               subMatchers=[
+                   SM(name='init_aug_smooth_dense_cIgn', coverageIgnore=True,
+                      startReStr=r"\s*SMOOTH grid -> DENSE grid\s*$",
+                   ),
+               ],
+            ),
             SM(name='initial_density_from_file',
                startReStr=r"\s*The initial density is read from file\s*:\s*$",
                subMatchers=[

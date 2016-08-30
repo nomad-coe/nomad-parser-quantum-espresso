@@ -87,8 +87,6 @@ class ParserQuantumEspresso(object):
             # ignore empty lines
             r"\s*",
             # initialization info
-            r"\s*Initializing real-space augmentation for DENSE grid\s*$",
-            r"\s*SMOOTH grid -> DENSE grid\s*$",
             r"\s*Checking if some PAW data can be deallocated\.\.\.\s*$",
             # table separators
             r"^\s*[=%-]+\s*$",
