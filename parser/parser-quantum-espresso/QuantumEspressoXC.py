@@ -83,6 +83,14 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
                 if sub_component['XC_functional_name'] not in xc_data:
                     xc_data[sub_component['XC_functional_name']] = sub_component
         elif this_component['XC_functional_name'] not in xc_data:
+            # special case for HSE06 hybrid
+            if this_component.get('XC_functional_name', None) == 'HYB_GGA_XC_HSE06':
+                if exact_exchange_fraction is not None:
+                    # we are at HSE06 component, with explicit exact_exchange_fraction
+                    this_component = this_component.copy()
+                    this_component['XC_functional_parameters'] = {
+                        'exx_mixing': exact_exchange_fraction,
+                    }
             xc_data[this_component['XC_functional_name']] = this_component
     result = []
     for k,v in sorted(xc_data.items()):
