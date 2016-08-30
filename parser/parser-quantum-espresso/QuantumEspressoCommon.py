@@ -217,7 +217,8 @@ class ParserQuantumEspresso(object):
     def addSectionDict(self, backend, section_name, section_dict):
         gIndex = backend.openSection(section_name)
         for key, value in sorted(section_dict.items()):
-            if isinstance(value, (dict, list)):
-                raise RuntimeError("At the moment, only 'flat' dictionaries are supported")
-            backend.addValue(key, value)
+            if isinstance(value, (list,dict)):
+                backend.addValue(key, value)
+            else:
+                backend.addValue(key, value)
         backend.closeSection(section_name, gIndex)
