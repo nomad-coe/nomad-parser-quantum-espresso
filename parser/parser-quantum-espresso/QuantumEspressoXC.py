@@ -64,9 +64,6 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
         if this_component is None:
             raise RuntimeError("Undefined XC component %s[%d]" % (
                 XC_COMPONENT_NAME[component_i], this_xf_num))
-        if exact_exchange_fraction is not None and abs(exact_exchange_fraction[-1]) < 1e-9:
-            # older exx-supporting espresso print exx_fraction == 0
-            exact_exchange_fraction = None
         if 'x_qe_t_xc_terms' in this_component:
             other_exchange_fraction = None
             for term in this_component['x_qe_t_xc_terms']:
