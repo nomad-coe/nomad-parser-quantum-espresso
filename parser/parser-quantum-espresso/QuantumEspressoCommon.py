@@ -86,8 +86,6 @@ class ParserQuantumEspresso(object):
         self.coverageIgnoreList = [
             # ignore empty lines
             r"\s*",
-            # when input is read from stdin...
-            r"\s*Waiting for input\.\.\.\s*",
             # warning msg is parsed before hints
             r"\s*their fractional transl?ations are incommensurate with FFT grid\)\s*$",
             r"\s*Threshold \(ethr\) on eigenvalues was too large:\s*$",

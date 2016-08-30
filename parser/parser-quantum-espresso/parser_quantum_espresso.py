@@ -797,7 +797,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def SMs_read_input_file(self, suffix=''):
         return [
             SM(name='read_input_file' + suffix,
-               startReStr=r"\s*Reading input from\s*(?P<x_qe_input_filename>.*?)\s*$",
+               # first case: input is read from stdin...
+               startReStr=r"\s*(?:Waiting for input\.\.\.|Reading input from\s*(?P<x_qe_input_filename>.*?))\s*$",
                subMatchers=[
                    SM(name="warning_input_card_ignored" + suffix, repeats=True,
                        startReStr=r"\s*Warning:\s*(?P<x_qe_warning>card.*ignored)\s*$",
