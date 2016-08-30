@@ -86,8 +86,6 @@ class ParserQuantumEspresso(object):
         self.coverageIgnoreList = [
             # ignore empty lines
             r"\s*",
-            # initialization info
-            r"\s*Checking if some PAW data can be deallocated\.\.\.\s*$",
             # table separators
             r"^\s*[=%-]+\s*$",
         ]

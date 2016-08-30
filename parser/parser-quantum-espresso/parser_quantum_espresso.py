@@ -1373,6 +1373,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             SM(name='starting_wfc',
                startReStr=r"\s*Starting wfc\s*(?P<x_qe_starting_wfc>.*?)\s*$",
             ),
+            SM(name='paw_dealloc_cIgn', coverageIgnore=True,
+               startReStr=r"\s*Checking if some PAW data can be deallocated\.\.\.\s*$",
+            ),
             SM(name='cputime_msg',
                startReStr=(r"\s*total cpu time spent up to now is\s*(?P<x_qe_time_setup_cpu1_end>" + RE_f +
                            r")\s*secs\s*$"),
