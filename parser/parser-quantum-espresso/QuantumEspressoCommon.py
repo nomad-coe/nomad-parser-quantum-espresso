@@ -73,8 +73,9 @@ QE_SMEARING_KIND = {
 
 class ParserQuantumEspresso(object):
     """Base class for all Quantum Espresso parsers"""
-    def __init__(self,cachingLevelForMetaName=None, coverageIgnoreList=None):
-        self.qe_program_name = None
+    def __init__(self,cachingLevelForMetaName=None, coverageIgnoreList=None,
+                 re_program_name=None):
+        self.re_program_name = re_program_name
         self.parserInfo = PARSER_INFO_DEFAULT.copy()
         self.cachingLevelForMetaName = {}
         for name in META_INFO.infoKinds:
@@ -112,6 +113,15 @@ class ParserQuantumEspresso(object):
                     cachingLevelForMetaName=self.cachingLevelForMetaName,
                     superContext=self)
 
+    def adHoc_suicide_qe_program_name(self, parser):
+        if self.re_program_name is not None:
+            if not self.re_program_name.match(
+                    parser.lastMatch['x_qe_program_name']):
+                raise Exception(
+                    "mainFile program name was: %s, unsuited for %s" % (
+                        parser.lastMatch['x_qe_program_name'],
+                        type(self).__name__))
+
     def mainFileDescription(self):
         # assemble matchers and submatchers
         result = SM(
@@ -131,6 +141,7 @@ class ParserQuantumEspresso(object):
                        # older espresso has just "..." and date on new line
                        r"(?:\s*\.\.\.)\s*$)"
                    ),
+                   adHoc = self.adHoc_suicide_qe_program_name,
                    fixedStartValues={'program_name': 'Quantum Espresso',
                                      'program_basis_set_type': 'plane waves'},
                    sections=['section_run'],
