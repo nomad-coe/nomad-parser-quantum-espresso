@@ -164,7 +164,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         xc_functionals = None
         if section['x_qe_xc_functional_num'] is not None:
             xc_functional_num = section['x_qe_xc_functional_num'][-1]
-            xc_functionals = translate_qe_xc_num(xc_functional_num, section['x_qe_t_exact_exchange_fraction'][-1])
+            exx_fraction = None
+            if section['x_qe_t_exact_exchange_fraction']:
+                # first SCF in EXX is done without HF-X, cache for later
+                self.tmp['exx_fraction'] = section['x_qe_t_exact_exchange_fraction'][-1]
+                self.tmp['xc_functional_num'] = xc_functional_num
+                exx_fraction = 0.0
+            elif section['x_qe_exact_exchange_fraction']:
+                exx_fraction = section['x_qe_exact_exchange_fraction'][-1]
+            xc_functionals = translate_qe_xc_num(xc_functional_num, exx_fraction)
         else:
             LOGGER.error("x_qe_xc_functional_num is not set")
         if xc_functionals is not None:
@@ -198,6 +206,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         exx_refine = self.tmp.pop('exx_refine', None)
         if exx_refine:
             backend.addValue('x_qe_exx_refine', True)
+            exx_fraction = self.tmp.pop('exx_fraction', None)
+            if exx_fraction:
+                # we need to add a section_method including exx
+                method_gIndex = backend.openSection('section_method')
+                backend.addValue('x_qe_xc_functional_num', self.tmp.pop('xc_functional_num'))
+                backend.addValue('x_qe_exact_exchange_fraction',  exx_fraction)
+                backend.closeSection('section_method', method_gIndex)
         self.close_header_sections(backend)
 
     def onClose_section_single_configuration_calculation(
