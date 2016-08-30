@@ -805,6 +805,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                # first case: input is read from stdin...
                startReStr=r"\s*(?:Waiting for input\.\.\.|Reading input from\s*(?P<x_qe_input_filename>.*?))\s*$",
                subMatchers=[
+                   # debug msg appearing in some old QE versions
+                   SM(name="ignore_ierr_debug", repeats=True, coverageIgnore=True,
+                      startReStr=r"\s*ierr\s*=\s*\d+",
+                   ),
                    SM(name="warning_input_card_ignored" + suffix, repeats=True,
                        startReStr=r"\s*Warning:\s*(?P<x_qe_warning>card.*ignored)\s*$",
                    ),
