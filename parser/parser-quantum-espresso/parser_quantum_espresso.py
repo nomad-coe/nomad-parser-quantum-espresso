@@ -67,11 +67,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.cache_t_method = section
         self.atom_kind_idx = -1
 
-    def onOpen_section_system(
-            self, backend, gIndex, section):
-        self.sectionIdx['section_system'] = gIndex
-        self.section['section_system'] = section
-
     def onClose_x_qe_t_section_pseudopotential(
             self, backend, gIndex, section):
         if section['x_qe_t_pp_label'] is None:
@@ -511,6 +506,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             else:
                 LOGGER.error("missing info about number of electrons in system")
         backend.addArrayValues('configuration_periodic_dimensions', np.asarray([True, True, True]))
+        self.sectionIdx['section_system'] = gIndex
+        self.section['section_system'] = section
 
     def onOpen_section_run(
             self, backend, gIndex, section):
