@@ -289,11 +289,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 new_system['x_qe_t_vec_a_y'] = section['x_qe_t_md_vec_a_y']
                 new_system['x_qe_t_vec_a_z'] = section['x_qe_t_md_vec_a_z']
                 LOGGER.info('NewCell')
-            else:
-                # no new cell vectors, copy the old ones
-                new_system['x_qe_t_vec_a_x'] = old_system['x_qe_t_vec_a_x']
-                new_system['x_qe_t_vec_a_y'] = old_system['x_qe_t_vec_a_y']
-                new_system['x_qe_t_vec_a_z'] = old_system['x_qe_t_vec_a_z']
             if section['x_qe_t_md_atom_labels']:
                 # we got new atom positions and labels
                 new_system['x_qe_t_atom_idx'] = old_system['x_qe_t_atom_idx']
@@ -389,7 +384,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addArrayValues('eigenvalues_values', k_energies)
 
     def onClose_section_system(self, backend, gIndex, section):
-        # store direct lattice matrix for transformation crystal -> cartesian
+        old_system = self.section.get('section_system', None)
+        # store direct lattice matrix and inverse for transformation crystal <-> cartesian
         if section['x_qe_t_vec_a_x'] is not None:
             self.amat = np.array([
                 section['x_qe_t_vec_a_x'], section['x_qe_t_vec_a_y'], section['x_qe_t_vec_a_z'],
@@ -399,30 +395,43 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 self.amat_inv = np.linalg.inv(self.amat)
             except np.linalg.linalg.LinAlgError:
                 raise Exception("error inverting bravais matrix " + str(self.amat))
-            backend.addArrayValues('simulation_cell', self.amat)
+        elif old_system is not None:
+            # we did not get new cell vectors, recycle old ones
+            pass
         else:
-            LOGGER.error("No bravais matrix found in output")
-        self.bmat = None
+            raise Exception("missing bravais vectors")
+        backend.addArrayValues('simulation_cell', self.amat)
+
+        # store reciprocal lattice matrix and inverse for transformation crystal <-> cartesian
         if section['x_qe_t_vec_b_x'] is not None:
-            # store reciprocal lattice matrix for transformation crystal -> cartesian
             self.bmat = np.array([
                 section['x_qe_t_vec_b_x'], section['x_qe_t_vec_b_y'], section['x_qe_t_vec_b_z'],
             ], dtype=np.float64).T
-        elif self.amat is not None:
-            LOGGER.debug('calculating bmat on the fly from amat')
+            # store inverse for transformation cartesian -> crystal
+            try:
+                self.bmat_inv = np.linalg.inv(self.bmat)
+            except np.linalg.linalg.LinAlgError:
+                raise Exception("error inverting reciprocal cell matrix")
+        elif section['x_qe_t_vec_a_x'] is not None:
+            # we got new lattice vectors, but no reciprocal ones, calculate
+            # on-the-fly
+            LOGGER.error('calculating bmat on the fly from amat')
             abmat = np.zeros((3,3), dtype=np.float64)
             abmat[0] = np.cross(self.amat[1],self.amat[2])
             abmat[1] = np.cross(self.amat[2],self.amat[0])
             abmat[2] = np.cross(self.amat[0],self.amat[1])
             abmat *= 2*math.pi / np.dot(abmat[0],self.amat[0])
             self.bmat = abmat
+            # store inverse for transformation cartesian -> crystal
+            try:
+                self.bmat_inv = np.linalg.inv(self.bmat)
+            except np.linalg.linalg.LinAlgError:
+                raise Exception("error inverting reciprocal cell matrix")
+        elif old_system is not None:
+            # keep what we had
+            pass
         else:
-            raise Exception("No bravais- and reciprocal cell matrix found in output")
-        # store inverse for transformation cartesian -> crystal
-        try:
-            self.bmat_inv = np.linalg.inv(self.bmat)
-        except np.linalg.linalg.LinAlgError:
-            raise Exception("error inverting reciprocal cell matrix")
+            raise Exception("missing reciprocal cell vectors")
         backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
         # atom positions
         if section['x_qe_t_atpos_x'] is not None:
