@@ -417,9 +417,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
         # atom positions
         if section['x_qe_t_atpos_x'] is not None:
-            atpos_cart = np.array([
+            atpos = np.array([
                 section['x_qe_t_atpos_x'], section['x_qe_t_atpos_y'], section['x_qe_t_atpos_z']
             ], dtype=np.float64).T
+            if len(section['x_qe_t_atpos_units']) != 1:
+                raise RuntimeError("len(atpos_units) = %s" % (str(len(section['x_qe_t_atpos_units']))))
+            atpos_units = section['x_qe_t_atpos_units'][-1]
+            if atpos_units == 'a_0' or atpos_units == 'alat':
+                atpos_cart = unit_conversion.convert_unit(atpos, 'usrAlat')
+            else:
+                raise RuntimeError("unknown atpos_units: %s" % (atpos_units))
             backend.addArrayValues('atom_positions',atpos_cart)
             backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
             backend.addArrayValues('x_qe_atom_idx',np.array(section['x_qe_t_atom_idx']))
@@ -762,13 +769,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*Cartesian axes\s*$",
                       subMatchers=[
                           SM(name='cart_heading',
-                             startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)\s*$",
+                             startReStr=r"\s*site n.     atom                  positions \((?P<x_qe_t_atpos_units>a_0|alat) units\)\s*$",
                              subMatchers=[
                                  SM(name='atom_pos_cart', repeats=True,
                                     startReStr=(
                                         r"\s*(?P<x_qe_t_atom_idx>" + RE_i + r")" +
                                         r"\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*" + RE_i + "\)\s*"
-                                        r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat') +
+                                        r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos') +
                                         r"\s*\)\s*$"),
                                  ),
                              ],
