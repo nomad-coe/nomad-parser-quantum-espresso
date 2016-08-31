@@ -517,24 +517,27 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('x_qe_vec_supercell', np.array([
                 section['x_qe_t_vec_supercell_x'], section['x_qe_t_vec_supercell_y'], section['x_qe_t_vec_supercell_z']
             ]).T)
-        nelec_up = section['x_qe_t_number_of_electrons_up']
-        if nelec_up is not None:
+
+        if section['x_qe_t_number_of_electrons_up'] is not None:
             # spin polarized case, with explicit up/down electrons
-            if len(nelec_up)>1:
-                LOGGER.error("got multiple nelec_up: %s", str(nelec))
+            if len(section['x_qe_t_number_of_electrons_up'])>1:
+                LOGGER.error("got multiple nelec_up: %s", str(
+                    section['x_qe_t_number_of_electrons_up']))
             backend.addArrayValues('number_of_electrons', np.array([
-                nelec_up[0], section['x_qe_t_number_of_electrons_down'][0]
+                section['x_qe_t_number_of_electrons_up'][0],
+                section['x_qe_t_number_of_electrons_down'][0]
             ]))
+        elif section['x_qe_t_number_of_electrons'] is not None:
+            if len(section['x_qe_t_number_of_electrons'])!=1:
+                LOGGER.error("got wrong nelec: %s", str(section['x_qe_t_number_of_electrons']))
+            backend.addArrayValues('number_of_electrons', np.array([
+                section['x_qe_t_number_of_electrons'][-1]
+            ]))
+        elif old_system is not None:
+            backend.addArrayValues('number_of_electrons', old_system['number_of_electrons'][-1])
         else:
-            nelec = section['x_qe_t_number_of_electrons']
-            if nelec is not None:
-                if len(nelec)>1:
-                    LOGGER.error("got multiple nelec: %s", str(nelec))
-                backend.addArrayValues('number_of_electrons', np.array([
-                    nelec[0]
-                ]))
-            else:
-                LOGGER.error("missing info about number of electrons in system")
+            raise Exception("missing info about number of electrons in system")
+
         backend.addArrayValues('configuration_periodic_dimensions', np.asarray([True, True, True]))
         self.sectionIdx['section_system'] = gIndex
         self.section['section_system'] = section
