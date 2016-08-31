@@ -276,7 +276,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             LOGGER.error("Neither HOMO, Fermi energy nor number of electrons are defined")
         # setup section_system for next scf
         if section['x_qe_t_md_atom_labels'] or section['x_qe_t_md_vec_a_x']:
-            old_system = self.section['section_system']
             next_system_gIndex = backend.openSection('section_system')
             LOGGER.error("TODO: setup frame sequence!")
             # we cannot simply do
@@ -290,7 +289,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 new_system['x_qe_t_vec_a_z'] = section['x_qe_t_md_vec_a_z']
             if section['x_qe_t_md_atom_labels']:
                 # we got new atom positions and labels
-                new_system['x_qe_t_atom_idx'] = old_system['x_qe_t_atom_idx']
                 new_system['x_qe_t_atom_labels'] = section['x_qe_t_md_atom_labels']
                 new_system['x_qe_t_atpos_units'] = section['x_qe_t_md_atom_positions_units']
                 new_system['x_qe_t_atpos_x'] = section['x_qe_t_md_atom_positions_x']
