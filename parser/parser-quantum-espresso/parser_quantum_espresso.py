@@ -298,13 +298,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 new_system['x_qe_t_atpos_y'] = section['x_qe_t_md_atom_positions_y']
                 new_system['x_qe_t_atpos_z'] = section['x_qe_t_md_atom_positions_z']
                 LOGGER.info('NewAtpos')
-            else:
-                # no new atom positions, copy the old ones
-                new_system['x_qe_t_atom_labels'] = old_system['x_qe_t_atom_labels']
-                new_system['x_qe_t_atpos_units'] = old_system['x_qe_t_atpos_units']
-                new_system['x_qe_t_atpos_x'] = old_system['x_qe_t_atpos_x']
-                new_system['x_qe_t_atpos_y'] = old_system['x_qe_t_atpos_y']
-                new_system['x_qe_t_atpos_z'] = old_system['x_qe_t_atpos_z']
             for target, data in new_system.items():
                 for val in data:
                     backend.addValue(target, val)
@@ -449,22 +442,39 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 atpos_cart = self.amat.dot(atpos.T).T
             else:
                 raise RuntimeError("unknown atpos_units: %s" % (atpos_units))
-            backend.addArrayValues('atom_positions',atpos_cart)
-            backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
-            backend.addArrayValues('x_qe_atom_idx',np.array(section['x_qe_t_atom_idx']))
-            if section['x_qe_t_starting_magnetization_species'] is not None:
-                # build dict with per-species magnetization
-                sp_magn = {}
-                for (label, magn) in zip(
-                        section['x_qe_t_starting_magnetization_species'],
-                        section['x_qe_t_starting_magnetization_value']):
-                    sp_magn[label] = magn
-                at_magn = []
-                for label in section['x_qe_t_atom_labels']:
-                    at_magn.append(sp_magn[label])
-                backend.addArrayValues('x_qe_atom_starting_magnetization',np.array(at_magn))
+        elif old_system is not None:
+            atpos_cart = old_system['atom_positions']
         else:
-            LOGGER.error("No atom positions found in output")
+            raise Exception("missing atom positions")
+        backend.addArrayValues('atom_positions',atpos_cart)
+
+        if section['x_qe_t_atom_labels'] is not None:
+            backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
+        elif old_system is not None:
+            backend.addArrayValues('atom_labels',old_system['atom_labels'])
+        else:
+            raise Exception("missing atom labels")
+
+        if section['x_qe_t_atom_idx']:
+            backend.addArrayValues('x_qe_atom_idx',np.array(section['x_qe_t_atom_idx']))
+        elif old_system is not None:
+            backend.addArrayValues('x_qe_atom_idx',old_system['x_qe_atom_idx'])
+        else:
+            raise Exception("missing x_qe_atom_idx")
+
+        if section['x_qe_t_starting_magnetization_species'] is not None:
+            # build dict with per-species magnetization
+            sp_magn = {}
+            for (label, magn) in zip(
+                    section['x_qe_t_starting_magnetization_species'],
+                    section['x_qe_t_starting_magnetization_value']):
+                sp_magn[label] = magn
+            at_magn = []
+            # transform to per-atom magnetization
+            for label in section['atom_labels']:
+                at_magn.append(sp_magn[label])
+            backend.addArrayValues('x_qe_atom_starting_magnetization',np.array(at_magn))
+
         if section['x_qe_t_celldm'] is not None:
             celldm_joint = " ".join(section['x_qe_t_celldm'])
             celldm = [None, None, None, None, None, None]
