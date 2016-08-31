@@ -481,8 +481,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 celldm[int(match[0])-1] = valueForStrValue(match[1], 'f')
             celldm[0] = self.alat
             backend.addArrayValues('x_qe_celldm', np.array(celldm))
-        else:
-            LOGGER.error("No QE cell dimensions found in output")
+
         if section['x_qe_t_k_info_vec_x'] is not None:
             backend.addArrayValues('x_qe_k_info_ik', np.array(section['x_qe_t_k_info_ik']))
             backend.addArrayValues('x_qe_k_info_wk', np.array(section['x_qe_t_k_info_wk']))
