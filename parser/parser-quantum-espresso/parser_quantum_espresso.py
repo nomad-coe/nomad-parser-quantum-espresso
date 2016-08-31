@@ -441,7 +441,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 raise RuntimeError("unknown atpos_units: %s" % (atpos_units))
             LOGGER.info('NewAtpos')
         elif old_system is not None:
-            atpos_cart = old_system['atom_positions']
+            atpos_cart = old_system['atom_positions'][-1]
             LOGGER.info('OldAtpos')
         else:
             raise Exception("missing atom positions")
@@ -450,14 +450,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         if section['x_qe_t_atom_labels'] is not None:
             backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
         elif old_system is not None:
-            backend.addArrayValues('atom_labels',old_system['atom_labels'])
+            backend.addArrayValues('atom_labels',old_system['atom_labels'][-1])
         else:
             raise Exception("missing atom labels")
 
-        if section['x_qe_t_atom_idx']:
-            backend.addArrayValues('x_qe_atom_idx',np.array(section['x_qe_t_atom_idx']))
+        if section['x_qe_t_atom_idx'] is not None:
+            backend.addArrayValues('x_qe_atom_idx', np.asarray(section['x_qe_t_atom_idx']))
         elif old_system is not None:
-            backend.addArrayValues('x_qe_atom_idx',old_system['x_qe_atom_idx'])
+            backend.addArrayValues('x_qe_atom_idx', old_system['x_qe_atom_idx'][-1])
         else:
             raise Exception("missing x_qe_atom_idx")
 
@@ -470,7 +470,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 sp_magn[label] = magn
             at_magn = []
             # transform to per-atom magnetization
-            for label in section['atom_labels']:
+            for label in section['atom_labels'][-1]:
                 at_magn.append(sp_magn[label])
             backend.addArrayValues('x_qe_atom_starting_magnetization',np.array(at_magn))
 
