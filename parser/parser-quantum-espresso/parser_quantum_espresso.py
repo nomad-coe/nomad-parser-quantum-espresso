@@ -421,6 +421,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             atpos_units = section['x_qe_t_atpos_units'][-1]
             if atpos_units == 'a_0' or atpos_units == 'alat':
                 atpos_cart = unit_conversion.convert_unit(atpos, 'usrAlat')
+            elif atpos_units == 'bohr':
+                atpos_cart = unit_conversion.convert_unit(atpos, 'bohr')
             else:
                 raise RuntimeError("unknown atpos_units: %s" % (atpos_units))
             backend.addArrayValues('atom_positions',atpos_cart)
