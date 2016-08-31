@@ -488,18 +488,31 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('x_qe_k_info_vec', np.array([
                 section['x_qe_t_k_info_vec_x'], section['x_qe_t_k_info_vec_y'], section['x_qe_t_k_info_vec_z']
             ]).T)
+        elif old_system is not None:
+            # unless espresso explicitly writes new k-points, sampling is kept fixed
+            backend.addArrayValues('x_qe_k_info_ik', old_system['x_qe_k_info_ik'][-1])
+            backend.addArrayValues('x_qe_k_info_wk', old_system['x_qe_k_info_wk'][-1])
+            backend.addArrayValues('x_qe_k_info_vec', old_system['x_qe_k_info_vec'][-1])
         else:
             LOGGER.error("No K-point info found in output")
+
         if section['x_qe_t_dense_FFT_grid_x'] is not None:
             backend.addArrayValues('x_qe_dense_FFT_grid', np.array([
                 section['x_qe_t_dense_FFT_grid_x'], section['x_qe_t_dense_FFT_grid_y'], section['x_qe_t_dense_FFT_grid_z']
             ]).T)
+        elif old_system is not None:
+            # unless espresso explicitly writes new FFT grid info, sampling is kept fixed
+            backend.addArrayValues('x_qe_dense_FFT_grid', old_system['x_qe_dense_FFT_grid'][-1])
         else:
-            LOGGER.warning("No FFT grid info found in output")
+            LOGGER.warning("No dense FFT grid info found in output")
+
         if section['x_qe_t_smooth_FFT_grid_x'] is not None:
             backend.addArrayValues('x_qe_smooth_FFT_grid', np.array([
                 section['x_qe_t_smooth_FFT_grid_x'], section['x_qe_t_smooth_FFT_grid_y'], section['x_qe_t_smooth_FFT_grid_z']
             ]).T)
+        elif old_system is not None and old_system['x_qe_smooth_FFT_grid'] is not None:
+            backend.addArrayValues('x_qe_smooth_FFT_grid', old_system['x_qe_smooth_FFT_grid'][-1])
+
         if section['x_qe_t_vec_supercell_x'] is not None:
             backend.addArrayValues('x_qe_vec_supercell', np.array([
                 section['x_qe_t_vec_supercell_x'], section['x_qe_t_vec_supercell_y'], section['x_qe_t_vec_supercell_z']
