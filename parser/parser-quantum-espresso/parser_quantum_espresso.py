@@ -763,13 +763,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       subMatchers=[
                           SM(name='cart_heading',
                              startReStr=r"\s*site n.     atom                  positions \((?:a_0|alat) units\)\s*$",
-                          ),
-                          SM(name='atom_pos_cart', repeats=True,
-                             startReStr=(
-                                 r"\s*(?P<x_qe_t_atom_idx>" + RE_i + r")" +
-                                 r"\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*" + RE_i + "\)\s*"
-                                 r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat') +
-                                 r"\s*\)\s*$"),
+                             subMatchers=[
+                                 SM(name='atom_pos_cart', repeats=True,
+                                    startReStr=(
+                                        r"\s*(?P<x_qe_t_atom_idx>" + RE_i + r")" +
+                                        r"\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*" + RE_i + "\)\s*"
+                                        r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos', 'usrAlat') +
+                                        r"\s*\)\s*$"),
+                                 ),
+                             ],
                           ),
                       ],
                    ),
