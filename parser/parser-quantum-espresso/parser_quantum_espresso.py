@@ -367,19 +367,28 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('simulation_cell', self.amat)
         else:
             LOGGER.error("No bravais matrix found in output")
+        self.bmat = None
         if section['x_qe_t_vec_b_x'] is not None:
             # store reciprocal lattice matrix for transformation crystal -> cartesian
             self.bmat = np.array([
                 section['x_qe_t_vec_b_x'], section['x_qe_t_vec_b_y'], section['x_qe_t_vec_b_z'],
             ], dtype=np.float64).T
-            # store inverse for transformation cartesian -> crystal
-            try:
-                self.bmat_inv = np.linalg.inv(self.bmat)
-            except np.linalg.linalg.LinAlgError:
-                raise Exception("error inverting reciprocal cell matrix")
-            backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
+        elif self.amat is not None:
+            LOGGER.debug('calculating bmat on the fly from amat')
+            abmat = np.zeros((3,3), dtype=np.float64)
+            abmat[0] = np.cross(self.amat[1],self.amat[2])
+            abmat[1] = np.cross(self.amat[2],self.amat[0])
+            abmat[2] = np.cross(self.amat[0],self.amat[1])
+            abmat *= 2*math.pi / np.dot(abmat[0],self.amat[0])
+            self.bmat = abmat
         else:
-            LOGGER.error("No reciprocal cell matrix found in output")
+            raise Exception("No bravais- and reciprocal cell matrix found in output")
+        # store inverse for transformation cartesian -> crystal
+        try:
+            self.bmat_inv = np.linalg.inv(self.bmat)
+        except np.linalg.linalg.LinAlgError:
+            raise Exception("error inverting reciprocal cell matrix")
+        backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
         # atom positions
         if section['x_qe_t_atpos_x'] is not None:
             atpos_cart = np.array([
