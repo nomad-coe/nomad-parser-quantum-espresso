@@ -1107,6 +1107,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                startReStr=r"\s*Damped Dynamics Calculation\s*$",
                adHoc = lambda p: self.setTmp('md_relax', 'damped_dynamics'),
             ),
+            SM(name="md_info_relax_damped",
+               startReStr=r"\s*Over-damped Langevin Dynamics Calculation\s*$",
+               adHoc = lambda p: self.setTmp('md_relax', 'langevin_overdamped_dynamics'),
+            ),
             # older espresso writes this _before_ 'entering dynamics'
             SM(name="md_maxSteps1",
                startReStr=r"\s*The maximum number of steps has been reached.\s*$",
