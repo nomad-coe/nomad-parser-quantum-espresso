@@ -984,6 +984,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         return [
             SM(name="bfgs_info",
                startReStr=r"\s*BFGS Geometry Optimization\s*$",
+               adHoc = lambda p: self.setTmp('md_relax', 'BFGS')
             ),
             SM(name="bfgs_scf_cycles",
                startReStr=r"\s*number of scf cycles\s*=\s*(?P<x_qe_t_md_bfgs_scf_cycles>\d+)\s*$",
@@ -1082,6 +1083,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   r")\s*femto-seconds\s*$"),
                    ),
                ],
+               adHoc = lambda p: self.setTmp('md_relax', 'molecular_dynamics')
             ),
             # older espresso writes this _before_ 'entering dynamics'
             SM(name="md_maxSteps1",
