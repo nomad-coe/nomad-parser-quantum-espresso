@@ -288,7 +288,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 new_system['x_qe_t_vec_a_x'] = section['x_qe_t_md_vec_a_x']
                 new_system['x_qe_t_vec_a_y'] = section['x_qe_t_md_vec_a_y']
                 new_system['x_qe_t_vec_a_z'] = section['x_qe_t_md_vec_a_z']
-                LOGGER.info('NewCell')
             if section['x_qe_t_md_atom_labels']:
                 # we got new atom positions and labels
                 new_system['x_qe_t_atom_idx'] = old_system['x_qe_t_atom_idx']
@@ -297,7 +296,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 new_system['x_qe_t_atpos_x'] = section['x_qe_t_md_atom_positions_x']
                 new_system['x_qe_t_atpos_y'] = section['x_qe_t_md_atom_positions_y']
                 new_system['x_qe_t_atpos_z'] = section['x_qe_t_md_atom_positions_z']
-                LOGGER.info('NewAtpos')
             for target, data in new_system.items():
                 for val in data:
                     backend.addValue(target, val)
@@ -388,9 +386,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 self.amat_inv = np.linalg.inv(self.amat)
             except np.linalg.linalg.LinAlgError:
                 raise Exception("error inverting bravais matrix " + str(self.amat))
+            LOGGER.info('NewCell')
         elif old_system is not None:
             # we did not get new cell vectors, recycle old ones
-            pass
+            LOGGER.info('OldCell')
         else:
             raise Exception("missing bravais vectors")
         backend.addArrayValues('simulation_cell', self.amat)
@@ -442,8 +441,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 atpos_cart = self.amat.dot(atpos.T).T
             else:
                 raise RuntimeError("unknown atpos_units: %s" % (atpos_units))
+            LOGGER.info('NewAtpos')
         elif old_system is not None:
             atpos_cart = old_system['atom_positions']
+            LOGGER.info('OldAtpos')
         else:
             raise Exception("missing atom positions")
         backend.addArrayValues('atom_positions',atpos_cart)
