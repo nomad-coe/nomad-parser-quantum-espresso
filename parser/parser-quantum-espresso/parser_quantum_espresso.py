@@ -283,6 +283,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         if section['x_qe_t_md_atom_labels'] or section['x_qe_t_md_vec_a_x']:
             old_system = self.section['section_system']
             next_system_gIndex = backend.openSection('section_system')
+            LOGGER.error("TODO: setup frame sequence!")
             # we cannot simply do
             #   backend.addValue('x_qe_t_vec_a_x', section['x_qe_t_md_vec_a_x'])
             # as this adds an outer list with one element (WTF)
@@ -292,6 +293,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 new_system['x_qe_t_vec_a_x'] = section['x_qe_t_md_vec_a_x']
                 new_system['x_qe_t_vec_a_y'] = section['x_qe_t_md_vec_a_y']
                 new_system['x_qe_t_vec_a_z'] = section['x_qe_t_md_vec_a_z']
+                LOGGER.info('NewCell')
             else:
                 # no new cell vectors, copy the old ones
                 new_system['x_qe_t_vec_a_x'] = old_system['x_qe_t_vec_a_x']
@@ -305,6 +307,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 new_system['x_qe_t_atpos_x'] = section['x_qe_t_md_atom_positions_x']
                 new_system['x_qe_t_atpos_y'] = section['x_qe_t_md_atom_positions_y']
                 new_system['x_qe_t_atpos_z'] = section['x_qe_t_md_atom_positions_z']
+                LOGGER.info('NewAtpos')
             else:
                 # no new atom positions, copy the old ones
                 new_system['x_qe_t_atom_labels'] = old_system['x_qe_t_atom_labels']
@@ -937,7 +940,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*" + QeC.re_vec('x_qe_t_md_vec_a') + r"\s*$",
                    ),
                ],
-               adHoc=lambda p: LOGGER.error('do sth with new cellvec')
             ),
             SM(name="atpos" + suffix,
                startReStr="ATOMIC_POSITIONS\s*\(\s*(?P<x_qe_t_md_atom_positions_units>\S+)\s*\)$",
@@ -955,7 +957,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       },
                    ),
                ],
-               adHoc=lambda p: LOGGER.error('do sth with new atposvec')
             ),
             SM(name="eat_end_final" + suffix,
                startReStr=r"\s*End final coordinates\s*$"
