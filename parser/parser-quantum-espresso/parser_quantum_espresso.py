@@ -279,6 +279,32 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             had_energy_reference = True
         if not (had_energy_reference):
             LOGGER.error("Neither HOMO, Fermi energy nor number of electrons are defined")
+        # setup section_system for next scf
+        if section['x_qe_t_md_atom_labels'] or section['x_qe_t_md_vec_a_x']:
+            old_system = self.section['section_system']
+            next_system_gIndex = backend.openSection('section_system')
+            # we cannot simply do
+            #   backend.addValue('x_qe_t_vec_a_x', section['x_qe_t_md_vec_a_x'])
+            # as this adds an outer list with one element (WTF)
+            if section['x_qe_t_md_vec_a']:
+                # we got new cell vectors
+                new_a = {
+                    'x_qe_t_vec_a_x': section['x_qe_t_md_vec_a_x'],
+                    'x_qe_t_vec_a_y': section['x_qe_t_md_vec_a_y'],
+                    'x_qe_t_vec_a_z': section['x_qe_t_md_vec_a_z']
+                }
+                LOGGER.error('here')
+            else:
+                # no new cell vectors, copy the old ones
+                new_a = {
+                    'x_qe_t_vec_a_x': old_system['x_qe_t_vec_a_x'],
+                    'x_qe_t_vec_a_y': old_system['x_qe_t_vec_a_y'],
+                    'x_qe_t_vec_a_z': old_system['x_qe_t_vec_a_z']
+                }
+            for target, data in new_a.items():
+                for val in data:
+                    backend.addValue(target, val)
+            backend.closeSection('section_system', next_system_gIndex)
 
     def onClose_section_scf_iteration(
             self, backend, gIndex, section):
