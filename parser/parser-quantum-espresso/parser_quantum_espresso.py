@@ -438,6 +438,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 atpos_cart = unit_conversion.convert_unit(atpos, 'usrAlat')
             elif atpos_units == 'bohr':
                 atpos_cart = unit_conversion.convert_unit(atpos, 'bohr')
+            elif atpos_units == 'angstrom':
+                atpos_cart = unit_conversion.convert_unit(atpos, 'angstrom')
             elif atpos_units == 'crystal':
                 atpos_cart = self.amat.dot(atpos.T).T
             else:
