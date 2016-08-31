@@ -1124,7 +1124,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       subMatchers=self.SMs_molecular_dynamics_end(suffix='2'),
                    ),
                ],
-               adHoc=lambda p: LOGGER.error("implement frames for md/relax"),
             ),
         ]
 
