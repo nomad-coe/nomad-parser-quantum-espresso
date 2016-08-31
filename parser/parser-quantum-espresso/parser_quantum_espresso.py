@@ -1101,6 +1101,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                ],
                adHoc = lambda p: self.setTmp('md_relax', 'molecular_dynamics')
             ),
+            SM(name="md_info_relax_damped",
+               startReStr=r"\s*Damped Dynamics Calculation\s*$",
+               adHoc = lambda p: self.setTmp('md_relax', 'damped_dynamics'),
+            ),
             # older espresso writes this _before_ 'entering dynamics'
             SM(name="md_maxSteps1",
                startReStr=r"\s*The maximum number of steps has been reached.\s*$",
@@ -1327,6 +1331,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                subMatchers=[
                   SM(name='warning_metallic',
                      startReStr=r"\s*(?P<x_qe_warning>the system is metallic, specify occupations)\s*$",
+                  ),
+                  SM(name='warning_dynamics_symm',
+                     startReStr=r"\s*(?P<x_qe_warning>Dynamics, you should have no symmetries)\s*$",
                   ),
                ],
             ),
