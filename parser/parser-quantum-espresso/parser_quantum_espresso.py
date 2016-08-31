@@ -297,6 +297,21 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 new_system['x_qe_t_vec_a_x'] = old_system['x_qe_t_vec_a_x']
                 new_system['x_qe_t_vec_a_y'] = old_system['x_qe_t_vec_a_y']
                 new_system['x_qe_t_vec_a_z'] = old_system['x_qe_t_vec_a_z']
+            if section['x_qe_t_md_atom_labels']:
+                # we got new atom positions and labels
+                new_system['x_qe_t_atom_idx'] = old_system['x_qe_t_atom_idx']
+                new_system['x_qe_t_atom_labels'] = section['x_qe_t_md_atom_labels']
+                new_system['x_qe_t_atpos_units'] = section['x_qe_t_md_atom_positions_units']
+                new_system['x_qe_t_atpos_x'] = section['x_qe_t_md_atom_positions_x']
+                new_system['x_qe_t_atpos_y'] = section['x_qe_t_md_atom_positions_y']
+                new_system['x_qe_t_atpos_z'] = section['x_qe_t_md_atom_positions_z']
+            else:
+                # no new atom positions, copy the old ones
+                new_system['x_qe_t_atom_labels'] = old_system['x_qe_t_atom_labels']
+                new_system['x_qe_t_atpos_units'] = old_system['x_qe_t_atpos_units']
+                new_system['x_qe_t_atpos_x'] = old_system['x_qe_t_atpos_x']
+                new_system['x_qe_t_atpos_y'] = old_system['x_qe_t_atpos_y']
+                new_system['x_qe_t_atpos_z'] = old_system['x_qe_t_atpos_z']
             for target, data in new_system.items():
                 for val in data:
                     backend.addValue(target, val)
