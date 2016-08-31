@@ -1124,6 +1124,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name="md_nat2_distance",
                       startReStr=r"\s*DISTANCE\s*=\s*(?P<x_qe_t_new_nat2_distance__bohr>" + RE_f + r")\s*$"
                    ),
+                   SM(name="md_projected_velocity",
+                       startReStr=r"\s*<vel\(dt\)\|acc\(dt\)>\s*=\s*(?P<x_qe_t_projected_velocity>" + RE_f + r")\s*$",
+                   ),
                ] + self.SMs_md_system_new(suffix='MD') + [
                    SM(name="md_ekin",
                       startReStr=(r"\s*kinetic energy\s*\(Ekin\)\s*=\s*(?P<x_qe_t_md_kinetic_energy__rydberg>" + RE_f +
