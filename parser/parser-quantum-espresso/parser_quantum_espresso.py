@@ -374,6 +374,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def onClose_section_system(self, backend, gIndex, section):
         old_system = self.section.get('section_system', None)
+        if old_system is not None and self.tmp.get('md_relax', None) is None:
+            raise Exception('encountered new section_system without knowing why')
+
         # store direct lattice matrix and inverse for transformation crystal <-> cartesian
         if section['x_qe_t_vec_a_x'] is not None:
             self.amat = np.array([
