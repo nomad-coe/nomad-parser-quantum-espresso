@@ -286,22 +286,18 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             # we cannot simply do
             #   backend.addValue('x_qe_t_vec_a_x', section['x_qe_t_md_vec_a_x'])
             # as this adds an outer list with one element (WTF)
+            new_system = {}
             if section['x_qe_t_md_vec_a']:
                 # we got new cell vectors
-                new_a = {
-                    'x_qe_t_vec_a_x': section['x_qe_t_md_vec_a_x'],
-                    'x_qe_t_vec_a_y': section['x_qe_t_md_vec_a_y'],
-                    'x_qe_t_vec_a_z': section['x_qe_t_md_vec_a_z']
-                }
-                LOGGER.error('here')
+                new_system['x_qe_t_vec_a_x'] = section['x_qe_t_md_vec_a_x']
+                new_system['x_qe_t_vec_a_y'] = section['x_qe_t_md_vec_a_y']
+                new_system['x_qe_t_vec_a_z'] = section['x_qe_t_md_vec_a_z']
             else:
                 # no new cell vectors, copy the old ones
-                new_a = {
-                    'x_qe_t_vec_a_x': old_system['x_qe_t_vec_a_x'],
-                    'x_qe_t_vec_a_y': old_system['x_qe_t_vec_a_y'],
-                    'x_qe_t_vec_a_z': old_system['x_qe_t_vec_a_z']
-                }
-            for target, data in new_a.items():
+                new_system['x_qe_t_vec_a_x'] = old_system['x_qe_t_vec_a_x']
+                new_system['x_qe_t_vec_a_y'] = old_system['x_qe_t_vec_a_y']
+                new_system['x_qe_t_vec_a_z'] = old_system['x_qe_t_vec_a_z']
+            for target, data in new_system.items():
                 for val in data:
                     backend.addValue(target, val)
             backend.closeSection('section_system', next_system_gIndex)
