@@ -956,7 +956,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
-    def SMs_md_system_new(self, suffix=''):
+    def SMs_md_system_new(self, suffix='', eatEndFinalSubMatchers=[]):
         return [
             SM(name="eat_start_final" + suffix,
                startReStr=r"\s*Begin final coordinates\s*$"
@@ -994,7 +994,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                ],
             ),
             SM(name="eat_end_final" + suffix,
-               startReStr=r"\s*End final coordinates\s*$"
+               startReStr=r"\s*End final coordinates\s*$",
+               subMatchers=eatEndFinalSubMatchers,
             ),
         ]
 
