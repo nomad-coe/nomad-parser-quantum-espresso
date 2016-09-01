@@ -1260,6 +1260,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                ],
             ),
         ] + self.SMs_read_input_file(suffix='2') + [
+            SM(name='input_positions_cell_dir_header',
+               startReStr=r"\s*Atomic positions and unit cell read from directory:\s*$",
+               subMatchers=[
+                   SM(name='input_positions_cell_dir',
+                      startReStr=r"\s*(?P<x_qe_input_positions_cell_dirname>.+?)\s*$",
+                   ),
+               ],
+            ),
             SM(name='supercell1',
                startReStr=r"\s*Found symmetry operation:\s*I\s*\+\s*\(\s*" + QeC.re_vec('x_qe_t_vec_supercell') + r"\s*\)\s*$",
             ),
@@ -1512,6 +1520,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                subMatchers=[
                    SM(name='init_aug_smooth_dense_cIgn', coverageIgnore=True,
                       startReStr=r"\s*SMOOTH grid -> DENSE grid\s*$",
+                   ),
+               ],
+            ),
+            SM(name='input_potential_recalculated_file_header',
+               startReStr=r"\s*The potential is recalculated from file :\s*$",
+               subMatchers=[
+                   SM(name='input_potential_recalculated_file',
+                      startReStr=r"\s*(?P<x_qe_input_potential_recalculated_file>.+?)\s*$",
                    ),
                ],
             ),
