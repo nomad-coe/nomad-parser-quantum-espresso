@@ -1157,6 +1157,38 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                ],
             ),
+            SM(name="damped_converged",
+               startReStr=r"\s*Damped Dynamics: convergence achieved in\s*(?P<x_qe_t_relax_converged_steps>\d+)\s+steps\s*$",
+               subMatchers=[
+                   SM(name="damped_end",
+                      startReStr=r"\s*End of damped dynamics calculation\s*$",
+                      adHoc=lambda p: LOGGER.error("TODO: do sth with end-of-damped-dynamics data"),
+                      subMatchers=[
+                          SM(name="damped_final_energy",
+                              startReStr=r"\s*Final energy =\s*(?P<x_qe_t_relax_final_energy__rydberg>" + RE_f + r")\s*Ry\s*$",
+                          ),
+                      ] + self.SMs_md_system_new(
+                              suffix="DMDFINAL",
+                              eatEndFinalSubMatchers=[
+                                  SM(name="DMDFi1", coverageIgnore=True,
+                                     startReStr=r"\s*Entering Dynamics:\s*iteration.*$",
+                                  ),
+                                  SM(name="DMDFi2", coverageIgnore=True,
+                                     startReStr=r"\s*<vel\(dt\)\|acc\(dt\)>\s*=.*$",
+                                  ),
+                                  SM(name="DMDFi3", coverageIgnore=True,
+                                     startReStr=r"\s*ATOMIC_POSITIONS \(.*\)\s*$",
+                                     subMatchers=[
+                                         SM(name="DMDFi4", repeats=True, coverageIgnore=True,
+                                            startReStr=r"\S+(?:\s+" + RE_f + r"){3}(?:(?:\s+\d+){3})?\s*$",
+                                         ),
+                                     ],
+                                  ),
+                              ],
+                          ),
+                   ),
+               ],
+            ),
         ]
 
     def header_sections(self):
