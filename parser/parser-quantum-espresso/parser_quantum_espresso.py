@@ -329,7 +329,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         # prepare numpy arrays
         k_energies = np.array([self.tmp['k_energies']], dtype=np.float64)
         k_energies = unit_conversion.convert_unit(k_energies, 'eV')
-        npw = np.array(src_sec['x_qe_t_k_pw'])
+        npw = None
+        if src_sec['x_qe_t_k_pw'] is not None:
+            npw = np.array(src_sec['x_qe_t_k_pw'])
         k_point_cartesian = np.array([
             src_sec['x_qe_t_k_x'], src_sec['x_qe_t_k_y'], src_sec['x_qe_t_k_z']
         ], dtype=np.float64).T
@@ -362,7 +364,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         # transform spin-polarized case
         if nspin == 2:
             k_point_cartesian[0:nk/2,:]
-            npw = npw[0:nk/2]
+            if npw is not None:
+                npw = npw[0:nk/2]
             # put spin channel into first dimension
             k_energies = np.concatenate((
                 k_energies[:,0:nk/2,:],
@@ -370,7 +373,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         # k-points are in cartesian, but metaInfo specifies crystal
         k_point_crystal = self.bmat_inv.dot(k_point_cartesian.T).T
         # emit data
-        backend.addArrayValues('x_qe_eigenvalues_number_of_planewaves', npw)
+        if npw is not None:
+            backend.addArrayValues('x_qe_eigenvalues_number_of_planewaves', npw)
         backend.addArrayValues('eigenvalues_kpoints', k_point_crystal)
         backend.addArrayValues('eigenvalues_values', k_energies)
         backend.closeSection('section_eigenvalues', sec_eigenvalues_gIndex)
@@ -912,8 +916,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         return [
             SM(name='bands' + suffix, repeats=True,
                 startReStr=(r'\s*k\s*=\s*' + QeC.re_vec('x_qe_t_k', 'usrTpiba', '\s*') +
-                            r'\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i +
-                            r")\s*PWs\s*\)\s*bands\s*\(\s*[eE][vV]\s*\)\s*:?\s*$"),
+                            r'(?:\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i + r')\s*PWs\s*\))?' +
+                            r'\s*band(?:s|\s+energies)\s*\(\s*[eE][vV]\s*\)\s*:?\s*$'),
                 # create new empty list for this k point's eigenvalues
                 adHoc=lambda p: self.tmp['k_energies'].append([]),
                 subMatchers=[
