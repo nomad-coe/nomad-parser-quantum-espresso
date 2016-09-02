@@ -1943,7 +1943,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                    SM(name='end_band_structure_calculation',
                       startReStr=r"\s*End of band structure calculation\s*$",
-                      subMatchers=[
+                      sections=['section_eigenvalues'],
+                      subMatchers=self.SMs_bands() + [
+                          SM(name='bands_spinBS', repeats=True,
+                              startReStr=r"\s*-+\s*SPIN\s+(?P<x_qe_t_spin_channel>UP|DOWN)\s*-+\s*$",
+                              adHoc=self.adHoc_bands_spin,
+                              subMatchers=self.SMs_bands(suffix='_spinBS'),
+                          ),
                           SM(name='end_bands_nobands_cIgn', coverageIgnore=True,
                              startReStr=r"\s*(?P<x_qe_warning>Number of k-points >= \d+: set verbosity='high' to print the bands\.)",
                           ),
