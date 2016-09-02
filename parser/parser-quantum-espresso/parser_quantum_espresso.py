@@ -227,6 +227,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 }
             )
         self.close_header_sections(backend)
+        # reset temporary storage for band structures
+        self.tmp['k_energies'] = []
+        self.tmp['kspin'] = {}
+        self.section['single_configuration_calculation'] = section
 
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
@@ -234,6 +238,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         is closed"""
         backend.addValue('single_configuration_to_calculation_method_ref', self.sectionIdx['section_method'])
         backend.addValue('single_configuration_calculation_to_system_ref', self.sectionIdx['section_system'])
+        # extract k band structure data if available
+        self.create_section_eigenvalues(backend, section)
         if section['x_qe_t_energy_decomposition_name'] is not None:
             backend.addArrayValues('x_qe_energy_decomposition_name', np.asarray(
                 section['x_qe_t_energy_decomposition_name']))
@@ -315,21 +321,17 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues("x_qe_iter_mpersite_constr", np.asarray(section["x_qe_t_iter_mpersite_constr"]))
         self.tmp['last_iteration'] = section['x_qe_iteration_number'][-1]
 
-    def onOpen_section_eigenvalues(self, backend, gIndex, section):
-        self.tmp['k_energies'] = []
-        self.section['eigenvalues'] = section
-        self.tmp['kspin'] = {}
-
-    def onClose_section_eigenvalues(self, backend, gIndex, section):
-        if section['x_qe_t_k_x'] is None or len(section['x_qe_t_k_x']) < 1:
-            LOGGER.error("no k-points!")
+    def create_section_eigenvalues(self, backend, src_sec):
+        if src_sec['x_qe_t_k_x'] is None or len(src_sec['x_qe_t_k_x']) < 1:
+            LOGGER.error("no k-points, not creating section_eigenvalues!")
             return
+        sec_eigenvalues_gIndex = backend.openSection('section_eigenvalues')
         # prepare numpy arrays
         k_energies = np.array([self.tmp['k_energies']], dtype=np.float64)
         k_energies = unit_conversion.convert_unit(k_energies, 'eV')
-        npw = np.array(section['x_qe_t_k_pw'])
+        npw = np.array(src_sec['x_qe_t_k_pw'])
         k_point_cartesian = np.array([
-            section['x_qe_t_k_x'], section['x_qe_t_k_y'], section['x_qe_t_k_z']
+            src_sec['x_qe_t_k_x'], src_sec['x_qe_t_k_y'], src_sec['x_qe_t_k_z']
         ], dtype=np.float64).T
         # check if we are dealing with spin-polarized data
         #   QE represents this as 2*k-points, with repeating coordinates
@@ -371,6 +373,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addArrayValues('x_qe_eigenvalues_number_of_planewaves', npw)
         backend.addArrayValues('eigenvalues_kpoints', k_point_crystal)
         backend.addArrayValues('eigenvalues_values', k_energies)
+        backend.closeSection('section_eigenvalues', sec_eigenvalues_gIndex)
 
     def onClose_section_system(self, backend, gIndex, section):
         old_system = self.section.get('section_system', None)
@@ -601,7 +604,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             'x_qe_t_pp_renormalized_filename']] = parser.lastMatch['x_qe_t_pp_renormalized_wfc']
 
     def adHoc_bands_spin(self, parser):
-        k_x = self.section['eigenvalues']['x_qe_t_k_x']
+        k_x = self.section['single_configuration_calculation']['x_qe_t_k_x']
         if k_x is None:
             nk_current = 0
         else:
@@ -1683,7 +1686,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                    SM(name='scf_result', repeats=False,
                        startReStr=r'\s*End of self-consistent calculation\s*$',
-                       sections=['section_eigenvalues'],
                        subMatchers=self.SMs_bands() + [
                           SM(name='bands_spin', repeats=True,
                               startReStr=r"\s*-+\s*SPIN\s+(?P<x_qe_t_spin_channel>UP|DOWN)\s*-+\s*$",
@@ -1943,7 +1945,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                    SM(name='end_band_structure_calculation',
                       startReStr=r"\s*End of band structure calculation\s*$",
-                      sections=['section_eigenvalues'],
                       subMatchers=self.SMs_bands() + [
                           SM(name='bands_spinBS', repeats=True,
                               startReStr=r"\s*-+\s*SPIN\s+(?P<x_qe_t_spin_channel>UP|DOWN)\s*-+\s*$",
