@@ -1191,24 +1191,24 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
-    def SMs_diagonalization(self):
+    def SMs_diagonalization(self, namespace=None):
         return [
             SM(name='david_or_cg', repeats=True,
-               startReStr=r"\s*(?P<x_qe_t_scf_diagonalization_algorithm>Davidson diagonalization with overlap|CG style diagonalization)\s*$",
-               adHoc=lambda p: p.backend.addValue('x_qe_scf_diagonalization_algorithm', QE_DIAGONALIZATION[p.lastMatch['x_qe_t_scf_diagonalization_algorithm']]),
-               sections=['x_qe_section_scf_diagonalization'],
+               startReStr=r"\s*(?P<x_qe_t_" + namespace + r"_algorithm>Davidson diagonalization with overlap|CG style diagonalization)\s*$",
+               adHoc=lambda p: p.backend.addValue('x_qe_' + namespace + '_algorithm', QE_DIAGONALIZATION[p.lastMatch['x_qe_t_' + namespace + '_algorithm']]),
+               sections=['x_qe_section_' + namespace],
                subMatchers=[
                    SM(name='warn_not_converged', repeats=True, floating=True,
-                      startReStr=(r"\s*WARNING:\s*(?P<x_qe_scf_diagonalization_warn_n_unconverged_eigenvalues>" + RE_i +
+                      startReStr=(r"\s*WARNING:\s*(?P<x_qe_" + namespace + r"_warn_n_unconverged_eigenvalues>" + RE_i +
                                   r")\s*eigenvalues not converged(?:\s+in\s+regterg)?\s*$"),
                    ),
                    SM(name='c_bands_not_converged', repeats=True,
-                      startReStr=(r"\s*c_bands:\s*(?P<x_qe_scf_diagonalization_c_bands_n_unconverged_eigenvalues>" + RE_i +
+                      startReStr=(r"\s*c_bands:\s*(?P<x_qe_" + namespace + r"_c_bands_n_unconverged_eigenvalues>" + RE_i +
                                   r")\s*eigenvalues not converged\s*$"),
                    ),
                    SM(name='ethr', repeats=True,
-                      startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_scf_diagonalization_ethr>" + RE_f +
-                                  r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_scf_diagonalization_iteration_avg>" + RE_f +
+                      startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_" + namespace + "_ethr>" + RE_f +
+                                  r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_" + namespace + "_iteration_avg>" + RE_f +
                                   r")\s*$"),
                       subMatchers=[
                           SM(name='redo_with_lower_ethr_cIgn1', coverageIgnore=True,
@@ -1618,7 +1618,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   r"\s*beta\s*=\s*(?P<x_qe_iteration_beta>" + RE_f + r")\s*$"),
                       sections=['section_scf_iteration'],
                       subMatchers=[
-                      ] + self.SMs_diagonalization() + [
+                      ] + self.SMs_diagonalization(namespace='scf_diagonalization') + [
                           SM(name="iter_warning_save_mggaI",
                              startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
                           ),
