@@ -864,6 +864,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       adHoc=lambda p: p.backend.addValue('smearing_kind', QeC.QE_SMEARING_KIND[p.lastMatch['x_qe_smearing_kind']]),
                       subMatchers=self.SMs_kpoints(),
                    ),
+                   SM(name='kpoint_info_nokpoints',
+                      startReStr=r"\s*(?P<x_qe_warning>Number of k-points >= 100: set verbosity='high' to print them\.)\s*$",
+                   ),
                    SM(name='dense_grid',
                       startReStr=(r"\s*Dense\s+grid:\s*(?P<x_qe_dense_g_vectors>\d+)\s*G-vectors\s*FFT\s+dimensions:\s*\(\s*" +
                                   QeC.re_vec("x_qe_t_dense_FFT_grid", split=r"\s*,\s*") + "\s*\)\s*$")
