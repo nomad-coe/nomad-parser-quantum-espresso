@@ -1381,7 +1381,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   r"norm=\s*(?P<x_qe_t_pp_warning_wfcnorm>" + RE_f + r")\s*$"),
                       subMatchers=[
                           SM(name='pp_warning_normalization_msg', repeats=True,
-                             startReStr=r"\s*WARNING: WFC HAS BEEN NOW RENORMALIZED\s*$",
+                             startReStr=r"\s*WARNING: WFC HAS BEEN NOW RENORMALIZED\s*!?\s*$",
                           ),
                       ],
                    ),
