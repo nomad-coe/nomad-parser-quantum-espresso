@@ -1963,7 +1963,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                               adHoc=self.adHoc_bands_spin,
                               subMatchers=self.SMs_bands(suffix='_spinBS'),
                           ),
-                          SM(name='end_bands_nobands_cIgn', coverageIgnore=True,
+                          SM(name='end_bands_nobands',
                              startReStr=r"\s*(?P<x_qe_warning>Number of k-points >= \d+: set verbosity='high' to print the bands\.)",
                           ),
                           SM(name='highest_occupiedBS',
