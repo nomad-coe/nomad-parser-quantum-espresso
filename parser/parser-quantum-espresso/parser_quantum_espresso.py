@@ -1529,7 +1529,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       # radius is in alat units, but they are not yet defined.
                       # convert manually in onClose hook...
                       startReStr=(r"\s*new\s+r_m\s*:\s*(?P<x_qe_t_species_integration_radius>" + RE_f + r")\s*" +
-                                  r"(?:\((?:alat|a0)\s*units\)\s*" + RE_f + r"\s*\(a\.u\.\)\s*for type\s*" +
+                                  r"(?:\((?:alat|a_0)\s*units\)\s*" + RE_f + r"\s*\(a\.u\.\)\s*for type\s*" +
                                   r"(?P<x_qe_t_species_integration_radius_idx>" + RE_i + r"))?\s*$"
                       ),
                    ),
