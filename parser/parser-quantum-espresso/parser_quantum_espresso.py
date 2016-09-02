@@ -1301,10 +1301,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                ],
             ),
         ] + self.SMs_read_input_file(suffix='2') + [
-            SM(name='input_positions_cell_dir_header',
+            SM(name='input_positions_cell_dir_header1',
                startReStr=r"\s*Atomic positions and unit cell read from directory:\s*$",
                subMatchers=[
-                   SM(name='input_positions_cell_dir',
+                   SM(name='input_positions_cell_dir1',
                       startReStr=r"\s*(?P<x_qe_input_positions_cell_dirname>.+?)\s*$",
                    ),
                ],
@@ -1387,6 +1387,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                ],
                sections=['x_qe_t_section_pp_warning'],
+            ),
+            SM(name='input_positions_cell_dir_header2',
+               startReStr=r"\s*Atomic positions and unit cell read from directory:\s*$",
+               subMatchers=[
+                   SM(name='input_positions_cell_dir2',
+                      startReStr=r"\s*(?P<x_qe_input_positions_cell_dirname>.+?)\s*$",
+                   ),
+               ],
             ),
             SM(name='dispersion_correction_obsolete_iosys',
                startReStr=r"\s*Message from routine iosys:\s*$",
