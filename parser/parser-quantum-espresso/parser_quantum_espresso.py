@@ -1937,6 +1937,43 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                sections = ['section_single_configuration_calculation'],
                subMatchers = [
                ] + self.SMs_diagonalization(namespace='bands_diagonalization') + [
+                   SM(name='cputime_nscf_msg',
+                      startReStr=(r"\s*total cpu time spent up to now is\s*(?P<time_single_configuration_calculation_cpu1_end>" + RE_f +
+                                  r")\s*secs\s*$"),
+                   ),
+                   SM(name='end_band_structure_calculation',
+                      startReStr=r"\s*End of band structure calculation\s*$",
+                      subMatchers=[
+                          SM(name='end_bands_nobands_cIgn', coverageIgnore=True,
+                             startReStr=r"\s*(?P<x_qe_warning>Number of k-points >= \d+: set verbosity='high' to print the bands\.)",
+                          ),
+                          SM(name='highest_occupiedBS',
+                             startReStr=(r"\s*highest occupied level \(ev\):\s*(?P<x_qe_t_energy_reference_highest_occupied__eV>" + RE_f +
+                                         r")\s*$"),
+                          ),
+                          SM(name='highest_occupied_lowest_unoccupiedBS',
+                             startReStr=(r"\s*highest occupied, lowest unoccupied level \(ev\):\s*" +
+                                         r"(?P<x_qe_t_energy_reference_highest_occupied__eV>" + RE_f + r")\s*" +
+                                         r"(?P<x_qe_t_energy_reference_lowest_unoccupied__eV>" + RE_f + r")\s*$"),
+                          ),
+                          SM(name='e_fermiBS',
+                             startReStr=(r"\s*the Fermi energy is\s*(?P<x_qe_t_energy_reference_fermi__eV>" + RE_f + ")\s*ev\s*$"),
+                          ),
+                          SM(name='e_fermi_spinBS',
+                             startReStr=(r"\s*the spin up/dw Fermi energies are\s*" +
+                                         r"(?P<x_qe_t_energy_reference_fermi_up__eV>" + RE_f + ")\s*" +
+                                         r"(?P<x_qe_t_energy_reference_fermi_down__eV>" + RE_f + ")\s*ev\s*$"),
+                          ),
+                          SM(name="write_datafileBS",
+                             startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
+                             subMatchers=[
+                                SM(name="warning_save_mgga2",
+                                   startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
+                                ),
+                             ],
+                          ),
+                      ],
+                   ),
                ]
             ),
             SM(name="profiling", repeats=True,
