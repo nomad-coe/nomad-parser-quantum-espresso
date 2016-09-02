@@ -1935,6 +1935,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             SM(name="band_structure_calculation",
                startReStr=r"\s*Band Structure Calculation\s*$",
                sections = ['section_single_configuration_calculation'],
+               subMatchers = [
+               ] + self.SMs_diagonalization(namespace='bands_diagonalization') + [
+               ]
             ),
             SM(name="profiling", repeats=True,
                # ugly: 3 SMs in one...
