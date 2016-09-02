@@ -321,7 +321,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.tmp['kspin'] = {}
 
     def onClose_section_eigenvalues(self, backend, gIndex, section):
-        if len(section['x_qe_t_k_x']) < 1:
+        if section['x_qe_t_k_x'] is None or len(section['x_qe_t_k_x']) < 1:
             LOGGER.error("no k-points!")
             return
         # prepare numpy arrays
