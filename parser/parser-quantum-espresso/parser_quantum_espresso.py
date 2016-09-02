@@ -1191,6 +1191,38 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
+    def SMs_diagonalization(self):
+        return [
+            SM(name='david_or_cg', repeats=True,
+               startReStr=r"\s*(?:(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)|(?P<x_qe_t_cg_diag>CG style diagonalization.*))\s*$",
+               subMatchers=[
+                   SM(name='warn_not_converged', repeats=True, floating=True,
+                      startReStr=(r"\s*WARNING:\s*(?P<x_qe_warn_n_unconverged_eigenvalues>" + RE_i +
+                                  r")\s*eigenvalues not converged(?:\s+in\s+regterg)?\s*$"),
+                   ),
+                   SM(name='c_bands_not_converged', repeats=True,
+                      startReStr=(r"\s*c_bands:\s*(?P<x_qe_c_bands_n_unconverged_eigenvalues>" + RE_i +
+                                  r")\s*eigenvalues not converged\s*$"),
+                   ),
+                   SM(name='ethr', repeats=True,
+                      startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
+                                  r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_t_iteration_avg>" + RE_f +
+                                  r")\s*$"),
+                      subMatchers=[
+                          SM(name='redo_with_lower_ethr_cIgn1', coverageIgnore=True,
+                             startReStr=r"\s*Threshold \(ethr\) on eigenvalues was too large:\s*$",
+                             subMatchers=[
+                                 SM(name='redo_with_lower_ethr_cIgn2', coverageIgnore=True,
+                                    startReStr=r"\s*Diagonalizing with lowered threshold\s*$",
+                                 ),
+                             ],
+                          ),
+                      ],
+                   ),
+               ],
+            ),
+        ]
+
     def header_sections(self):
         return ['section_basis_set_cell_dependent', 'section_method',
                 'section_system', 'x_qe_section_parallel',
@@ -1584,34 +1616,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   r"\s*beta\s*=\s*(?P<x_qe_iteration_beta>" + RE_f + r")\s*$"),
                       sections=['section_scf_iteration'],
                       subMatchers=[
-                          SM(name='david_or_cg', repeats=True,
-                             startReStr=r"\s*(?:(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)|(?P<x_qe_t_cg_diag>CG style diagonalization.*))\s*$",
-                             subMatchers=[
-                                 SM(name='warn_not_converged', repeats=True, floating=True,
-                                    startReStr=(r"\s*WARNING:\s*(?P<x_qe_warn_n_unconverged_eigenvalues>" + RE_i +
-                                                r")\s*eigenvalues not converged(?:\s+in\s+regterg)?\s*$"),
-                                 ),
-                                 SM(name='c_bands_not_converged', repeats=True,
-                                    startReStr=(r"\s*c_bands:\s*(?P<x_qe_c_bands_n_unconverged_eigenvalues>" + RE_i +
-                                                r")\s*eigenvalues not converged\s*$"),
-                                 ),
-                                 SM(name='ethr', repeats=True,
-                                    startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
-                                                r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_t_iteration_avg>" + RE_f +
-                                                r")\s*$"),
-                                    subMatchers=[
-                                        SM(name='redo_with_lower_ethr_cIgn1', coverageIgnore=True,
-                                           startReStr=r"\s*Threshold \(ethr\) on eigenvalues was too large:\s*$",
-                                           subMatchers=[
-                                               SM(name='redo_with_lower_ethr_cIgn2', coverageIgnore=True,
-                                                  startReStr=r"\s*Diagonalizing with lowered threshold\s*$",
-                                               ),
-                                           ],
-                                        ),
-                                    ],
-                                 ),
-                             ],
-                          ),
+                      ] + self.SMs_diagonalization() + [
                           SM(name="iter_warning_save_mggaI",
                              startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
                           ),
