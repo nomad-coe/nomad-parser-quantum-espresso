@@ -25,6 +25,12 @@ QE_SPIN_NONCOLLINEAR = {
     'Non magnetic': False,
 }
 
+# Lookup table mapping diagonalization scheme match to string
+QE_DIAGONALIZATION = {
+    'Davidson diagonalization with overlap': 'davidson',
+    'CG style diagonalization': 'conjugate_gradient',
+}
+
 
 class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     """main place to keep the parser status, open ancillary files,..."""
@@ -302,12 +308,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def onClose_section_scf_iteration(
             self, backend, gIndex, section):
         """trigger called when section_scf_iteration is closed"""
-        if section['x_qe_t_david_with_overlap'] is not None:
-            backend.addValue('x_qe_diagonalization_scheme', 'davidson')
-        elif section['x_qe_t_cg_diag']:
-            backend.addValue('x_qe_diagonalization_scheme', 'conjugate_gradient')
-        if section['x_qe_t_iteration_ethr'] is not None:
-            backend.addValue('x_qe_iteration_ethr', section['x_qe_t_iteration_ethr'][-1])
         if section["x_qe_t_iter_mpersite_idx"] is not None:
             backend.addArrayValues("x_qe_iter_mpersite_idx", np.asarray(section["x_qe_t_iter_mpersite_idx"]))
             backend.addArrayValues("x_qe_iter_mpersite_charge", np.asarray(section["x_qe_t_iter_mpersite_charge"]))
@@ -1194,19 +1194,21 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def SMs_diagonalization(self):
         return [
             SM(name='david_or_cg', repeats=True,
-               startReStr=r"\s*(?:(?P<x_qe_t_david_with_overlap>Davidson diagonalization with overlap.*)|(?P<x_qe_t_cg_diag>CG style diagonalization.*))\s*$",
+               startReStr=r"\s*(?P<x_qe_t_scf_diagonalization_algorithm>Davidson diagonalization with overlap|CG style diagonalization)\s*$",
+               adHoc=lambda p: p.backend.addValue('x_qe_scf_diagonalization_algorithm', QE_DIAGONALIZATION[p.lastMatch['x_qe_t_scf_diagonalization_algorithm']]),
+               sections=['x_qe_section_scf_diagonalization'],
                subMatchers=[
                    SM(name='warn_not_converged', repeats=True, floating=True,
-                      startReStr=(r"\s*WARNING:\s*(?P<x_qe_warn_n_unconverged_eigenvalues>" + RE_i +
+                      startReStr=(r"\s*WARNING:\s*(?P<x_qe_scf_diagonalization_warn_n_unconverged_eigenvalues>" + RE_i +
                                   r")\s*eigenvalues not converged(?:\s+in\s+regterg)?\s*$"),
                    ),
                    SM(name='c_bands_not_converged', repeats=True,
-                      startReStr=(r"\s*c_bands:\s*(?P<x_qe_c_bands_n_unconverged_eigenvalues>" + RE_i +
+                      startReStr=(r"\s*c_bands:\s*(?P<x_qe_scf_diagonalization_c_bands_n_unconverged_eigenvalues>" + RE_i +
                                   r")\s*eigenvalues not converged\s*$"),
                    ),
                    SM(name='ethr', repeats=True,
-                      startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_t_iteration_ethr>" + RE_f +
-                                  r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_t_iteration_avg>" + RE_f +
+                      startReStr=(r"\s*ethr\s*=\s*(?P<x_qe_scf_diagonalization_ethr>" + RE_f +
+                                  r")\s*,\s*avg\s*#\s*of iterations\s*=\s*(?P<x_qe_scf_diagonalization_iteration_avg>" + RE_f +
                                   r")\s*$"),
                       subMatchers=[
                           SM(name='redo_with_lower_ethr_cIgn1', coverageIgnore=True,
