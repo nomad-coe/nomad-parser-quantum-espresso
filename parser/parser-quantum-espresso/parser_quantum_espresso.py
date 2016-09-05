@@ -1232,6 +1232,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  ),
                              ],
                           ),
+                          SM(name='warn_ef_above_band', repeats=True,
+                             startReStr=r"\s*Warning: (?P<x_qe_t_warning>ef =\s*" + RE_f + "\s*is above the highest band at k-point\s*\d+)\s*$",
+                             adHoc=lambda p: self.setTmp('x_qe_t_warning', p.lastMatch['x_qe_t_warning']),
+                             subMatchers=[
+                                 SM(name="warn_ef_above_band1",
+                                    startReStr=r"\s*(?P<x_qe_t_warning>e\s*=\s*" + RE_f + r")\s*$",
+                                    adHoc=lambda p: p.backend.addValue('x_qe_warning', (self.popTmp('x_qe_t_warning') + "\n" + p.lastMatch['x_qe_t_warning'])),
+                                 )
+                             ],
+                          ),
                       ],
                    ),
                ],
