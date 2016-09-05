@@ -1467,6 +1467,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                ],
             ),
+            SM(name='forbidden_symm', repeats=True,
+               startReStr=r"\s*warning: (?P<x_qe_t_warning>symmetry operation #\s*\d+\s*not allowed.\s*fractional translation:)\s*$",
+               adHoc=lambda p: self.setTmp('x_qe_t_warning', p.lastMatch['x_qe_t_warning']),
+               subMatchers=[
+                   SM(name="forbidden_symm_ft",
+                      startReStr=r"\s*(?P<x_qe_t_warning>" + RE_f + r"\s*" + RE_f +  r"\s*" + RE_f + r"\s*in crystal coordinates)\s*$",
+                      adHoc=lambda p: p.backend.addValue('x_qe_warning', (self.popTmp('x_qe_t_warning') + "\n" + p.lastMatch['x_qe_t_warning'])),
+                   )
+               ],
+            ),
             SM(name='mesh_sticks',
                startReStr=r"\s*G-vector sticks info\s*$",
                subMatchers=[
