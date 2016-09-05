@@ -589,6 +589,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def setTmp(self, tmpname, value):
         self.tmp[tmpname] = value
 
+    def popTmp(self, tmpname, fallback=None):
+        return self.tmp.pop(tmpname, fallback)
+
     def adHoc_dispersion_correction_values(self, parser):
         if 'dispersion_correction' not in self.tmp:
             self.tmp['dispersion_correction'] = {}
