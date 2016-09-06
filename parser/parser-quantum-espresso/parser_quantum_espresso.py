@@ -205,6 +205,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def onOpen_section_single_configuration_calculation(
             self, backend, gIndex, section):
         exx_refine = self.tmp.pop('exx_refine', None)
+        md_relax = self.tmp.get('md_relax', None)
+        old_scc = self.section.get('single_configuration_calculation', None)
+        if old_scc is not None:
+            if md_relax is not None:
+                LOGGER.info('new scc due to md_relax=="%s"', str(md_relax))
+            elif exx_refine is not None:
+                LOGGER.info('new scc due to exx_refine=="%s"', str(exx_refine))
+            else:
+                raise Exception('encountered new section_single_configuration_calculation without knowing why')
         if exx_refine:
             backend.addValue('x_qe_exx_refine', True)
             exx_fraction = self.tmp.pop('exx_fraction', None)
