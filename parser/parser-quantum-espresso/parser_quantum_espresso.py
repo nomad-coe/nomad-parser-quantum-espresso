@@ -825,6 +825,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ],
                    ),
+                   SM(name='cell_mass',
+                      startReStr=r"\s*cell mass =\s*(?P<x_qe_md_cell_mass>" + RE_f + r")\s*AMU/\(a\.u\.\)\^2",
+                   ),
                    SM(name='nsymm',
                       startReStr=(r"\s*(?P<x_qe_nsymm>\d+)\s*Sym\.\s*Ops\.\s*[\(,]\s*(?P<x_qe_t_symm_inversion>\S+) inversion\s*[\),]\s*(?:found)?\s*"
                                   r"(?:\(\s*(?P<x_qe_nsymm_with_fractional_translation>\d+)\s*have fractional translation\s*\))?\s*$"),
