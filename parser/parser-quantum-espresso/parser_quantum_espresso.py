@@ -1961,6 +1961,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_t_md_starting_charge_negative_new_up>" + RE_f +
                                          r")\s*(?P<x_qe_t_md_starting_charge_negative_new_down>" + RE_f + r")\s*$"),
                           ),
+                          SM(name='extrapolated_charge',
+                             startReStr=(r"\s*extrapolated charge\s*(?P<x_qe_t_md_starting_charge>" + RE_f +
+                                         r")\s*,\s*renormalised to\s*(?P<x_qe_t_md_starting_charge_renormalized>" + RE_f +
+                                         r")\s*$"),
+                          ),
                           SM(name="md_wave_function_extrapolation2",
                              startReStr=r"\s*(?P<x_qe_t_md_extrapolation_wfc>\S+ order)\s*wave-functions extrapolation\s*$",
                              subMatchers=[
