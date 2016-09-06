@@ -1813,6 +1813,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*EXX self-consistency reached\s*$",
                              fixedStartValues={ "x_qe_exx_self_consistency": True },
                           ),
+                          SM(name='md_starting_rho_new2',
+                             startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_t_md_starting_charge_negative_new_up>" + RE_f +
+                                         r")\s*(?P<x_qe_t_md_starting_charge_negative_new_down>" + RE_f + r")\s*$"),
+                          ),
                           SM(name="atom_forces",
                              startReStr=r"\s*Forces acting on atoms\s*\(Ry/au\):\s*$",
                              subMatchers=[
