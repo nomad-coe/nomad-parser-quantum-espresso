@@ -707,7 +707,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*EXX-fraction\s*=\s*(?P<x_qe_t_exact_exchange_fraction>" + RE_f + r")\s*$",
                    ),
                    SM(name='nstep',
-                      startReStr=r"\s*nstep\s*=\s*(?P<x_qe_dynamics_max_steps>" + RE_i + r")\s*$",
+                      startReStr=r"\s*nstep\s*=\s*(?P<x_qe_md_max_steps>" + RE_i + r")\s*$",
                    ),
                    SM(name='spin_orbit_mode',
                       startReStr=r"\s*(?P<x_qe_t_spin_orbit_magn>.*?)\s*calculation\s*(?P<x_qe_t_spin_orbit_mode>with(?:out)?)\s*spin-orbit\s*$",
