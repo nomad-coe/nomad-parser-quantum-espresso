@@ -1670,7 +1670,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           SM(name='iteration_per_site_magnetization_header',
                              startReStr=(r"\s*Magnetic\s*moment\s*per\s*site:?\s*$"),
                              subMatchers=[
-                                 SM(name='iteration_per_site_magnetization',
+                                 SM(name='iteration_per_site_magnetization', repeats=True,
                                     startReStr=(r"\s*atom:\s*(?P<x_qe_t_iter_mpersite_idx>" + RE_i + r")\s*" +
                                                 r"charge:\s*(?P<x_qe_t_iter_mpersite_charge>" + RE_f + r")\s*" +
                                                 r"magn:\s*(?P<x_qe_t_iter_mpersite_magn>" + RE_f + r")\s*" +
