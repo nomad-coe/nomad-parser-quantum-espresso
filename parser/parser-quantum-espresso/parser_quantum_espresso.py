@@ -565,6 +565,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             gIndex = backend.openSection(sec)
             self.openSectionIdx[sec] = gIndex
 
+    def adHoc_final_scf_MD(self, parser):
+        """final SCF calculation in VC-relax runs needs open header sections"""
+        # manually open header sections, closed at the beginning of scf
+        for sec in self.header_sections():
+            gIndex = parser.backend.openSection(sec)
+            self.openSectionIdx[sec] = gIndex
+
     def onClose_section_run(
             self, backend, gIndex, section):
         """trigger called when section_single_configuration_calculation
@@ -1474,6 +1481,20 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='serial_algorithm',
                       startReStr=r"\s*a serial algorithm will be used\s*$",
                       adHoc=lambda p: p.backend.addValue('x_qe_diagonalization_algorithm', 'serial')
+                   ),
+               ],
+            ),
+            SM(name='final_scf_MD', floating=True,
+               # entry point for final scf calculation after VC-relax
+               # used to reset position (a.k.a. as a goto) in our SM hierarchy
+               startReStr=r"\s*A final scf calculation at the relaxed structure\.\s*$",
+               adHoc=self.adHoc_final_scf_MD,
+               subMatchers=[
+                   SM(name='final_scf_MD2',
+                      startReStr=r"\s*The G-vectors are recalculated for the final unit cell\s*$",
+                   ),
+                   SM(name='final_scf_MD3',
+                      startReStr=r"\s*Results may differ from those at the preceding step\.\s*$",
                    ),
                ],
             ),
