@@ -1083,6 +1083,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                        startReStr=(r"\s*new unit-cell volume =\s*" +
                                   r"(?P<x_qe_t_md_new_volume__bohr3>" + RE_f + r") \(a\.u\.\)\^3"),
                    ),
+                   SM(name="new_cell_alat" + suffix,
+                      startReStr=r"\s*input alat =\s*" + RE_f + "\s*\(a\.u\.\)",
+                   ),
                ],
             ),
             SM(name="atpos" + suffix, repeats=True,
