@@ -303,7 +303,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             #   backend.addValue('x_qe_t_vec_a_x', section['x_qe_t_md_vec_a_x'])
             # as this adds an outer list with one element (WTF)
             new_system = {}
-            if section['x_qe_t_md_vec_a']:
+            if section['x_qe_t_md_vec_a_x']:
                 # we got new cell vectors
                 new_system['x_qe_t_vec_a_x'] = section['x_qe_t_md_vec_a_x']
                 new_system['x_qe_t_vec_a_y'] = section['x_qe_t_md_vec_a_y']
