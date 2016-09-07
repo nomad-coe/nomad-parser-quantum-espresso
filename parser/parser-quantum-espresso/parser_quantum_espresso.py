@@ -221,8 +221,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 LOGGER.info('new scc due to exx_refine=="%s"', str(exx_refine))
             else:
                 raise Exception('encountered new section_single_configuration_calculation without knowing why')
-        if md_relax and not have_new_system:
-            raise Exception('running MD/relax calculation, but no new cell or atom coordinates found')
+        if md_relax:
+            if have_new_system:
+                pass
+            elif exx_refine:
+                LOGGER.info("EXX refinement in MD/relax run")
+            else:
+                raise Exception('running MD/relax calculation, but no new cell or atom coordinates found')
         if exx_refine:
             backend.addValue('x_qe_exx_refine', True)
             exx_fraction = self.tmp.pop('exx_fraction', None)
