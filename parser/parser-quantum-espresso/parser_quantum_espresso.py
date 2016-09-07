@@ -1079,11 +1079,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='md_cell_vec_a' + suffix, repeats=True,
                       startReStr=r"\s*" + QeC.re_vec('x_qe_t_md_vec_a') + r"\s*$",
                    ),
+                   SM(name="new_cell_volume" + suffix,
+                       startReStr=(r"\s*new unit-cell volume =\s*" +
+                                  r"(?P<x_qe_t_md_new_volume__bohr3>" + RE_f + r") \(a\.u\.\)\^3"),
+                   ),
                ],
-            ),
-            SM(name="new_cell_volume" + suffix,
-               startReStr=(r"\s*new unit-cell volume =\s*" +
-                           r"(?P<x_qe_t_md_new_volume__bohr3>" + RE_f + r") \(a\.u\.\)\^3"),
             ),
             SM(name="atpos" + suffix, repeats=True,
                startReStr="\s*new positions in\s*(?P<x_qe_t_md_atom_positions_units_vcsmd>.*?)\s*$",
