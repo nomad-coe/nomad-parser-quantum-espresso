@@ -1074,13 +1074,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             #    startReStr=r"\s*Begin final coordinates\s*$"
             # ),
             SM(name="cellparam" + suffix,
-               startReStr=r"\s*new lattice vectors\s*\(\s*(?P<x_qe_t_md_vec_a_units>\S+?)\s*unit\s*\)\s*:\s*$",
+               startReStr=r"\s*(?:Final estimate of|new) lattice vectors\s*\(\s*(?P<x_qe_t_md_vec_a_units>.+?)\s*units?\s*\)\s*:?\s*$",
                subMatchers=[
                    SM(name='md_cell_vec_a' + suffix, repeats=True,
                       startReStr=r"\s*" + QeC.re_vec('x_qe_t_md_vec_a') + r"\s*$",
                    ),
                    SM(name="new_cell_volume" + suffix,
-                       startReStr=(r"\s*new unit-cell volume =\s*" +
+                       startReStr=(r"\s*(?:final|new) unit-cell volume =\s*" +
                                   r"(?P<x_qe_t_md_new_volume__bohr3>" + RE_f + r") \(a\.u\.\)\^3"),
                    ),
                    SM(name="new_cell_alat" + suffix,
