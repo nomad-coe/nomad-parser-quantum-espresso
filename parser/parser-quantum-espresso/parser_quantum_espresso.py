@@ -206,6 +206,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             self, backend, gIndex, section):
         exx_refine = self.tmp.pop('exx_refine', None)
         md_relax = self.tmp.get('md_relax', None)
+        have_new_system = self.tmp.pop('have_new_system', None)
         old_scc = self.section.get('single_configuration_calculation', None)
         if old_scc is not None:
             if md_relax is not None:
@@ -214,6 +215,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 LOGGER.info('new scc due to exx_refine=="%s"', str(exx_refine))
             else:
                 raise Exception('encountered new section_single_configuration_calculation without knowing why')
+        if md_relax and not have_new_system:
+            raise Exception('running MD/relax calculation, but no new cell or atom coordinates found')
         if exx_refine:
             backend.addValue('x_qe_exx_refine', True)
             exx_fraction = self.tmp.pop('exx_fraction', None)
@@ -426,6 +429,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         else:
             raise Exception("missing bravais vectors")
         backend.addArrayValues('simulation_cell', self.amat)
+        self.tmp['have_new_system'] = True
 
         # store reciprocal lattice matrix and inverse for transformation crystal <-> cartesian
         if section['x_qe_t_vec_b_x'] is not None:
