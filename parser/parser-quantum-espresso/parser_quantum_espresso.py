@@ -1646,7 +1646,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                adHoc=self.adHoc_final_scf_MD,
                subMatchers=[
                    SM(name='final_scf_MD2',
-                      startReStr=r"\s*The G-vectors are recalculated for the final unit cell\s*$",
+                      startReStr=r"\s*The G-vectors are recalculated(?:\.|\s*for the final unit cell)\s*$",
                    ),
                    SM(name='final_scf_MD3',
                       startReStr=r"\s*Results may differ from those at the preceding step\.\s*$",
