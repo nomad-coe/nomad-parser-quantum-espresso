@@ -638,6 +638,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def setTmp(self, tmpname, value):
         self.tmp[tmpname] = value
 
+    def setTmpUnlessExists(self, tmpname, value):
+        if self.tmp.get(tmpname,None) is None:
+            self.tmp[tmpname] = value
+
     def popTmp(self, tmpname, fallback=None):
         return self.tmp.pop(tmpname, fallback)
 
@@ -1299,13 +1303,34 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
     def SMs_vcs_molecular_dynamics(self):
         return [
+            SM(name='vcs_wentzcovitch_damped_minimization',
+               startReStr=r"\s*Wentzcovitch Damped Cell Dynamics Minimization:\s*$",
+               adHoc=lambda p: self.setTmp('md_relax', 'vcsmd_wentzcovitch_damped_minization'),
+               subMatchers=[
+                   SM(name='vcs_went_dmin_thresholds',
+                      startReStr=(
+                          r"\s*convergence thresholds EPSE =\s*(?P<x_qe_t_relax_threshold_energy__rydberg>" + RE_f + r")" +
+                          r"\s*EPSF =\s*(?P<x_qe_t_relax_threshold_force__rydberg_bohr_1>" + RE_f + r")\s*$"
+                      ),
+                   ),
+                   SM(name='vcs_went_dmin_thresholds',
+                      startReStr=(
+                          r"\s*convergence achieved, Efinal=\s*(?P<x_qe_t_relax_final_energy__rydberg>" + RE_f + r")\s*$"
+                      ),
+                      subMatchers=[
+                      ] + self.SMs_vcsmd_system_new(suffix='VCS') + [
+                      ] + self.SMs_md_system_new(suffix='VCS') + [
+                      ],
+                   ),
+               ],
+            ),
             SM(name='vcs_enter',
                startReStr=(r"\s*Entering Dynamics;\s*it\s*=\s*(?P<x_qe_t_md_iteration>" + RE_i + r")\s*" +
                            r"time\s*=\s*(?P<x_qe_t_md_time__picoseconds>" + RE_f +
                            r")\s*pico-seconds\s*$"),
                # there are several algorithms in vcsmd, but apparently only
                # printed when used for minimization and at the end of the calculation ?!
-               adHoc = lambda p: self.setTmp('md_relax', 'vcsmd'),
+               adHoc = lambda p: self.setTmpUnlessExists('md_relax', 'vcsmd'),
                subMatchers=[
                ] + self.SMs_vcsmd_system_new(suffix='VCSMD') + [
                    SM(name='vcs_energies',
