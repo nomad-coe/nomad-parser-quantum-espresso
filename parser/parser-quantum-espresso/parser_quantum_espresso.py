@@ -1818,6 +1818,34 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                   SM(name="warning_save_mgga2",
                      startReStr=r"\s*Warning:\s*(?P<x_qe_warning>cannot save meta-gga kinetic terms: not implemented\.)\s*$",
                   ),
+                  SM(name='starting_charge_negative2',
+                     startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_starting_charge_negative>" + RE_f +
+                                 r")\s*$"),
+                  ),
+                  SM(name='starting_charge_negative_spin_ignore2', repeats=True,
+                     startReStr=(r"\s*Check: negative starting charge=\(component\d\):?\s*" + RE_f + r"\s*$"),
+                  ),
+               ],
+            ),
+            SM(name="md_new_old_atomic_charge_approximation",
+               startReStr=r"\s*NEW-OLD atomic charge density approx\. for the potential\s*$",
+               fixedStartValues={ 'x_qe_extrapolation_charge': 'atomic' },
+               subMatchers=[
+                   SM(name='core_charge_check',
+                      startReStr=(r"\s*Check: negative/imaginary core charge\s*=\s*(?P<x_qe_core_charge_negative>" +
+                                  RE_f + r")\s*(?P<x_qe_core_charge_imaginary>" + RE_f + r")\s*$")
+                   ),
+                   SM(name='starting_charge_negative2',
+                      startReStr=(r"\s*Check: negative starting charge=\s*(?P<x_qe_starting_charge_negative>" + RE_f +
+                                  r")\s*$"),
+                   ),
+                   SM(name='starting_charge_negative_spin_ignore2', repeats=True,
+                      startReStr=(r"\s*Check: negative starting charge=\(component\d\):?\s*" + RE_f + r"\s*$"),
+                   ),
+                   SM(name='starting_rho2',
+                      startReStr=(r"\s*negative rho \(up, down\):\s*(?P<x_qe_starting_charge_negative_up>" + RE_f +
+                                  r")\s*(?P<x_qe_starting_charge_negative_down>" + RE_f + r")\s*$"),
+                   ),
                ],
             ),
             SM(name='paw_dealloc_cIgn', coverageIgnore=True,
