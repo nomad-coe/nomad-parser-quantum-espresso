@@ -1618,6 +1618,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                startReStr=r"\s*EXX: grid of k\+q points same as grid of k-points",
                fixedStartValues={ "x_qe_exx_grid_same_as_k_grid": True },
             ),
+            SM(name='forbidden_symm1', repeats=True,
+               startReStr=r"\s*warning: (?P<x_qe_t_warning>symmetry operation #\s*\d+\s*not allowed.\s*fractional translation:)\s*$",
+               adHoc=lambda p: self.setTmp('x_qe_t_warning', p.lastMatch['x_qe_t_warning']),
+               subMatchers=[
+                   SM(name="forbidden_symm_ft1",
+                      startReStr=r"\s*(?P<x_qe_t_warning>" + RE_f + r"\s*" + RE_f +  r"\s*" + RE_f + r"\s*in crystal coordinates)\s*$",
+                      adHoc=lambda p: p.backend.addValue('x_qe_warning', (self.popTmp('x_qe_t_warning') + "\n" + p.lastMatch['x_qe_t_warning'])),
+                   )
+               ],
+            ),
             SM(name='subspace_diagonalization',
                startReStr=r"\s*(?:Subspace diagonalization in iterative solution of the eigenvalue problem:|Iterative solution of the eigenvalue problem)\s*$",
                subMatchers=[
@@ -1653,11 +1663,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                ],
             ),
-            SM(name='forbidden_symm', repeats=True,
+            SM(name='forbidden_symm2', repeats=True,
                startReStr=r"\s*warning: (?P<x_qe_t_warning>symmetry operation #\s*\d+\s*not allowed.\s*fractional translation:)\s*$",
                adHoc=lambda p: self.setTmp('x_qe_t_warning', p.lastMatch['x_qe_t_warning']),
                subMatchers=[
-                   SM(name="forbidden_symm_ft",
+                   SM(name="forbidden_symm_ft2",
                       startReStr=r"\s*(?P<x_qe_t_warning>" + RE_f + r"\s*" + RE_f +  r"\s*" + RE_f + r"\s*in crystal coordinates)\s*$",
                       adHoc=lambda p: p.backend.addValue('x_qe_warning', (self.popTmp('x_qe_t_warning') + "\n" + p.lastMatch['x_qe_t_warning'])),
                    )
