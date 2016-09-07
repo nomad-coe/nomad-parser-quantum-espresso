@@ -303,7 +303,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             #   backend.addValue('x_qe_t_vec_a_x', section['x_qe_t_md_vec_a_x'])
             # as this adds an outer list with one element (WTF)
             new_system = {}
-            if section['x_qe_t_md_vec_a_x']:
+            if section['x_qe_t_md_vec_a_units']:
                 # we got new cell vectors
                 new_system['x_qe_t_vec_a_units'] = section['x_qe_t_md_vec_a_units']
                 new_system['x_qe_t_vec_a_x'] = section['x_qe_t_md_vec_a_x']
@@ -396,8 +396,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
         # store direct lattice matrix and inverse for transformation crystal <-> cartesian
         if section['x_qe_t_vec_a_x'] is not None:
+            # there may have been more than one instance of the bravais matrix
+            # in different units (seen in relax/MD)
             self.amat = np.array([
-                section['x_qe_t_vec_a_x'], section['x_qe_t_vec_a_y'], section['x_qe_t_vec_a_z'],
+                section['x_qe_t_vec_a_x'][-3:], section['x_qe_t_vec_a_y'][-3:], section['x_qe_t_vec_a_z'][-3:],
             ], dtype=np.float64).T
             # explicit unit conversion
             amat_units = section['x_qe_t_vec_a_units'][-1]
