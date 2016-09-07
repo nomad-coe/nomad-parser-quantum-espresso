@@ -393,6 +393,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         old_system = self.section.get('section_system', None)
         if old_system is not None and self.tmp.get('md_relax', None) is None:
             raise Exception('encountered new section_system without knowing why')
+        if section['number_of_atoms']:
+            self.number_of_atoms = section['number_of_atoms'][-1]
 
         # store direct lattice matrix and inverse for transformation crystal <-> cartesian
         if section['x_qe_t_vec_a_x'] is not None:
@@ -458,11 +460,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addArrayValues('x_qe_reciprocal_cell', self.bmat)
         # atom positions
         if section['x_qe_t_atpos_x'] is not None:
+            # there may have been more than one instance of the atom positions
+            # in different units (seen in relax/MD)
             atpos = np.array([
-                section['x_qe_t_atpos_x'], section['x_qe_t_atpos_y'], section['x_qe_t_atpos_z']
+                section['x_qe_t_atpos_x'][-self.number_of_atoms:],
+                section['x_qe_t_atpos_y'][-self.number_of_atoms:],
+                section['x_qe_t_atpos_z'][-self.number_of_atoms:]
             ], dtype=np.float64).T
-            if len(section['x_qe_t_atpos_units']) != 1:
-                raise RuntimeError("len(atpos_units) = %s" % (str(len(section['x_qe_t_atpos_units']))))
             atpos_units = section['x_qe_t_atpos_units'][-1]
             if atpos_units == 'a_0' or atpos_units == 'alat':
                 atpos_cart = unit_conversion.convert_unit(atpos, 'usrAlat')
@@ -483,14 +487,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addArrayValues('atom_positions',atpos_cart)
 
         if section['x_qe_t_atom_labels'] is not None:
-            backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels']))
+            backend.addArrayValues('atom_labels',np.asarray(section['x_qe_t_atom_labels'][-self.number_of_atoms:]))
         elif old_system is not None:
             backend.addArrayValues('atom_labels',old_system['atom_labels'][-1])
         else:
             raise Exception("missing atom labels")
 
         if section['x_qe_t_atom_idx'] is not None:
-            backend.addArrayValues('x_qe_atom_idx', np.asarray(section['x_qe_t_atom_idx']))
+            backend.addArrayValues('x_qe_atom_idx', np.asarray(section['x_qe_t_atom_idx'][-self.number_of_atoms:]))
         elif old_system is not None:
             backend.addArrayValues('x_qe_atom_idx', old_system['x_qe_atom_idx'][-1])
         else:
