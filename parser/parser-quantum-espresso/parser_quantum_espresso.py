@@ -305,6 +305,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             new_system = {}
             if section['x_qe_t_md_vec_a_x']:
                 # we got new cell vectors
+                new_system['x_qe_t_vec_a_units'] = section['x_qe_t_md_vec_a_units']
                 new_system['x_qe_t_vec_a_x'] = section['x_qe_t_md_vec_a_x']
                 new_system['x_qe_t_vec_a_y'] = section['x_qe_t_md_vec_a_y']
                 new_system['x_qe_t_vec_a_z'] = section['x_qe_t_md_vec_a_z']
@@ -398,6 +399,17 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             self.amat = np.array([
                 section['x_qe_t_vec_a_x'], section['x_qe_t_vec_a_y'], section['x_qe_t_vec_a_z'],
             ], dtype=np.float64).T
+            # explicit unit conversion
+            amat_units = section['x_qe_t_vec_a_units'][-1]
+            if amat_units == 'a_0' or amat_units == 'alat':
+                self.amat = unit_conversion.convert_unit(self.amat, 'usrAlat')
+            elif amat_units == 'bohr':
+                self.amat = unit_conversion.convert_unit(self.amat, 'bohr')
+            elif amat_units == 'angstrom':
+                self.amat = unit_conversion.convert_unit(self.amat, 'angstrom')
+            else:
+                raise RuntimeError("unknown amat_units: %s" % (amat_units))
+
             # store inverse for transformation cartesian -> crystal
             try:
                 self.amat_inv = np.linalg.inv(self.amat)
@@ -741,10 +753,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"(?P<x_qe_t_celldm>(?:\s*celldm\(\d+\)\s*=\s*" + RE_f + r")+)\s*$",
                    ),
                    SM(name='simulation_cell',
-                      startReStr=r"\s*crystal axes: \(cart. coord.\s*in units of (?:a_0|alat)\s*\)\s*$",
+                      startReStr=r"\s*crystal axes: \(cart. coord.\s*in units of (?P<x_qe_t_vec_a_units>a_0|alat)\s*\)\s*$",
                       subMatchers=[
                           SM(name='cell_vec_a', repeats=True,
-                             startReStr=r"\s*a\(\d\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_vec_a', 'usrAlat') + r"\s*\)\s*$",
+                             startReStr=r"\s*a\(\d\)\s*=\s*\(\s*" + QeC.re_vec('x_qe_t_vec_a') + r"\s*\)\s*$",
                           ),
                       ],
                    ),
