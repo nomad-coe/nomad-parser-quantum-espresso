@@ -31,6 +31,12 @@ QE_DIAGONALIZATION = {
     'CG style diagonalization': 'conjugate_gradient',
 }
 
+# Lookup table for VCSMD notation of atom position units
+QE_VCSMD_ATPOS_UNITS = {
+    'cryst coord': 'crystal',
+    'cart coord (alat unit)': 'alat',
+}
+
 
 class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     """main place to keep the parser status, open ancillary files,..."""
@@ -1053,6 +1059,47 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
+    def SMs_vcsmd_system_new(self, suffix='', eatEndFinalSubMatchers=[]):
+        return [
+            # SM(name="eat_start_final" + suffix,
+            #    startReStr=r"\s*Begin final coordinates\s*$"
+            # ),
+            SM(name="cellparam" + suffix,
+               startReStr=r"\s*new lattice vectors\s*\(\s*(?P<x_qe_t_md_vec_a_units>\S+?)\s*unit\s*\)\s*:\s*$",
+               subMatchers=[
+                   SM(name='md_cell_vec_a' + suffix, repeats=True,
+                      startReStr=r"\s*" + QeC.re_vec('x_qe_t_md_vec_a') + r"\s*$",
+                   ),
+               ],
+            ),
+            SM(name="new_cell_volume" + suffix,
+               startReStr=(r"\s*new unit-cell volume =\s*" +
+                           r"(?P<x_qe_t_md_new_volume__bohr3>" + RE_f + r") \(a\.u\.\)\^3"),
+            ),
+            SM(name="atpos" + suffix, repeats=True,
+               startReStr="\s*new positions in\s*(?P<x_qe_t_md_atom_positions_units_vcsmd>.*?)\s*$",
+               adHoc=lambda p: p.backend.addValue('x_qe_t_md_atom_positions_units', QE_VCSMD_ATPOS_UNITS[p.lastMatch['x_qe_t_md_atom_positions_units_vcsmd']]),
+               # QE use syntax of its _input_ files here
+               subMatchers=[
+                   SM(name='atpos_data' + suffix, repeats=True,
+                      startReStr=(r"\s*(?P<x_qe_t_md_atom_labels>\S+)\s+" +
+                                  QeC.re_vec('x_qe_t_md_atom_positions') +
+                                  r"(?:\s+(?P<x_qe_t_md_atom_free_x>\d)\s+(?P<x_qe_t_md_atom_free_y>\d)\s+(?P<x_qe_t_md_atom_free_z>\d))?" +
+                                  r"\s*$"),
+                      fixedStartValues={
+                          'x_qe_t_md_atom_free_x': True,
+                          'x_qe_t_md_atom_free_y': True,
+                          'x_qe_t_md_atom_free_z': True,
+                      },
+                   ),
+               ],
+            ),
+            # SM(name="eat_end_final" + suffix,
+            #    startReStr=r"\s*End final coordinates\s*$",
+            #    subMatchers=eatEndFinalSubMatchers,
+            # ),
+        ]
+
     def SMs_relax_bfgs(self):
         return [
             SM(name="bfgs_info",
@@ -1240,6 +1287,31 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                   ),
                               ],
                           ),
+                   ),
+               ],
+            ),
+        ]
+
+    def SMs_vcs_molecular_dynamics(self):
+        return [
+            SM(name='vcs_enter',
+               startReStr=(r"\s*Entering Dynamics;\s*it\s*=\s*(?P<x_qe_t_md_iteration>" + RE_i + r")\s*" +
+                           r"time\s*=\s*(?P<x_qe_t_md_time__picoseconds>" + RE_f +
+                           r")\s*pico-seconds\s*$"),
+               # there are several algorithms in vcsmd, but apparently only
+               # printed when used for minimization and at the end of the calculation ?!
+               adHoc = lambda p: self.setTmp('md_relax', 'vcsmd'),
+               subMatchers=[
+               ] + self.SMs_vcsmd_system_new(suffix='VCSMD') + [
+                   SM(name='vcs_energies',
+                      startReStr=(r"\s*Ekin\s*=\s*(?P<x_qe_t_md_kinetic_energy__rydberg>" + RE_f + r")\s*Ry" +
+                                  r"\s*T\s*=\s*(?P<x_qe_t_md_temperature__kelvin>" + RE_f + r")\s*K" +
+                                  r"\s*Etot\s*=\s*(?P<x_qe_t_md_total_energy>" + RE_f + r")\s*$"),
+                   ),
+               ] + self.SMs_md_system_new(suffix='VCS') + [
+                   SM(name='vcs_maxiter',
+                      startReStr=r"\s*Maximum number of iterations reached, stopping\s*$",
+                      fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
                    ),
                ],
             ),
@@ -1947,6 +2019,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           ),
                       ] + self.SMs_relax_bfgs() + [
                       ] + self.SMs_molecular_dynamics() + [
+                      ] + self.SMs_vcs_molecular_dynamics() + [
                           SM(name="write_datafile",
                              startReStr=r"\s*Writing output data file\s*(?P<x_qe_output_datafile>.*?)\s*$",
                              subMatchers=[
