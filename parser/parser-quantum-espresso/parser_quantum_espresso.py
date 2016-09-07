@@ -1307,13 +1307,15 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     def SMs_vcs_molecular_dynamics(self):
         return [
             SM(name='vcs_wentzcovitch_damped_minimization',
-               startReStr=r"\s*Wentzcovitch Damped Cell Dynamics Minimization:\s*$",
+                startReStr=r"\s*Wentzcovitch Damped Cell(?:-| )Dynamics Minimization:?\s*$",
                adHoc=lambda p: self.setTmp('md_relax', 'vcsmd_wentzcovitch_damped_minization'),
                subMatchers=[
                    SM(name='vcs_went_dmin_thresholds',
                       startReStr=(
-                          r"\s*convergence thresholds EPSE =\s*(?P<x_qe_t_relax_threshold_energy__rydberg>" + RE_f + r")" +
-                          r"\s*EPSF =\s*(?P<x_qe_t_relax_threshold_force__rydberg_bohr_1>" + RE_f + r")\s*$"
+                          r"\s*convergence thresholds:? EPSE =\s*(?P<x_qe_t_relax_threshold_energy__rydberg>" + RE_f + r")" +
+                          r"\s*EPSF =\s*(?P<x_qe_t_relax_threshold_force__rydberg_bohr_1>" + RE_f + r")" +
+                          r"(?:\s*EPSP =\s*(?P<x_qe_t_relax_threshold_pressure__kilobar>" + RE_f + r"))?" +
+                          r"\s*$"
                       ),
                    ),
                    SM(name='vcs_went_dmin_thresholds',
