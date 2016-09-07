@@ -1341,17 +1341,27 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                # printed when used for minimization and at the end of the calculation ?!
                adHoc = lambda p: self.setTmpUnlessExists('md_relax', 'vcsmd'),
                subMatchers=[
-               ] + self.SMs_vcsmd_system_new(suffix='VCSMD') + [
+               ] + self.SMs_vcsmd_system_new(suffix='VCSMD1') + [
                    SM(name='vcs_energies',
                       startReStr=(r"\s*Ekin\s*=\s*(?P<x_qe_t_md_kinetic_energy__rydberg>" + RE_f + r")\s*Ry" +
                                   r"\s*T\s*=\s*(?P<x_qe_t_md_temperature__kelvin>" + RE_f + r")\s*K" +
                                   r"\s*Etot\s*=\s*(?P<x_qe_t_md_total_energy>" + RE_f + r")\s*$"),
                    ),
-               ] + self.SMs_md_system_new(suffix='VCS') + [
+               ] + self.SMs_md_system_new(suffix='VCS1') + [
                    SM(name='vcs_maxiter',
                       startReStr=r"\s*Maximum number of iterations reached, stopping\s*$",
                       fixedStartValues={ 'x_qe_t_md_max_steps_reached': True },
                    ),
+               ],
+            ),
+            SM(name='vcs_went_converged',
+               startReStr=(
+                   r"\s*Wentzcovitch Damped Dynamics: convergence achieved, Efinal=\s*(?P<x_qe_t_relax_final_energy__rydberg>" + RE_f + r")\s*$"
+               ),
+               adHoc=lambda p: self.setTmp('md_relax', 'vcsmd_wentzcovitch_damped_minization'),
+               subMatchers=[
+               ] + self.SMs_vcsmd_system_new(suffix='VCS2') + [
+               ] + self.SMs_md_system_new(suffix='VCS2') + [
                ],
             ),
         ]
