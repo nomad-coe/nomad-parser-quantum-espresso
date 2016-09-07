@@ -1322,7 +1322,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                           r"\s*$"
                       ),
                    ),
-                   SM(name='vcs_went_dmin_thresholds',
+                   SM(name='vcs_went_dmin_converged',
                       startReStr=(
                           r"\s*convergence achieved, Efinal=\s*(?P<x_qe_t_relax_final_energy__rydberg>" + RE_f + r")\s*$"
                       ),
