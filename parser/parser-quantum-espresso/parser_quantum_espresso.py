@@ -2264,17 +2264,23 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                ]
             ),
-            SM(name="profiling", repeats=True,
-               # ugly: 3 SMs in one...
-               startReStr=(r"\s*(?:" +
-                           r"Called by\s*(?P<x_qe_t_profile_caller>\S+?):?" + r'|' +
-                           r"(?P<x_qe_t_profile_category>.*?)\s*routines:?" + r'|' +
-                           r"(?P<x_qe_t_profile_function>\S+)\s*:\s*" +
-                           r"(?:(?P<x_qe_t_profile_cputime__strQeTimespan>.*)\s*(?:CPU\s*time\s*,|CPU)\s*)?" +
-                           r"(?:(?P<x_qe_t_profile_walltime__strQeTimespan>.*)\s*[wW][aA][lL][lL](?:\s*[tT][iI][mM][eE])?\s*)?"
-                           r"(?:\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls\s*(?:,\s*\S+\s*s\s*avg\s*)?\)\s*)?" +
-                           r")\s*$"),
-               adHoc=self.adHoc_profiling_complete,
+            SM(name="profiling_protector",
+               startReStr=r"\s*(?:PWSCF|init_run)\s*:\s*\d+.*$",
+               forwardMatch=True,
+               subMatchers=[
+                   SM(name="profiling", repeats=True,
+                      # ugly: 3 SMs in one...
+                      startReStr=(r"\s*(?:" +
+                                  r"Called by\s*(?P<x_qe_t_profile_caller>\S+?):?" + r'|' +
+                                  r"(?P<x_qe_t_profile_category>.*?)\s*routines:?" + r'|' +
+                                  r"(?P<x_qe_t_profile_function>\S+)\s*:\s*" +
+                                  r"(?:(?P<x_qe_t_profile_cputime__strQeTimespan>.*)\s*(?:CPU\s*time\s*,|CPU)\s*)?" +
+                                  r"(?:(?P<x_qe_t_profile_walltime__strQeTimespan>.*)\s*[wW][aA][lL][lL](?:\s*[tT][iI][mM][eE])?\s*)?"
+                                  r"(?:\(\s*(?P<x_qe_t_profile_ncalls>\d+)\s*calls\s*(?:,\s*\S+\s*s\s*avg\s*)?\)\s*)?" +
+                                  r")\s*$"),
+                      adHoc=self.adHoc_profiling_complete,
+                   ),
+               ],
             ),
         ]
 
