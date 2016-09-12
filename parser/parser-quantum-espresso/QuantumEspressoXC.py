@@ -461,7 +461,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'x_qe_xc_name':       "pw86",
         'x_qe_xc_comment':    "Perdew-Wang (1986) exchange",
         'x_qe_xc_index_name': "igcx",
-        'x_qe_xc_index':      "21",
+        'x_qe_xc_index':      21,
     },
     {
         'XC_functional_name': "GGA_X_B86_MGC",
