@@ -872,7 +872,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*atomic species\s+magnetization\s*$",
                              subMatchers=[
                                  SM(name='starting_magnetization_data', repeats=True,
-                                    startReStr=(r"\s*(?P<x_qe_t_starting_magnetization_species>.*?)\s*" +
+                                    startReStr=(r"\s*(?P<x_qe_t_starting_magnetization_species>\S+)\s*" +
                                                 r"(?P<x_qe_t_starting_magnetization_value>" + RE_f + r")\s*$"),
                                  ),
                              ],
