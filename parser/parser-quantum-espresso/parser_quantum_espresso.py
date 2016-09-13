@@ -1093,6 +1093,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         return [
             SM(name="kpoint_heading" + suffix,
                startReStr=r"\s*" + coordinates + r"\s*$",
+               # stop on the first empty line. keeps k-in-fractional-coords (only printed in high-verbosity mode) from interfering
+               endReStr=r"\s*$",
                subMatchers=[
                    SM(name="kpoint_kpoints" + suffix, repeats=True,
                       startReStr=(
