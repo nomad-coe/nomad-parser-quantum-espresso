@@ -285,7 +285,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('x_qe_energy_decomposition_value', np.asarray(
                 section['x_qe_t_energy_decomposition_value']))
         if section['x_qe_t_force_x'] is not None:
-            backend.addArrayValues('atom_forces', np.array([
+            # constraints etc. not part of the reported forces, so correct metaInfo is 'atom_forces_raw'
+            backend.addArrayValues('atom_forces_raw', np.array([
                 section['x_qe_t_force_x'], section['x_qe_t_force_y'], section['x_qe_t_force_z']
                 ]).T)
         if section['x_qe_t_dispersion_force_x'] is not None:
