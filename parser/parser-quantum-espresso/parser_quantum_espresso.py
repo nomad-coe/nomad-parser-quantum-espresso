@@ -252,6 +252,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.close_header_sections(backend)
         # reset temporary storage for band structures
         self.tmp['k_energies'] = []
+        self.tmp['k_occupations'] = []
         self.tmp['kspin'] = {}
         self.section['single_configuration_calculation'] = section
 
@@ -361,6 +362,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         # prepare numpy arrays
         k_energies = np.array([self.tmp['k_energies']], dtype=np.float64)
         k_energies = unit_conversion.convert_unit(k_energies, 'eV')
+        k_occupations = np.array([self.tmp['k_occupations']], dtype=np.float64)
         npw = None
         if src_sec['x_qe_t_k_pw'] is not None:
             npw = np.array(src_sec['x_qe_t_k_pw'])
@@ -402,11 +404,17 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             k_energies = np.concatenate((
                 k_energies[:,0:nk/2,:],
                 k_energies[:,nk/2:,:]), axis=0)
+            k_occupations = np.concatenate((
+                k_occupations[:,0:nk/2,:],
+                k_occupations[:,nk/2:,:]), axis=0)
         # k-points are in cartesian, but metaInfo specifies crystal
         k_point_crystal = self.bmat_inv.dot(k_point_cartesian.T).T
         # emit data
         if npw is not None:
             backend.addArrayValues('x_qe_eigenvalues_number_of_planewaves', npw)
+        if k_occupations.shape[2] > 0:
+            LOGGER.error('here')
+            backend.addArrayValues('eigenvalues_occupation', k_occupations)
         backend.addArrayValues('eigenvalues_kpoints', k_point_crystal)
         backend.addArrayValues('eigenvalues_values', k_energies)
         backend.closeSection('section_eigenvalues', sec_eigenvalues_gIndex)
@@ -1021,6 +1029,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             ),
         ]
 
+    def adHoc_add_kbnd_occ_storage(self, parser):
+        self.tmp['k_energies'].append([])
+        self.tmp['k_occupations'].append([])
+
     def SMs_bands(self, suffix=''):
         return [
             SM(name='bands' + suffix, repeats=True,
@@ -1028,12 +1040,23 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                             r'(?:\s*\(\s*(?P<x_qe_t_k_pw>' + RE_i + r')\s*PWs\s*\))?' +
                             r'\s*band(?:s|\s+energies)\s*\(\s*[eE][vV]\s*\)\s*:?\s*$'),
                 # create new empty list for this k point's eigenvalues
-                adHoc=lambda p: self.tmp['k_energies'].append([]),
+                adHoc=self.adHoc_add_kbnd_occ_storage,
                 subMatchers=[
                     SM(name='kbnd' + suffix, repeats=True,
                         startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
                         # extend list by eigenvalues in this line
                         adHoc=lambda p: self.tmp['k_energies'][-1].extend(cRE_f.findall(p.lastMatch['x_qe_t_k_point_energies'])),
+                    ),
+                    SM(name='occhead' + suffix,
+                       # only printed in verbose mode
+                       startReStr=r"\s*occupation\s*numbers\s*$",
+                       subMatchers=[
+                           SM(name='kbndocc' + suffix, repeats=True,
+                               startReStr=r'\s*(?P<x_qe_t_k_point_energies>(?:\s*' + RE_f + ')+\s*$)',
+                               # extend list by eigenvalues in this line
+                               adHoc=lambda p: self.tmp['k_occupations'][-1].extend(cRE_f.findall(p.lastMatch['x_qe_t_k_point_energies'])),
+                           ),
+                       ],
                     ),
                 ],
             ),
