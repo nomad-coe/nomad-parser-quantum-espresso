@@ -940,6 +940,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       ],
                    ),
                    SM(name='atom_pos_cryst_list',
+                      # happens in verbose mode
                       startReStr=r"\s*Crystallographic axes\s*$",
                       subMatchers=[
                           SM(name='cryst_heading',
