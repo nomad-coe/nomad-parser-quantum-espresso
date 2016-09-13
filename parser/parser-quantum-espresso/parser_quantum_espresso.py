@@ -1643,7 +1643,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*\(k\+q\)-points:\s*$",
                    ),
                    SM(name='exx_k_plus_q_grid_line', repeats=True,
-                      startReStr=r"\s*" + RE_f + "\s+" + RE_f + "\s+" + RE_f + "\s+\d+\s+1\s*$",
+                      startReStr=r"\s*" + RE_f + r"\s+" + RE_f + r"\s+" + RE_f + r"\s+" + RE_i + r"\s+" + RE_i + "\s*$",
                    ),
                ],
             ),
