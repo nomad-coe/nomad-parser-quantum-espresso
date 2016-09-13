@@ -37,6 +37,14 @@ QE_VCSMD_ATPOS_UNITS = {
     'cart coord (alat unit)': 'alat',
 }
 
+QE_MD_RELAX_SAMPLING_METHOD = {
+    'langevin_overdamped_dynamics': 'langevin_dynamics',
+    'BFGS': 'geometry_optimization',
+    'damped_dynamics': 'geometry_optimization',
+    'molecular_dynamics': 'molecular_dynamics',
+    'vcsmd': 'molecular_dynamics',
+    'vcsmd_wentzcovitch_damped_minization': 'geometry_optimization',
+}
 
 class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     """main place to keep the parser status, open ancillary files,..."""
@@ -217,13 +225,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         if old_scc is not None:
             if md_relax is not None:
                 LOGGER.info('new scc due to md_relax=="%s"', str(md_relax))
+                if self.tmp.get('frames', None) is None:
+                    # add previous scc
+                    self.tmp['frames'] = [self.sectionIdx['single_configuration_calculation']]
             elif exx_refine is not None:
                 LOGGER.info('new scc due to exx_refine=="%s"', str(exx_refine))
             else:
                 raise Exception('encountered new section_single_configuration_calculation without knowing why')
         if md_relax:
             if have_new_system:
-                pass
+                self.tmp['frames'].append(gIndex)
             elif exx_refine:
                 LOGGER.info("EXX refinement in MD/relax run")
             else:
@@ -255,6 +266,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.tmp['k_occupations'] = []
         self.tmp['kspin'] = {}
         self.section['single_configuration_calculation'] = section
+        self.sectionIdx['single_configuration_calculation'] = gIndex
 
     def onClose_section_single_configuration_calculation(
             self, backend, gIndex, section):
@@ -313,7 +325,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         # setup section_system for next scf
         if section['x_qe_t_md_atom_labels'] or section['x_qe_t_md_vec_a_x']:
             next_system_gIndex = backend.openSection('section_system')
-            LOGGER.error("TODO: setup frame sequence!")
             # we cannot simply do
             #   backend.addValue('x_qe_t_vec_a_x', section['x_qe_t_md_vec_a_x'])
             # as this adds an outer list with one element (WTF)
@@ -659,6 +670,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 section['x_qe_t_profile_category_list']))
             backend.addArrayValues('x_qe_profile_caller', np.asarray(
                 section['x_qe_t_profile_caller_list']))
+
+        frames = self.tmp.get('frames', None)
+        if frames:
+            sampling_method_gIndex = backend.openSection('section_sampling_method')
+            backend.addValue('sampling_method', QE_MD_RELAX_SAMPLING_METHOD[self.tmp['md_relax']])
+            backend.closeSection('section_sampling_method', sampling_method_gIndex)
+            frame_sequence_gIndex = backend.openSection('section_frame_sequence')
+            backend.addValue('frame_sequence_to_sampling_ref', sampling_method_gIndex)
+            backend.addArrayValues('frame_sequence_local_frames_ref', np.array(self.tmp['frames']))
+            backend.closeSection('section_frame_sequence', frame_sequence_gIndex)
 
     def appendToTmp(self, tmpname, value):
         self.tmp[tmpname] += value
