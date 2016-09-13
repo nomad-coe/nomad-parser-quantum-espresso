@@ -215,6 +215,8 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              str(section['x_qe_t_spin_orbit_magn'][-1]))
             else:
                 backend.addValue('x_qe_spin_noncollinear', noncollinear)
+        # TODO check for LDA+U and switch to 'DFT+U' in that clase
+        backend.addValue('electronic_structure_method', 'DFT')
 
     def onOpen_section_single_configuration_calculation(
             self, backend, gIndex, section):
