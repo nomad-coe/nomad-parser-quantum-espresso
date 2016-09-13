@@ -330,6 +330,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 new_system['x_qe_t_atpos_x'] = section['x_qe_t_md_atom_positions_x']
                 new_system['x_qe_t_atpos_y'] = section['x_qe_t_md_atom_positions_y']
                 new_system['x_qe_t_atpos_z'] = section['x_qe_t_md_atom_positions_z']
+            if section['x_qe_t_md_k_info_vec_x']:
+                # we got new atom positions and labels
+                new_system['x_qe_t_k_info_wk'] = section['x_qe_t_md_k_info_wk']
+                new_system['x_qe_t_k_info_vec_x'] = section['x_qe_t_md_k_info_vec_x']
+                new_system['x_qe_t_k_info_vec_y'] = section['x_qe_t_md_k_info_vec_y']
+                new_system['x_qe_t_k_info_vec_z'] = section['x_qe_t_md_k_info_vec_z']
+            if section['x_qe_t_md_k_info_ik']:
+                new_system['x_qe_t_k_info_ik'] = section['x_qe_t_md_k_info_ik']
             for target, data in new_system.items():
                 for val in data:
                     backend.addValue(target, val)
