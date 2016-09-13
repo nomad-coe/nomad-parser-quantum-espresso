@@ -2207,6 +2207,17 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*second order charge density extrapolation\s*$",
                              fixedStartValues={ 'x_qe_t_md_extrapolation_charge': 'second-order' }
                           ),
+                          SM(name="md_new_kpoints_info_old",
+                             # seen in old espresso
+                             startReStr=r"\s*NEW K-POINTS\s*$",
+                             subMatchers=[
+                                 SM(name="md_new_k_kpoints", repeats=True,
+                                    startReStr=(
+                                        r"\s*" + QeC.re_vec("x_qe_t_md_k_info_vec", 'usrTpiba') +
+                                        r"\s+(?P<x_qe_t_md_k_info_wk>" + RE_f + r")\s*$"),
+                                 ),
+                             ],
+                          ),
                           SM(name="md_new_kpoints_info",
                              startReStr=r"\s*NEW k-points:\s*$",
                              subMatchers=[
