@@ -413,7 +413,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         if npw is not None:
             backend.addArrayValues('x_qe_eigenvalues_number_of_planewaves', npw)
         if k_occupations.shape[2] > 0:
-            LOGGER.error('here')
             backend.addArrayValues('eigenvalues_occupation', k_occupations)
         backend.addArrayValues('eigenvalues_kpoints', k_point_crystal)
         backend.addArrayValues('eigenvalues_values', k_energies)
