@@ -545,18 +545,31 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('x_qe_celldm', np.array(celldm))
 
         if section['x_qe_t_k_info_vec_x'] is not None:
-            backend.addArrayValues('x_qe_k_info_ik', np.array(section['x_qe_t_k_info_ik']))
-            backend.addArrayValues('x_qe_k_info_wk', np.array(section['x_qe_t_k_info_wk']))
             backend.addArrayValues('x_qe_k_info_vec', np.array([
                 section['x_qe_t_k_info_vec_x'], section['x_qe_t_k_info_vec_y'], section['x_qe_t_k_info_vec_z']
             ]).T)
         elif old_system is not None:
             # unless espresso explicitly writes new k-points, sampling is kept fixed
-            backend.addArrayValues('x_qe_k_info_ik', old_system['x_qe_k_info_ik'][-1])
-            backend.addArrayValues('x_qe_k_info_wk', old_system['x_qe_k_info_wk'][-1])
             backend.addArrayValues('x_qe_k_info_vec', old_system['x_qe_k_info_vec'][-1])
         else:
             LOGGER.error("No K-point info found in output")
+
+        if section['x_qe_t_k_info_ik'] is not None:
+            backend.addArrayValues('x_qe_k_info_ik', np.array(section['x_qe_t_k_info_ik']))
+        elif old_system is not None:
+            # unless espresso explicitly writes new k-points, sampling is kept fixed
+            backend.addArrayValues('x_qe_k_info_ik', old_system['x_qe_k_info_ik'][-1])
+        else:
+            LOGGER.error("No K-point index info found in output")
+
+        if section['x_qe_t_k_info_wk'] is not None:
+            backend.addArrayValues('x_qe_k_info_wk', np.array(section['x_qe_t_k_info_wk']))
+        elif old_system is not None:
+            # unless espresso explicitly writes new k-points, sampling is kept fixed
+            backend.addArrayValues('x_qe_k_info_wk', old_system['x_qe_k_info_wk'][-1])
+        else:
+            LOGGER.error("No K-point weight info found in output")
+
 
         if section['x_qe_t_dense_FFT_grid_x'] is not None:
             backend.addArrayValues('x_qe_dense_FFT_grid', np.array([
