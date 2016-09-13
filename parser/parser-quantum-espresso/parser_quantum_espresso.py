@@ -1022,6 +1022,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name="warning_input_card_ignored" + suffix, repeats=True,
                        startReStr=r"\s*Warning:\s*(?P<x_qe_warning>card.*ignored)\s*$",
                    ),
+                   SM(name="msg_read_cards" + suffix, repeats=True,
+                      startReStr=r"\s*Message from routine read_cards\s*:\s*$",
+                      subMatchers=[
+                          SM(name="warning_read_cards" + suffix,
+                             startReStr=r"\s*(?P<x_qe_warning>DEPRECATED: no units specified in CELL_PARAMETERS card)\s*$"
+                          ),
+                      ],
+                   ),
                ],
             ),
         ]
@@ -1492,6 +1500,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    ),
                    SM(name="qe_dim_lmaxx",
                       startReStr=r"\s*Max angular momentum in pseudopotentials \(lmaxx?\)\s*=\s*(?P<x_qe_lmaxx>\d+)\s*$",
+                   ),
+                   SM(name="qe_warn_efield_symm",
+                      startReStr=r"\s*(?P<x_qe_warning>Presently no symmetry can be used with electric field)\s*",
                    ),
                ],
             ),
