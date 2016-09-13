@@ -497,7 +497,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 atpos_cart = unit_conversion.convert_unit(atpos, 'bohr')
             elif atpos_units == 'angstrom':
                 atpos_cart = unit_conversion.convert_unit(atpos, 'angstrom')
-            elif atpos_units == 'crystal':
+            elif atpos_units == 'crystal' or atpos_units == 'cryst. coord.':
                 atpos_cart = self.amat.dot(atpos.T).T
             else:
                 raise RuntimeError("unknown atpos_units: %s" % (atpos_units))
@@ -921,6 +921,23 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                              startReStr=r"\s*site n.     atom                  positions \((?P<x_qe_t_atpos_units>a_0|alat) units\)\s*$",
                              subMatchers=[
                                  SM(name='atom_pos_cart', repeats=True,
+                                    startReStr=(
+                                        r"\s*(?P<x_qe_t_atom_idx>" + RE_i + r")" +
+                                        r"\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*" + RE_i + "\)\s*"
+                                        r"=\s*\(\s*" + QeC.re_vec('x_qe_t_atpos') +
+                                        r"\s*\)\s*$"),
+                                 ),
+                             ],
+                          ),
+                      ],
+                   ),
+                   SM(name='atom_pos_cryst_list',
+                      startReStr=r"\s*Crystallographic axes\s*$",
+                      subMatchers=[
+                          SM(name='cryst_heading',
+                             startReStr=r"\s*site n.     atom                  positions \((?P<x_qe_t_atpos_units>cryst\. coord\.)\)\s*$",
+                             subMatchers=[
+                                 SM(name='atom_pos_cyst', repeats=True,
                                     startReStr=(
                                         r"\s*(?P<x_qe_t_atom_idx>" + RE_i + r")" +
                                         r"\s+(?P<x_qe_t_atom_labels>\S+)\s+tau\(\s*" + RE_i + "\)\s*"
