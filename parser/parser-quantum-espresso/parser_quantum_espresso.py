@@ -470,7 +470,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         elif section['x_qe_t_vec_a_x'] is not None:
             # we got new lattice vectors, but no reciprocal ones, calculate
             # on-the-fly
-            LOGGER.error('calculating bmat on the fly from amat')
+            LOGGER.info('calculating bmat on the fly from amat')
             abmat = np.zeros((3,3), dtype=np.float64)
             abmat[0] = np.cross(self.amat[1],self.amat[2])
             abmat[1] = np.cross(self.amat[2],self.amat[0])
