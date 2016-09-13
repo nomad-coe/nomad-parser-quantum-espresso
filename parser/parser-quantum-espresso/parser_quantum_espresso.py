@@ -2176,10 +2176,12 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                                  SM(name="stress_header",
                                     startReStr=(r"\s*total\s*stress\s*\(Ry/bohr\*\*3\)\s*\(kbar\)\s*P=\s*" +
                                                 r"(?P<x_qe_pressure__kilobar>" + RE_f + r")\s*$"),
-                                 ),
-                                 SM(name="stress_components", repeats=True,
-                                    startReStr=(r"\s*" + QeC.re_vec('x_qe_t_stress', 'rydberg_bohr_3') + "\s*" +
-                                                RE_f + r"\s*" + RE_f + r"\s*" + RE_f + r"\s*$")
+                                    subMatchers=[
+                                        SM(name="stress_components", repeats=True,
+                                           startReStr=(r"\s*" + QeC.re_vec('x_qe_t_stress', 'rydberg_bohr_3') + "\s*" +
+                                                       RE_f + r"\s*" + RE_f + r"\s*" + RE_f + r"\s*$")
+                                        ),
+                                    ],
                                  ),
                              ],
                           ),
