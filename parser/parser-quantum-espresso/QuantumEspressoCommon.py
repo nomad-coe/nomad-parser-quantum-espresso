@@ -88,6 +88,7 @@ class ParserQuantumEspresso(object):
             r"\s*",
             # table separators
             r"^\s*[=%-]+\s*$",
+            r"^\s*%\s*%\s*$",
         ]
         self.coverageIgnore = None
 
@@ -113,6 +114,10 @@ class ParserQuantumEspresso(object):
             weak=True,
             startReStr="",
             subMatchers=[
+                SM(name='ktab_cIgn', coverageIgnore=True,
+                   # early output seen in benchmark.out.v5.3.0.inp\=vdw1.in.1452257026
+                   startReStr=r"\s*Generating kernel table - May take several minutes.*$",
+                ),
                 SM(name='newRun', repeats=True, required=True,
                    startReStr=(
                        # program name, e.g. PWSCF, DOS
