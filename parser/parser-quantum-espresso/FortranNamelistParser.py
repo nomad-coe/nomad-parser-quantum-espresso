@@ -63,7 +63,8 @@ RE_unescape = {
 
 def unquote_string(value):
     result = value[1:-1]
-    return RE_unescape[value[0]].sub(value[0], result)
+    result = RE_unescape[value[0]].sub(value[0], result)
+    return result
 
 
 # quoted strings
