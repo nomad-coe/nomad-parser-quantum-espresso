@@ -121,7 +121,7 @@ class FortranNamelistParser(object):
                 m = cRE_start_group.match(line, last_end)
                 if m is not None:
                     self.nl_group = m.group(1)
-                    sys.stdout.write(ANSI.FG_BRIGHT_YELLOW + m.group() + ANSI.RESET)
+                    sys.stdout.write(ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
                     last_end = m.end()
                     self.state = 1
                     self.onOpen_namelist_group(m.group(1))
@@ -179,7 +179,7 @@ class FortranNamelistParser(object):
                     self.nvalues_after_comma = 0
                     self.onClose_namelist_group(self.nl_group)
                     self.nl_group = None
-                    sys.stdout.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_YELLOW + m.group() + ANSI.RESET)
+                    sys.stdout.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
                     self.state = 0
                     last_end = m.end()
                     continue
