@@ -98,12 +98,12 @@ class FortranNamelistParser(object):
         self.input_tree = {}
         self.file_path = file_path
         self.state = 0
-        self.nl_group = None
-        self.target = None
-        self.target_subscript = None
-        self.values = None
-        self.types = None
-        self.nvalues_after_comma = 0
+        self.__nl_group = None
+        self.__target = None
+        self.__subscript = None
+        self.__values = None
+        self.__types = None
+        self.__nvalues_after_comma = 0
 
     def parse(self):
         with open(self.file_path, "r") as fIn:
@@ -121,7 +121,7 @@ class FortranNamelistParser(object):
                 # we have no open group
                 m = cRE_start_group.match(line, last_end)
                 if m is not None:
-                    self.nl_group = m.group(1)
+                    self.__nl_group = m.group(1)
                     sys.stdout.write(ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
                     last_end = m.end()
                     self.state = 1
@@ -139,13 +139,13 @@ class FortranNamelistParser(object):
                 m = cRE_str_s_close.match(line, last_end)
                 if m is None:
                     sys.stdout.write(ANSI.FG_YELLOW + line[last_end:] + ANSI.RESET)
-                    self.values[-1] += "\n" + line
+                    self.__values[-1] += "\n" + line
                     last_end=len(line)
                 else:
                     sys.stdout.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
-                    self.values[-1] += "\n" + m.group(1)
-                    self.values[-1] = unquote_string(self.values[-1])
-                    self.types[-1] = 'C'
+                    self.__values[-1] += "\n" + m.group(1)
+                    self.__values[-1] = unquote_string(self.__values[-1])
+                    self.__types[-1] = 'C'
                     last_end=m.end()
                     self.state = 2
                     continue
@@ -154,13 +154,13 @@ class FortranNamelistParser(object):
                 m = cRE_str_d_close.match(line, last_end)
                 if m is None:
                     sys.stdout.write(ANSI.FG_YELLOW + line[last_end:] + ANSI.RESET)
-                    self.values[-1] += "\n" + line
+                    self.__values[-1] += "\n" + line
                     last_end=len(line)
                 else:
                     sys.stdout.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
-                    self.values[-1] += "\n" + m.group(1)
-                    self.values[-1] = unquote_string(self.values[-1])
-                    self.types[-1] = 'C'
+                    self.__values[-1] += "\n" + m.group(1)
+                    self.__values[-1] = unquote_string(self.__values[-1])
+                    self.__types[-1] = 'C'
                     last_end=m.end()
                     self.state = 2
                     continue
@@ -169,17 +169,17 @@ class FortranNamelistParser(object):
                 #   check for group-closing /
                 m = cRE_end_group.match(line, last_end)
                 if m is not None:
-                    if self.target is not None:
+                    if self.__target is not None:
                         self.onClose_value_assignment(
-                            self.target, self.target_subscript,
-                            self.values, self.types)
-                    self.target = None
-                    self.target_subscript = None
-                    self.values = None
-                    self.types = None
-                    self.nvalues_after_comma = 0
-                    self.onClose_namelist_group(self.nl_group)
-                    self.nl_group = None
+                            self.__target, self.__subscript,
+                            self.__values, self.__types)
+                    self.__target = None
+                    self.__subscript = None
+                    self.__values = None
+                    self.__types = None
+                    self.__nvalues_after_comma = 0
+                    self.onClose_namelist_group(self.__nl_group)
+                    self.__nl_group = None
                     sys.stdout.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
                     self.state = 0
                     last_end = m.end()
@@ -187,20 +187,20 @@ class FortranNamelistParser(object):
                 #   check for new assignment
                 m = cRE_start_assignment.match(line, last_end)
                 if m is not None:
-                    if self.target is not None:
+                    if self.__target is not None:
                         self.onClose_value_assignment(
-                            self.target, self.target_subscript,
-                            self.values, self.types)
+                            self.__target, self.__subscript,
+                            self.__values, self.__types)
                     self.state = 2
                     last_end=m.end()
                     sys.stdout.write(ANSI.FG_GREEN + m.group() + ANSI.RESET)
-                    self.target = m.group('target')
-                    self.target_subscript = m.group('subscript')
-                    self.values = []
-                    self.types = []
-                    self.values_after_comma = 0
+                    self.__target = m.group('target')
+                    self.__subscript = m.group('subscript')
+                    self.__values = []
+                    self.__types = []
+                    self.__nvalues_after_comma = 0
                     self.onOpen_value_assignment(
-                        self.target, self.target_subscript)
+                        self.__target, self.__subscript)
                     continue
                 if self.state == 2:
                     # we are inside the values-part of an assignment
@@ -208,51 +208,51 @@ class FortranNamelistParser(object):
                     if m is not None:
                         if m.group('num') is not None:
                             (value, dtype) = match_to_float(m, group_offset=1)
-                            self.values.append(value)
-                            self.types.append(dtype)
+                            self.__values.append(value)
+                            self.__types.append(dtype)
                         elif m.group('cnum_r') is not None:
                             (cnum_r, dtype) = match_to_float(m, group_offset=10)
                             (cnum_i, dtype) = match_to_float(m, group_offset=19)
-                            self.values.append(complex(cnum_r, cnum_i))
-                            self.types.append('complex')
+                            self.__values.append(complex(cnum_r, cnum_i))
+                            self.__types.append('complex')
                         elif m.group('bool_t') is not None:
-                            self.values.append(True)
-                            self.types.append('b')
+                            self.__values.append(True)
+                            self.__types.append('b')
                         elif m.group('bool_f') is not None:
-                            self.values.append(False)
-                            self.types.append('b')
+                            self.__values.append(False)
+                            self.__types.append('b')
                         elif m.group('str_s') is not None:
-                            self.values.append(unquote_string(m.group('str_s')))
-                            self.types.append('C')
+                            self.__values.append(unquote_string(m.group('str_s')))
+                            self.__types.append('C')
                         elif m.group('str_d') is not None:
-                            self.values.append(unquote_string(m.group('str_d')))
-                            self.types.append('C')
+                            self.__values.append(unquote_string(m.group('str_d')))
+                            self.__types.append('C')
                         elif m.group('str_s_nc') is not None:
                             # non-closed single-quoted string
                             self.state=3
-                            self.values.append(m.group('str_s_nc'))
-                            self.types.append('string_singlequoted')
+                            self.__values.append(m.group('str_s_nc'))
+                            self.__types.append('string_singlequoted')
                         elif m.group('str_d_nc') is not None:
                             # non-closed double-quoted string
                             self.state=4
-                            self.values.append(m.group('str_d_nc'))
-                            self.types.append('string_doublequoted')
+                            self.__values.append(m.group('str_d_nc'))
+                            self.__types.append('string_doublequoted')
                         elif m.group('comment') is not None:
                             sys.stdout.write(ANSI.FG_BLUE + m.group() + ANSI.RESET)
                             last_end=m.end()
                             self.onComment(m.group())
                             continue
-                        self.values_after_comma +=1
+                        self.__nvalues_after_comma +=1
                         sys.stdout.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
                         last_end=m.end()
                         continue
                     # special meaning of comma: may indicate Null values in array assignments
                     m = cRE_comma.match(line, last_end)
                     if m is not None:
-                        if self.values_after_comma is 0:
-                            self.values.append(None)
-                            self.types.append(None)
-                        self.values_after_comma = 0
+                        if self.__nvalues_after_comma is 0:
+                            self.__values.append(None)
+                            self.__types.append(None)
+                        self.__nvalues_after_comma = 0
                         sys.stdout.write(ANSI.FG_MAGENTA + m.group() + ANSI.RESET)
                         last_end = m.end()
                         continue
