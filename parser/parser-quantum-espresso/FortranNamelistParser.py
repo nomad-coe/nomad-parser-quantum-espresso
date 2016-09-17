@@ -164,7 +164,7 @@ class FortranNamelistParser(object):
                     last_end=m.end()
                     self.state = 2
                     continue
-            else:
+            elif self.state == 1 or self.state == 2:
                 # we are inside opened group
                 #   check for group-closing /
                 m = cRE_end_group.match(line, last_end)
@@ -202,7 +202,7 @@ class FortranNamelistParser(object):
                     self.onOpen_value_assignment(
                         self.target, self.target_subscript)
                     continue
-                if self.state >= 2:
+                if self.state == 2:
                     # we are inside the values-part of an assignment
                     m = cRE_assigned_value.match(line, last_end)
                     if m is not None:
@@ -258,12 +258,12 @@ class FortranNamelistParser(object):
                         continue
             break
         if last_end < len(line):
-            line_leftover = line[last_end:]
-            if self.state > 0 and line_leftover.strip():
-                LOGGER.error("ERROR: leftover chars in line while inside namelist group")
-                sys.stdout.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED + line_leftover + ANSI.RESET)
+            if self.state > 0 and self.state < 5 and line[last_end:].strip():
+                # states we as the base class are handling, but with leftover chars on a line
+                LOGGER.error("ERROR: leftover chars in line while inside namelist group: '%s'", line[last_end:])
+                sys.stdout.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED + line[last_end:] + ANSI.RESET)
             else:
-                sys.stdout.write(ANSI.BEGIN_INVERT + ANSI.FG_BLUE + line_leftover + ANSI.RESET)
+                sys.stdout.write(ANSI.BEGIN_INVERT + ANSI.FG_BLUE + line[last_end:] + ANSI.RESET)
         sys.stdout.write('\n')
 
     # Hooks to be overloaded in derived classes in order to do stuff
