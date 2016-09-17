@@ -90,6 +90,8 @@ cRE_str_s_close = re.compile(r"([^']*(?:[^']|'')*'(?!'))") # single-quoted strin
 cRE_str_d_close = re.compile(r'([^"]*(?:[^"]|"")*"(?!"))') # double-quoted string, closing
 cRE_comma = re.compile(r'\s*,')
 
+cRE_subscript = re.compile(r'\s*,?\s*(?:(\d*):\s*(\d*)|(\d*))')
+
 
 class FortranNamelistParser(object):
     """Parser for Fortran 90 Namelists
@@ -113,6 +115,42 @@ class FortranNamelistParser(object):
                 if line[-1] == '\n':
                     line = line[:-1]
                 self.parse_line(line)
+
+    def parse_subscript(self, subscript):
+        if subscript is None:
+            return None
+        result = []
+        last_end = 0
+        while last_end<len(subscript):
+            m = cRE_subscript.match(subscript, last_end)
+            if m is None:
+                break
+            elif m.group(3) is not None:
+                sys.stdout.write(ANSI.FG_CYAN + subscript[last_end:m.end()] + ANSI.RESET)
+                # prepend to result list, making ranges explicit:
+                #    fortran has fastest-running index first
+                #  while
+                #    python/c has fastest-running index last
+                result[0:0] = [ [int(m.group(3))] ]
+                last_end = m.end()
+                continue
+            elif m.group(1) is not None:
+                sys.stdout.write(ANSI.FG_BRIGHT_CYAN + subscript[last_end:m.end()] + ANSI.RESET)
+                # prepend to result list, making ranges explicit
+                #    fortran has fastest-running index first
+                #  while
+                #    python/c has fastest-running index last
+                result[0:0] = [list(range(int(m.group(1)),int(m.group(2))+1))]
+                last_end = m.end()
+                continue
+            break
+        if last_end < len(subscript):
+            if subscript[last_end:].stript():
+                LOGGER.error("ERROR: leftover chars in subscript: '%s'", subscript[last_end:])
+                sys.stdout.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED + subscript[last_end:] + ANSI.RESET)
+            else:
+                sys.stdout.write(ANSI.BEGIN_INVERT + ANSI.FG_BLUE + subscript[last_end:] + ANSI.RESET)
+        return result
 
     def parse_line(self, line):
         last_end = 0
@@ -192,10 +230,15 @@ class FortranNamelistParser(object):
                             self.__target, self.__subscript,
                             self.__values, self.__types)
                     self.state = 2
+                    if m.group('subscript') is None:
+                        self.__subscript = None
+                        sys.stdout.write(ANSI.FG_GREEN + m.group() + ANSI.RESET)
+                    else:
+                        sys.stdout.write(ANSI.FG_GREEN + line[last_end:m.start('subscript')] + ANSI.RESET)
+                        self.__subscript = self.parse_subscript(m.group('subscript'))
+                        sys.stdout.write(ANSI.FG_GREEN + line[m.end('subscript'):m.end()] + ANSI.RESET)
                     last_end=m.end()
-                    sys.stdout.write(ANSI.FG_GREEN + m.group() + ANSI.RESET)
                     self.__target = m.group('target')
-                    self.__subscript = m.group('subscript')
                     self.__values = []
                     self.__types = []
                     self.__nvalues_after_comma = 0
