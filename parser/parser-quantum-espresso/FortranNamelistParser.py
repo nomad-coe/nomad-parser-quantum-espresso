@@ -73,7 +73,7 @@ cRE_comment = re.compile(r"\s*!.*")
 RE_identifier = r"[a-zA-Z]\w*" # fortran identifier
 cRE_start_group = re.compile(r'\s*&(' + RE_identifier + r')') # beginning of namelist group 
 cRE_end_group = re.compile(r'\s*/')
-cRE_start_assignment = re.compile(r'\s*(?P<target>' + RE_identifier + r')(?:\(\s*(?P<subscript>[^\)]*?)\s*\))?\s*=\s*')
+cRE_start_assignment = re.compile(r'\s*(?P<target>' + RE_identifier + r')(?:\((?P<subscript>[^\)]*)\))?\s*=\s*')
 cRE_assigned_value = re.compile(
     r'\s*(?:' + '|'.join([
         r'(?P<num>' + RE_f + r')', # integers and floats
