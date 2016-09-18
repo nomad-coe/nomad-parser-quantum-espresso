@@ -269,6 +269,67 @@ class FortranNamelistParser(object):
             return m.end()
         return None
 
+    def parse_line_state2(self, line, pos_in_line):
+        # check for group-close or new assignment
+        new_pos_in_line = self.parse_line_state1(line, pos_in_line)
+        if new_pos_in_line is not None:
+            return new_pos_in_line
+        # we are inside the values-part of an assignment
+        m = cRE_assigned_value.match(line, pos_in_line)
+        if m is not None:
+            if m.group('comment') is not None:
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.FG_BLUE + m.group() + ANSI.RESET)
+                self.onComment(m.group())
+            else:
+                if m.group('num') is not None:
+                    (value, dtype) = match_to_float(m, group_offset=1)
+                    self.__values.append(value)
+                    self.__types.append(dtype)
+                elif m.group('cnum_r') is not None:
+                    (cnum_r, dtype) = match_to_float(m, group_offset=10)
+                    (cnum_i, dtype) = match_to_float(m, group_offset=19)
+                    self.__values.append(complex(cnum_r, cnum_i))
+                    self.__types.append('complex')
+                elif m.group('bool_t') is not None:
+                    self.__values.append(True)
+                    self.__types.append('b')
+                elif m.group('bool_f') is not None:
+                    self.__values.append(False)
+                    self.__types.append('b')
+                elif m.group('str_s') is not None:
+                    self.__values.append(unquote_string(m.group('str_s')))
+                    self.__types.append('C')
+                elif m.group('str_d') is not None:
+                    self.__values.append(unquote_string(m.group('str_d')))
+                    self.__types.append('C')
+                elif m.group('str_s_nc') is not None:
+                    # non-closed single-quoted string
+                    self.state=3
+                    self.__values.append(m.group('str_s_nc'))
+                    self.__types.append('string_singlequoted')
+                elif m.group('str_d_nc') is not None:
+                    # non-closed double-quoted string
+                    self.state=4
+                    self.__values.append(m.group('str_d_nc'))
+                    self.__types.append('string_doublequoted')
+                self.__nvalues_after_comma +=1
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
+            return m.end()
+        else:
+            # special meaning of comma: may indicate Null values in array assignments
+            m = cRE_comma.match(line, pos_in_line)
+            if m is not None:
+                if self.__nvalues_after_comma is 0:
+                    self.__values.append(None)
+                    self.__types.append(None)
+                self.__nvalues_after_comma = 0
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.FG_MAGENTA + m.group() + ANSI.RESET)
+                return m.end()
+        return None
+
     def parse_line(self, line):
         pos_in_line = 0
         while pos_in_line<len(line):
@@ -279,63 +340,10 @@ class FortranNamelistParser(object):
                 new_pos_in_line = self.parse_line_state3(line, pos_in_line)
             elif self.state==4:
                 new_pos_in_line = self.parse_line_state4(line, pos_in_line)
-            elif self.state == 1 or self.state == 2:
+            elif self.state == 1:
                 new_pos_in_line = self.parse_line_state1(line, pos_in_line)
-                if new_pos_in_line is None and self.state == 2:
-                    # we are inside the values-part of an assignment
-                    m = cRE_assigned_value.match(line, pos_in_line)
-                    if m is not None:
-                        new_pos_in_line=m.end()
-                        if m.group('comment') is not None:
-                            if self.annotateFile:
-                                self.annotateFile.write(ANSI.FG_BLUE + m.group() + ANSI.RESET)
-                            self.onComment(m.group())
-                        else:
-                            if m.group('num') is not None:
-                                (value, dtype) = match_to_float(m, group_offset=1)
-                                self.__values.append(value)
-                                self.__types.append(dtype)
-                            elif m.group('cnum_r') is not None:
-                                (cnum_r, dtype) = match_to_float(m, group_offset=10)
-                                (cnum_i, dtype) = match_to_float(m, group_offset=19)
-                                self.__values.append(complex(cnum_r, cnum_i))
-                                self.__types.append('complex')
-                            elif m.group('bool_t') is not None:
-                                self.__values.append(True)
-                                self.__types.append('b')
-                            elif m.group('bool_f') is not None:
-                                self.__values.append(False)
-                                self.__types.append('b')
-                            elif m.group('str_s') is not None:
-                                self.__values.append(unquote_string(m.group('str_s')))
-                                self.__types.append('C')
-                            elif m.group('str_d') is not None:
-                                self.__values.append(unquote_string(m.group('str_d')))
-                                self.__types.append('C')
-                            elif m.group('str_s_nc') is not None:
-                                # non-closed single-quoted string
-                                self.state=3
-                                self.__values.append(m.group('str_s_nc'))
-                                self.__types.append('string_singlequoted')
-                            elif m.group('str_d_nc') is not None:
-                                # non-closed double-quoted string
-                                self.state=4
-                                self.__values.append(m.group('str_d_nc'))
-                                self.__types.append('string_doublequoted')
-                            self.__nvalues_after_comma +=1
-                            if self.annotateFile:
-                                self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
-                    else:
-                        # special meaning of comma: may indicate Null values in array assignments
-                        m = cRE_comma.match(line, pos_in_line)
-                        if m is not None:
-                            if self.__nvalues_after_comma is 0:
-                                self.__values.append(None)
-                                self.__types.append(None)
-                            self.__nvalues_after_comma = 0
-                            if self.annotateFile:
-                                self.annotateFile.write(ANSI.FG_MAGENTA + m.group() + ANSI.RESET)
-                            new_pos_in_line = m.end()
+            elif self.state == 2:
+                new_pos_in_line = self.parse_line_state2(line, pos_in_line)
             if new_pos_in_line is None:
                 break
             else:
