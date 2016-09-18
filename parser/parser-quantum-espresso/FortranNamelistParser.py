@@ -218,6 +218,57 @@ class FortranNamelistParser(object):
             return m.end()
         return None
 
+    def parse_line_state1(self, line, pos_in_line):
+        # we are inside opened group, but have no open assignment
+        #   check for group-closing /
+        m = cRE_end_group.match(line, pos_in_line)
+        if m is not None:
+            # we just closed a NL group
+            if self.__target is not None:
+                self.onClose_value_assignment(
+                    self.__nl_group,
+                    self.__target, self.__subscript,
+                    self.__values, self.__types)
+            self.__target = None
+            self.__subscript = None
+            self.__values = None
+            self.__types = None
+            self.__nvalues_after_comma = 0
+            self.onClose_namelist_group(self.__nl_group)
+            self.__nl_group = None
+            if self.annotateFile:
+                self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
+            self.state = 0
+            return m.end()
+        m = cRE_start_assignment.match(line, pos_in_line)
+        if m is not None:
+            # we have a new assignment
+            if self.__target is not None:
+                self.onClose_value_assignment(
+                    self.__nl_group,
+                    self.__target, self.__subscript,
+                    self.__values, self.__types)
+            self.state = 2
+            if m.group('subscript') is None:
+                self.__subscript = None
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.FG_GREEN + m.group() + ANSI.RESET)
+            else:
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.FG_GREEN + line[pos_in_line:m.start('subscript')] + ANSI.RESET)
+                self.__subscript = self.parse_subscript(m.group('subscript'))
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.FG_GREEN + line[m.end('subscript'):m.end()] + ANSI.RESET)
+            self.__target = m.group('target').lower()
+            self.__values = []
+            self.__types = []
+            self.__nvalues_after_comma = 0
+            self.onOpen_value_assignment(
+                self.__nl_group,
+                self.__target, self.__subscript)
+            return m.end()
+        return None
+
     def parse_line(self, line):
         pos_in_line = 0
         while pos_in_line<len(line):
@@ -229,54 +280,8 @@ class FortranNamelistParser(object):
             elif self.state==4:
                 new_pos_in_line = self.parse_line_state4(line, pos_in_line)
             elif self.state == 1 or self.state == 2:
-                # we are inside opened group
-                #   check for group-closing /
-                m = cRE_end_group.match(line, pos_in_line)
-                if m is not None:
-                    if self.__target is not None:
-                        self.onClose_value_assignment(
-                            self.__nl_group,
-                            self.__target, self.__subscript,
-                            self.__values, self.__types)
-                    self.__target = None
-                    self.__subscript = None
-                    self.__values = None
-                    self.__types = None
-                    self.__nvalues_after_comma = 0
-                    self.onClose_namelist_group(self.__nl_group)
-                    self.__nl_group = None
-                    if self.annotateFile:
-                        self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
-                    self.state = 0
-                    new_pos_in_line = m.end()
-                #   check for new assignment
-                m = cRE_start_assignment.match(line, pos_in_line)
-                if m is not None:
-                    if self.__target is not None:
-                        self.onClose_value_assignment(
-                            self.__nl_group,
-                            self.__target, self.__subscript,
-                            self.__values, self.__types)
-                    self.state = 2
-                    if m.group('subscript') is None:
-                        self.__subscript = None
-                        if self.annotateFile:
-                            self.annotateFile.write(ANSI.FG_GREEN + m.group() + ANSI.RESET)
-                    else:
-                        if self.annotateFile:
-                            self.annotateFile.write(ANSI.FG_GREEN + line[pos_in_line:m.start('subscript')] + ANSI.RESET)
-                        self.__subscript = self.parse_subscript(m.group('subscript'))
-                        if self.annotateFile:
-                            self.annotateFile.write(ANSI.FG_GREEN + line[m.end('subscript'):m.end()] + ANSI.RESET)
-                    self.__target = m.group('target').lower()
-                    self.__values = []
-                    self.__types = []
-                    self.__nvalues_after_comma = 0
-                    self.onOpen_value_assignment(
-                        self.__nl_group,
-                        self.__target, self.__subscript)
-                    new_pos_in_line=m.end()
-                if self.state == 2:
+                new_pos_in_line = self.parse_line_state1(line, pos_in_line)
+                if new_pos_in_line is None and self.state == 2:
                     # we are inside the values-part of an assignment
                     m = cRE_assigned_value.match(line, pos_in_line)
                     if m is not None:
