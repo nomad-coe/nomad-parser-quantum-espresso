@@ -128,7 +128,8 @@ class FortranNamelistParser(object):
             if m is None:
                 break
             elif m.group(3) is not None:
-                self.annotateFile.write(ANSI.FG_CYAN + subscript[last_end:m.end()] + ANSI.RESET)
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.FG_CYAN + subscript[last_end:m.end()] + ANSI.RESET)
                 # prepend to result list, making ranges explicit:
                 #    fortran has fastest-running index first
                 #  while
@@ -137,7 +138,8 @@ class FortranNamelistParser(object):
                 last_end = m.end()
                 continue
             elif m.group(1) is not None:
-                self.annotateFile.write(ANSI.FG_BRIGHT_CYAN + subscript[last_end:m.end()] + ANSI.RESET)
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.FG_BRIGHT_CYAN + subscript[last_end:m.end()] + ANSI.RESET)
                 # prepend to result list, making ranges explicit
                 #    fortran has fastest-running index first
                 #  while
@@ -149,9 +151,11 @@ class FortranNamelistParser(object):
         if last_end < len(subscript):
             if subscript[last_end:].stript():
                 LOGGER.error("ERROR: leftover chars in subscript: '%s'", subscript[last_end:])
-                self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED + subscript[last_end:] + ANSI.RESET)
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED + subscript[last_end:] + ANSI.RESET)
             else:
-                self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BLUE + subscript[last_end:] + ANSI.RESET)
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BLUE + subscript[last_end:] + ANSI.RESET)
         return result
 
     def parse_line(self, line):
@@ -162,7 +166,8 @@ class FortranNamelistParser(object):
                 m = cRE_start_group.match(line, last_end)
                 if m is not None:
                     self.__nl_group = m.group(1)
-                    self.annotateFile.write(ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
+                    if self.annotateFile:
+                        self.annotateFile.write(ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
                     last_end = m.end()
                     self.state = 1
                     self.onOpen_namelist_group(m.group(1))
@@ -170,7 +175,8 @@ class FortranNamelistParser(object):
                 # but comments may appear here
                 m = cRE_comment.match(line, last_end)
                 if m is not None:
-                    self.annotateFile.write(ANSI.FG_BLUE + m.group() + ANSI.RESET)
+                    if self.annotateFile:
+                        self.annotateFile.write(ANSI.FG_BLUE + m.group() + ANSI.RESET)
                     last_end = m.end()
                     self.onComment(m.group())
                     continue
@@ -178,11 +184,13 @@ class FortranNamelistParser(object):
                 # we are inside single-quoted multiline string
                 m = cRE_str_s_close.match(line, last_end)
                 if m is None:
-                    self.annotateFile.write(ANSI.FG_YELLOW + line[last_end:] + ANSI.RESET)
+                    if self.annotateFile:
+                        self.annotateFile.write(ANSI.FG_YELLOW + line[last_end:] + ANSI.RESET)
                     self.__values[-1] += "\n" + line
                     last_end=len(line)
                 else:
-                    self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
+                    if self.annotateFile:
+                        self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
                     self.__values[-1] += "\n" + m.group(1)
                     self.__values[-1] = unquote_string(self.__values[-1])
                     self.__types[-1] = 'C'
@@ -193,11 +201,13 @@ class FortranNamelistParser(object):
                 # we are inside double-quoted multiline string
                 m = cRE_str_d_close.match(line, last_end)
                 if m is None:
-                    self.annotateFile.write(ANSI.FG_YELLOW + line[last_end:] + ANSI.RESET)
+                    if self.annotateFile:
+                        self.annotateFile.write(ANSI.FG_YELLOW + line[last_end:] + ANSI.RESET)
                     self.__values[-1] += "\n" + line
                     last_end=len(line)
                 else:
-                    self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
+                    if self.annotateFile:
+                        self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
                     self.__values[-1] += "\n" + m.group(1)
                     self.__values[-1] = unquote_string(self.__values[-1])
                     self.__types[-1] = 'C'
@@ -221,7 +231,8 @@ class FortranNamelistParser(object):
                     self.__nvalues_after_comma = 0
                     self.onClose_namelist_group(self.__nl_group)
                     self.__nl_group = None
-                    self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
+                    if self.annotateFile:
+                        self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
                     self.state = 0
                     last_end = m.end()
                     continue
@@ -236,11 +247,14 @@ class FortranNamelistParser(object):
                     self.state = 2
                     if m.group('subscript') is None:
                         self.__subscript = None
-                        self.annotateFile.write(ANSI.FG_GREEN + m.group() + ANSI.RESET)
+                        if self.annotateFile:
+                            self.annotateFile.write(ANSI.FG_GREEN + m.group() + ANSI.RESET)
                     else:
-                        self.annotateFile.write(ANSI.FG_GREEN + line[last_end:m.start('subscript')] + ANSI.RESET)
+                        if self.annotateFile:
+                            self.annotateFile.write(ANSI.FG_GREEN + line[last_end:m.start('subscript')] + ANSI.RESET)
                         self.__subscript = self.parse_subscript(m.group('subscript'))
-                        self.annotateFile.write(ANSI.FG_GREEN + line[m.end('subscript'):m.end()] + ANSI.RESET)
+                        if self.annotateFile:
+                            self.annotateFile.write(ANSI.FG_GREEN + line[m.end('subscript'):m.end()] + ANSI.RESET)
                     last_end=m.end()
                     self.__target = m.group('target')
                     self.__values = []
@@ -286,12 +300,14 @@ class FortranNamelistParser(object):
                             self.__values.append(m.group('str_d_nc'))
                             self.__types.append('string_doublequoted')
                         elif m.group('comment') is not None:
-                            self.annotateFile.write(ANSI.FG_BLUE + m.group() + ANSI.RESET)
+                            if self.annotateFile:
+                                self.annotateFile.write(ANSI.FG_BLUE + m.group() + ANSI.RESET)
                             last_end=m.end()
                             self.onComment(m.group())
                             continue
                         self.__nvalues_after_comma +=1
-                        self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
+                        if self.annotateFile:
+                            self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
                         last_end=m.end()
                         continue
                     # special meaning of comma: may indicate Null values in array assignments
@@ -301,7 +317,8 @@ class FortranNamelistParser(object):
                             self.__values.append(None)
                             self.__types.append(None)
                         self.__nvalues_after_comma = 0
-                        self.annotateFile.write(ANSI.FG_MAGENTA + m.group() + ANSI.RESET)
+                        if self.annotateFile:
+                            self.annotateFile.write(ANSI.FG_MAGENTA + m.group() + ANSI.RESET)
                         last_end = m.end()
                         continue
             break
@@ -309,10 +326,13 @@ class FortranNamelistParser(object):
             if self.state > 0 and self.state < 5 and line[last_end:].strip():
                 # states we as the base class are handling, but with leftover chars on a line
                 LOGGER.error("ERROR: leftover chars in line while inside namelist group: '%s'", line[last_end:])
-                self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED + line[last_end:] + ANSI.RESET)
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED + line[last_end:] + ANSI.RESET)
             else:
-                self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BLUE + line[last_end:] + ANSI.RESET)
-        self.annotateFile.write('\n')
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BLUE + line[last_end:] + ANSI.RESET)
+        if self.annotateFile:
+            self.annotateFile.write('\n')
 
     # Hooks to be overloaded in derived classes in order to do stuff
     def onComment(self, comment):
