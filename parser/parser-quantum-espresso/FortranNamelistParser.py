@@ -200,6 +200,24 @@ class FortranNamelistParser(object):
             return m.end()
         return None
 
+    def parse_line_state4(self, line, pos_in_line):
+        # we are inside double-quoted multiline string
+        m = cRE_str_d_close.match(line, pos_in_line)
+        if m is None:
+            if self.annotateFile:
+                self.annotateFile.write(ANSI.FG_YELLOW + line[pos_in_line:] + ANSI.RESET)
+            self.__values[-1] += "\n" + line
+            return len(line)
+        else:
+            if self.annotateFile:
+                self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
+            self.__values[-1] += "\n" + m.group(1)
+            self.__values[-1] = unquote_string(self.__values[-1])
+            self.__types[-1] = 'C'
+            self.state = 2
+            return m.end()
+        return None
+
     def parse_line(self, line):
         pos_in_line = 0
         while pos_in_line<len(line):
@@ -209,21 +227,7 @@ class FortranNamelistParser(object):
             elif self.state==3:
                 new_pos_in_line = self.parse_line_state3(line, pos_in_line)
             elif self.state==4:
-                # we are inside double-quoted multiline string
-                m = cRE_str_d_close.match(line, pos_in_line)
-                if m is None:
-                    if self.annotateFile:
-                        self.annotateFile.write(ANSI.FG_YELLOW + line[pos_in_line:] + ANSI.RESET)
-                    self.__values[-1] += "\n" + line
-                    new_pos_in_line=len(line)
-                else:
-                    if self.annotateFile:
-                        self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
-                    self.__values[-1] += "\n" + m.group(1)
-                    self.__values[-1] = unquote_string(self.__values[-1])
-                    self.__types[-1] = 'C'
-                    self.state = 2
-                    new_pos_in_line=m.end()
+                new_pos_in_line = self.parse_line_state4(line, pos_in_line)
             elif self.state == 1 or self.state == 2:
                 # we are inside opened group
                 #   check for group-closing /
