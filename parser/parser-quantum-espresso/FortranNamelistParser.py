@@ -336,14 +336,15 @@ class FortranNamelistParser(object):
             new_pos_in_line = None
             if self.state == 0:
                 new_pos_in_line = self.parse_line_state0(line, pos_in_line)
-            elif self.state==3:
-                new_pos_in_line = self.parse_line_state3(line, pos_in_line)
-            elif self.state==4:
-                new_pos_in_line = self.parse_line_state4(line, pos_in_line)
             elif self.state == 1:
                 new_pos_in_line = self.parse_line_state1(line, pos_in_line)
             elif self.state == 2:
                 new_pos_in_line = self.parse_line_state2(line, pos_in_line)
+            elif self.state == 3:
+                new_pos_in_line = self.parse_line_state3(line, pos_in_line)
+            elif self.state == 4:
+                new_pos_in_line = self.parse_line_state4(line, pos_in_line)
+            # check if anything was parsed, otherwise cancel that line
             if new_pos_in_line is None:
                 break
             else:
