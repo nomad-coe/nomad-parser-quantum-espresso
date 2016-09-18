@@ -183,7 +183,7 @@ class FortranNamelistParser(object):
                 return m.end()
         return None
 
-    def parse_line_state1(self, line, pos_in_line):
+    def parse_line_open_group(self, line, pos_in_line):
         # we are inside opened group, but have no open assignment
         #   check for group-closing /
         m = cRE_end_group.match(line, pos_in_line)
@@ -235,10 +235,6 @@ class FortranNamelistParser(object):
         return None
 
     def parse_line_state2(self, line, pos_in_line):
-        # check for group-close or new assignment
-        new_pos_in_line = self.parse_line_state1(line, pos_in_line)
-        if new_pos_in_line is not None:
-            return new_pos_in_line
         # we are inside the values-part of an assignment
         m = cRE_assigned_value.match(line, pos_in_line)
         if m is not None:
@@ -295,6 +291,10 @@ class FortranNamelistParser(object):
                 if self.annotateFile:
                     self.annotateFile.write(ANSI.FG_MAGENTA + m.group() + ANSI.RESET)
                 return m.end()
+        # check for group-close or new assignment
+        new_pos_in_line = self.open_group(line, pos_in_line)
+        if new_pos_in_line is not None:
+            return new_pos_in_line
         return None
 
     def parse_line_state3(self, line, pos_in_line):
@@ -322,7 +322,7 @@ class FortranNamelistParser(object):
             if self.state == 0:
                 new_pos_in_line = self.parse_line_state0(line, pos_in_line)
             elif self.state == 1:
-                new_pos_in_line = self.parse_line_state1(line, pos_in_line)
+                new_pos_in_line = self.parse_line_open_group(line, pos_in_line)
             elif self.state == 2:
                 new_pos_in_line = self.parse_line_state2(line, pos_in_line)
             elif self.state == 3:
