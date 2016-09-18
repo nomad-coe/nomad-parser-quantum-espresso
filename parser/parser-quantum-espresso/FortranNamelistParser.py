@@ -112,6 +112,7 @@ class FortranNamelistParser(object):
             # split lines into 'line' and 'comment' parts
             for line in fIn:
                 # strip final newline if it exists
+                #   (may not exist at end of file)
                 if line[-1] == '\n':
                     line = line[:-1]
                 self.parse_line(line)
