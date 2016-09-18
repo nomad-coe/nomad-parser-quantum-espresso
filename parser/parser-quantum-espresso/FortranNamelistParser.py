@@ -165,12 +165,12 @@ class FortranNamelistParser(object):
                 # we have no open group
                 m = cRE_start_group.match(line, last_end)
                 if m is not None:
-                    self.__nl_group = m.group(1)
+                    self.__nl_group = m.group(1).lower()
                     if self.annotateFile:
                         self.annotateFile.write(ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
                     last_end = m.end()
                     self.state = 1
-                    self.onOpen_namelist_group(m.group(1))
+                    self.onOpen_namelist_group(self.__nl_group)
                     continue
                 # but comments may appear here
                 m = cRE_comment.match(line, last_end)
@@ -256,7 +256,7 @@ class FortranNamelistParser(object):
                         if self.annotateFile:
                             self.annotateFile.write(ANSI.FG_GREEN + line[m.end('subscript'):m.end()] + ANSI.RESET)
                     last_end=m.end()
-                    self.__target = m.group('target')
+                    self.__target = m.group('target').lower()
                     self.__values = []
                     self.__types = []
                     self.__nvalues_after_comma = 0
