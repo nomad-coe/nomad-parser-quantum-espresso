@@ -209,6 +209,7 @@ class FortranNamelistParser(object):
                 if m is not None:
                     if self.__target is not None:
                         self.onClose_value_assignment(
+                            self.__nl_group,
                             self.__target, self.__subscript,
                             self.__values, self.__types)
                     self.__target = None
@@ -227,6 +228,7 @@ class FortranNamelistParser(object):
                 if m is not None:
                     if self.__target is not None:
                         self.onClose_value_assignment(
+                            self.__nl_group,
                             self.__target, self.__subscript,
                             self.__values, self.__types)
                     self.state = 2
@@ -243,6 +245,7 @@ class FortranNamelistParser(object):
                     self.__types = []
                     self.__nvalues_after_comma = 0
                     self.onOpen_value_assignment(
+                        self.__nl_group,
                         self.__target, self.__subscript)
                     continue
                 if self.state == 2:
@@ -319,14 +322,14 @@ class FortranNamelistParser(object):
     def onClose_namelist_group(self, groupname):
         pass
 
-    def onOpen_value_assignment(self, target, subscript):
+    def onOpen_value_assignment(self, groupname, target, subscript):
         pass
 
-    def onClose_value_assignment(self, target, subscript, values, dtypes):
+    def onClose_value_assignment(self, groupname, target, subscript, values, dtypes):
         if subscript is None:
-            LOGGER.error("SET %s = %s (types: %s)", target, str(values), str(dtypes))
+            LOGGER.error("SET %s/%s = %s (types: %s)", groupname, target, str(values), str(dtypes))
         else:
-            LOGGER.error("SET %s(%s) = %s (types: %s)", target, subscript, str(values), str(dtypes))
+            LOGGER.error("SET %s/%s(%s) = %s (types: %s)", groupname, target, subscript, str(values), str(dtypes))
 
 if __name__ == "__main__":
     parser = FortranNamelistParser(sys.argv[1])
