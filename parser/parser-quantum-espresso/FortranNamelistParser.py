@@ -183,24 +183,6 @@ class FortranNamelistParser(object):
                 return m.end()
         return None
 
-    def parse_line_state3(self, line, pos_in_line):
-        # we are inside quoted multiline string
-        m = self.__cre_closing.match(line, pos_in_line)
-        if m is None:
-            if self.annotateFile:
-                self.annotateFile.write(ANSI.FG_YELLOW + line[pos_in_line:] + ANSI.RESET)
-            self.__values[-1] += "\n" + line
-            return len(line)
-        else:
-            if self.annotateFile:
-                self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
-            self.__values[-1] += "\n" + m.group(1)
-            self.__values[-1] = unquote_string(self.__values[-1])
-            self.__cre_closing = None
-            self.state = 2
-            return m.end()
-        return None
-
     def parse_line_state1(self, line, pos_in_line):
         # we are inside opened group, but have no open assignment
         #   check for group-closing /
@@ -313,6 +295,24 @@ class FortranNamelistParser(object):
                 if self.annotateFile:
                     self.annotateFile.write(ANSI.FG_MAGENTA + m.group() + ANSI.RESET)
                 return m.end()
+        return None
+
+    def parse_line_state3(self, line, pos_in_line):
+        # we are inside quoted multiline string
+        m = self.__cre_closing.match(line, pos_in_line)
+        if m is None:
+            if self.annotateFile:
+                self.annotateFile.write(ANSI.FG_YELLOW + line[pos_in_line:] + ANSI.RESET)
+            self.__values[-1] += "\n" + line
+            return len(line)
+        else:
+            if self.annotateFile:
+                self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
+            self.__values[-1] += "\n" + m.group(1)
+            self.__values[-1] = unquote_string(self.__values[-1])
+            self.__cre_closing = None
+            self.state = 2
+            return m.end()
         return None
 
     def parse_line(self, line):
