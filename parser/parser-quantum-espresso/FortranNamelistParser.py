@@ -107,6 +107,7 @@ class FortranNamelistParser(object):
         self.__values = None
         self.__types = None
         self.__nvalues_after_comma = 0
+        self.bad_input = False
 
     def parse(self):
         with open(self.file_path, "r") as fIn:
@@ -117,6 +118,8 @@ class FortranNamelistParser(object):
                 if line[-1] == '\n':
                     line = line[:-1]
                 self.parse_line(line)
+        if self.bad_input:
+            self.onBad_input()
 
     def parse_subscript(self, subscript):
         if subscript is None:
@@ -153,6 +156,7 @@ class FortranNamelistParser(object):
                 LOGGER.error("ERROR: leftover chars in subscript: '%s'", subscript[last_end:])
                 if self.annotateFile:
                     self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED + subscript[last_end:] + ANSI.RESET)
+                self.bad_input = True
             else:
                 if self.annotateFile:
                     self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BLUE + subscript[last_end:] + ANSI.RESET)
@@ -326,6 +330,7 @@ class FortranNamelistParser(object):
             if self.state > 0 and self.state < 5 and line[last_end:].strip():
                 # states we as the base class are handling, but with leftover chars on a line
                 LOGGER.error("ERROR: leftover chars in line while inside namelist group: '%s'", line[last_end:])
+                self.bad_input = True
                 if self.annotateFile:
                     self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED + line[last_end:] + ANSI.RESET)
             else:
@@ -352,6 +357,9 @@ class FortranNamelistParser(object):
             LOGGER.error("SET %s/%s = %s (types: %s)", groupname, target, str(values), str(dtypes))
         else:
             LOGGER.error("SET %s/%s(%s) = %s (types: %s)", groupname, target, subscript, str(values), str(dtypes))
+
+    def onBad_input(self):
+        pass
 
 if __name__ == "__main__":
     parser = FortranNamelistParser(sys.argv[1])
