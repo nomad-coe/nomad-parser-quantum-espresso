@@ -107,6 +107,7 @@ class FortranNamelistParser(object):
         self.__values = None
         self.__types = None
         self.__nvalues_after_comma = 0
+        self.__cre_closing = None
         self.bad_input = False
 
     def parse(self):
@@ -183,8 +184,8 @@ class FortranNamelistParser(object):
         return None
 
     def parse_line_state3(self, line, pos_in_line):
-        # we are inside single-quoted multiline string
-        m = cRE_str_s_close.match(line, pos_in_line)
+        # we are inside quoted multiline string
+        m = self.__cre_closing.match(line, pos_in_line)
         if m is None:
             if self.annotateFile:
                 self.annotateFile.write(ANSI.FG_YELLOW + line[pos_in_line:] + ANSI.RESET)
@@ -195,25 +196,7 @@ class FortranNamelistParser(object):
                 self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
             self.__values[-1] += "\n" + m.group(1)
             self.__values[-1] = unquote_string(self.__values[-1])
-            self.__types[-1] = 'C'
-            self.state = 2
-            return m.end()
-        return None
-
-    def parse_line_state4(self, line, pos_in_line):
-        # we are inside double-quoted multiline string
-        m = cRE_str_d_close.match(line, pos_in_line)
-        if m is None:
-            if self.annotateFile:
-                self.annotateFile.write(ANSI.FG_YELLOW + line[pos_in_line:] + ANSI.RESET)
-            self.__values[-1] += "\n" + line
-            return len(line)
-        else:
-            if self.annotateFile:
-                self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
-            self.__values[-1] += "\n" + m.group(1)
-            self.__values[-1] = unquote_string(self.__values[-1])
-            self.__types[-1] = 'C'
+            self.__cre_closing = None
             self.state = 2
             return m.end()
         return None
@@ -305,15 +288,17 @@ class FortranNamelistParser(object):
                     self.__types.append('C')
                 elif m.group('str_s_nc') is not None:
                     # non-closed single-quoted string
-                    self.state=3
+                    self.state = 3
                     self.__values.append(m.group('str_s_nc'))
-                    self.__types.append('string_singlequoted')
+                    self.__types.append('C')
+                    self.__cre_closing = cRE_str_s_close
                 elif m.group('str_d_nc') is not None:
                     # non-closed double-quoted string
-                    self.state=4
+                    self.state = 3
                     self.__values.append(m.group('str_d_nc'))
-                    self.__types.append('string_doublequoted')
-                self.__nvalues_after_comma +=1
+                    self.__types.append('C')
+                    self.__cre_closing = cRE_str_d_close
+                self.__nvalues_after_comma += 1
                 if self.annotateFile:
                     self.annotateFile.write(ANSI.FG_YELLOW + m.group() + ANSI.RESET)
             return m.end()
@@ -342,8 +327,6 @@ class FortranNamelistParser(object):
                 new_pos_in_line = self.parse_line_state2(line, pos_in_line)
             elif self.state == 3:
                 new_pos_in_line = self.parse_line_state3(line, pos_in_line)
-            elif self.state == 4:
-                new_pos_in_line = self.parse_line_state4(line, pos_in_line)
             # check if anything was parsed, otherwise cancel that line
             if new_pos_in_line is None:
                 break
