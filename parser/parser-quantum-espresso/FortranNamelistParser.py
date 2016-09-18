@@ -162,28 +162,32 @@ class FortranNamelistParser(object):
                     self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BLUE + subscript[last_end:] + ANSI.RESET)
         return result
 
+    def parse_line_state0(self, line, pos_in_line):
+        # we have no open group
+        m = cRE_start_group.match(line, pos_in_line)
+        if m is not None:
+            self.__nl_group = m.group(1).lower()
+            if self.annotateFile:
+                self.annotateFile.write(ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
+            self.state = 1
+            self.onOpen_namelist_group(self.__nl_group)
+            return m.end()
+        else:
+            # but comments may appear here
+            m = cRE_comment.match(line, pos_in_line)
+            if m is not None:
+                if self.annotateFile:
+                    self.annotateFile.write(ANSI.FG_BLUE + m.group() + ANSI.RESET)
+                self.onComment(m.group())
+                return m.end()
+        return None
+
     def parse_line(self, line):
         pos_in_line = 0
         while pos_in_line<len(line):
             new_pos_in_line = None
             if self.state == 0:
-                # we have no open group
-                m = cRE_start_group.match(line, pos_in_line)
-                if m is not None:
-                    self.__nl_group = m.group(1).lower()
-                    if self.annotateFile:
-                        self.annotateFile.write(ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
-                    self.state = 1
-                    self.onOpen_namelist_group(self.__nl_group)
-                    new_pos_in_line = m.end()
-                else:
-                    # but comments may appear here
-                    m = cRE_comment.match(line, pos_in_line)
-                    if m is not None:
-                        if self.annotateFile:
-                            self.annotateFile.write(ANSI.FG_BLUE + m.group() + ANSI.RESET)
-                        self.onComment(m.group())
-                        new_pos_in_line = m.end()
+                new_pos_in_line = self.parse_line_state0(line, pos_in_line)
             elif self.state==3:
                 # we are inside single-quoted multiline string
                 m = cRE_str_s_close.match(line, pos_in_line)
