@@ -101,7 +101,7 @@ class FortranNamelistParser(object):
         self.input_tree = {}
         self.file_path = file_path
         self.state = self.parse_line_root
-        self.annotateFile = sys.stdout
+        self.__annotateFile = sys.stdout
         self.__nl_group = None
         self.__target = None
         self.__subscript = None
@@ -120,9 +120,9 @@ class FortranNamelistParser(object):
             self.onBad_input()
 
     def annotate(self, what, highlight):
-        if self.annotateFile:
+        if self.__annotateFile:
             m = cRE_end_newline.match(what)
-            self.annotateFile.write(highlight + m.group(1) + ANSI.RESET + m.group(2))
+            self.__annotateFile.write(highlight + m.group(1) + ANSI.RESET + m.group(2))
 
     def parse_subscript(self, subscript):
         if subscript is None:
