@@ -99,7 +99,7 @@ class FortranNamelistParser(object):
     def __init__(self, file_path):
         self.input_tree = {}
         self.file_path = file_path
-        self.state = 0
+        self.state = self.parse_line_root
         self.annotateFile = sys.stdout
         self.__nl_group = None
         self.__target = None
@@ -163,14 +163,14 @@ class FortranNamelistParser(object):
                     self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BLUE + subscript[last_end:] + ANSI.RESET)
         return result
 
-    def parse_line_state0(self, line, pos_in_line):
+    def parse_line_root(self, line, pos_in_line):
         # we have no open group
         m = cRE_start_group.match(line, pos_in_line)
         if m is not None:
             self.__nl_group = m.group(1).lower()
             if self.annotateFile:
                 self.annotateFile.write(ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
-            self.state = 1
+            self.state = self.parse_line_open_group
             self.onOpen_namelist_group(self.__nl_group)
             return m.end()
         else:
@@ -203,7 +203,7 @@ class FortranNamelistParser(object):
             self.__nl_group = None
             if self.annotateFile:
                 self.annotateFile.write(ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_GREEN + m.group() + ANSI.RESET)
-            self.state = 0
+            self.state = self.parse_line_root
             return m.end()
         m = cRE_start_assignment.match(line, pos_in_line)
         if m is not None:
@@ -213,7 +213,7 @@ class FortranNamelistParser(object):
                     self.__nl_group,
                     self.__target, self.__subscript,
                     self.__values, self.__types)
-            self.state = 2
+            self.state = self.parse_line_values
             if m.group('subscript') is None:
                 self.__subscript = None
                 if self.annotateFile:
@@ -234,7 +234,7 @@ class FortranNamelistParser(object):
             return m.end()
         return None
 
-    def parse_line_state2(self, line, pos_in_line):
+    def parse_line_values(self, line, pos_in_line):
         # we are inside the values-part of an assignment
         m = cRE_assigned_value.match(line, pos_in_line)
         if m is not None:
@@ -266,13 +266,13 @@ class FortranNamelistParser(object):
                     self.__types.append('C')
                 elif m.group('str_s_nc') is not None:
                     # non-closed single-quoted string
-                    self.state = 3
+                    self.state = self.parse_line_multiline_string
                     self.__values.append(m.group('str_s_nc'))
                     self.__types.append('C')
                     self.__cre_closing = cRE_str_s_close
                 elif m.group('str_d_nc') is not None:
                     # non-closed double-quoted string
-                    self.state = 3
+                    self.state = self.parse_line_multiline_string
                     self.__values.append(m.group('str_d_nc'))
                     self.__types.append('C')
                     self.__cre_closing = cRE_str_d_close
@@ -292,12 +292,12 @@ class FortranNamelistParser(object):
                     self.annotateFile.write(ANSI.FG_MAGENTA + m.group() + ANSI.RESET)
                 return m.end()
         # check for group-close or new assignment
-        new_pos_in_line = self.open_group(line, pos_in_line)
+        new_pos_in_line = self.parse_line_open_group(line, pos_in_line)
         if new_pos_in_line is not None:
             return new_pos_in_line
         return None
 
-    def parse_line_state3(self, line, pos_in_line):
+    def parse_line_multiline_string(self, line, pos_in_line):
         # we are inside quoted multiline string
         m = self.__cre_closing.match(line, pos_in_line)
         if m is None:
@@ -311,29 +311,21 @@ class FortranNamelistParser(object):
             self.__values[-1] += "\n" + m.group(1)
             self.__values[-1] = unquote_string(self.__values[-1])
             self.__cre_closing = None
-            self.state = 2
+            self.state = self.parse_line_values
             return m.end()
         return None
 
     def parse_line(self, line):
         pos_in_line = 0
         while pos_in_line<len(line):
-            new_pos_in_line = None
-            if self.state == 0:
-                new_pos_in_line = self.parse_line_state0(line, pos_in_line)
-            elif self.state == 1:
-                new_pos_in_line = self.parse_line_open_group(line, pos_in_line)
-            elif self.state == 2:
-                new_pos_in_line = self.parse_line_state2(line, pos_in_line)
-            elif self.state == 3:
-                new_pos_in_line = self.parse_line_state3(line, pos_in_line)
+            new_pos_in_line = self.state(line, pos_in_line)
             # check if anything was parsed, otherwise cancel that line
             if new_pos_in_line is None:
                 break
             else:
                 pos_in_line = new_pos_in_line
         if pos_in_line < len(line):
-            if self.state > 0 and self.state < 5 and line[pos_in_line:].strip():
+            if self.state != self.parse_line_root and line[pos_in_line:].strip():
                 # states we as the base class are handling, but with leftover chars on a line
                 LOGGER.error("ERROR: leftover chars in line while inside namelist group: '%s'", line[pos_in_line:])
                 self.bad_input = True
