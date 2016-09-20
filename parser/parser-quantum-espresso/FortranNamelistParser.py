@@ -291,6 +291,10 @@ class FortranNamelistParser(object):
             self.__nvalues_after_comma = 0
             self.annotate(m.group(), ANSI.FG_MAGENTA)
             return m.end()
+        if not line[pos_in_line:].strip():
+            # remaining part of line is empty
+            self.annotate(line[pos_in_line:], ANSI.BG_BRIGHT_BLACK)
+            return len(line)
         # check for group-close or new assignment
         new_pos_in_line = self.parse_line_open_group(line, pos_in_line)
         if new_pos_in_line is not None:
