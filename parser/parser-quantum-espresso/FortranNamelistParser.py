@@ -231,6 +231,11 @@ class FortranNamelistParser(object):
                 self.__target, self.__subscript)
             self.state = self.parse_line_values
             return m.end()
+        m = cRE_comment.match(line, pos_in_line)
+        if m is not None:
+            self.annotate(m.group(), ANSI.FG_BLUE)
+            self.onComment(m.group('comment'))
+            return m.end()
         return None
 
     def parse_line_values(self, line, pos_in_line):
