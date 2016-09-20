@@ -343,7 +343,7 @@ class FortranNamelistParser(object):
         if pos_in_line < len(line):
             if self.state != self.parse_line_root and line[pos_in_line:].strip():
                 # states we as the base class are handling, but with leftover chars on a line
-                LOGGER.error("ERROR: leftover chars in line while inside namelist group: '%s'", line[pos_in_line:])
+                LOGGER.error("ERROR: leftover chars in line while inside namelist group: '%s', state %s", line[pos_in_line:], str(self.state))
                 self.bad_input = True
                 self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED)
             else:
