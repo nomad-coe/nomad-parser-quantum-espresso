@@ -69,7 +69,7 @@ def unquote_string(value):
 
 # quoted strings
 cRE_string_quoted = re.compile(r"(?:'[^']*'|\"[^\"]*\")")
-cRE_comment = re.compile(r"\s*!.*")
+cRE_comment = re.compile(r"\s*!(?P<comment>.*)")
 RE_identifier = r"[a-zA-Z]\w*" # fortran identifier
 cRE_start_group = re.compile(r'\s*&(' + RE_identifier + r')') # beginning of namelist group 
 cRE_end_group = re.compile(r'\s*/')
@@ -83,7 +83,7 @@ cRE_assigned_value = re.compile(
         r'(?P<str_d>"[^"]*(?:[^"]|"")*"(?!"))', # double-quoted string, closed, allowing for escaped quotes ("")
         r"(?P<str_s_nc>'[^']*(?:[^']|'')*)", # single-quoted string, not closed
         r'(?P<str_d_nc>"[^"]*(?:[^"]|"")*)', # double-quoted string, not closed
-        r'(?P<comment>!.*)', # comment
+        r'!(?P<comment>.*)', # comment
     ]) + ')', re.I)
 cRE_str_s_close = re.compile(r"([^']*(?:[^']|'')*'(?!'))") # single-quoted string, closing
 cRE_str_d_close = re.compile(r'([^"]*(?:[^"]|"")*"(?!"))') # double-quoted string, closing
@@ -175,7 +175,7 @@ class FortranNamelistParser(object):
             m = cRE_comment.match(line, pos_in_line)
             if m is not None:
                 self.annotate(m.group(), ANSI.FG_BLUE)
-                self.onComment(m.group())
+                self.onComment(m.group('comment'))
                 return m.end()
         return None
 
@@ -239,7 +239,7 @@ class FortranNamelistParser(object):
         if m is not None:
             if m.group('comment') is not None:
                 self.annotate(m.group(), ANSI.FG_BLUE)
-                self.onComment(m.group())
+                self.onComment(m.group('comment'))
             else:
                 if m.group('num') is not None:
                     (value, dtype) = match_to_float(m, group_offset=1)
@@ -324,6 +324,7 @@ class FortranNamelistParser(object):
         m = cRE_comment.match(line, pos_in_line)
         if m is not None:
             self.annotate(m.group(), ANSI.FG_BLUE)
+            self.onComment(m.group('comment'))
             self.__subscript += line[pos_in_line:m.start()]
             return m.end()
         LOGGER.error("ERROR: leftover chars in line while inside subscript: '%s'", line[pos_in_line:])
