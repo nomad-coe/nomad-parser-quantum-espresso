@@ -295,11 +295,9 @@ class FortranNamelistParser(object):
             # remaining part of line is empty
             self.annotate(line[pos_in_line:], ANSI.BG_BRIGHT_BLACK)
             return len(line)
-        # check for group-close or new assignment
-        new_pos_in_line = self.parse_line_open_group(line, pos_in_line)
-        if new_pos_in_line is not None:
-            return new_pos_in_line
-        return None
+        # if none of the above matched, switch back to checking for new assignment
+        self.state = self.parse_line_open_group
+        return pos_in_line
 
     def parse_line_multiline_string(self, line, pos_in_line):
         # we are inside quoted multiline string
