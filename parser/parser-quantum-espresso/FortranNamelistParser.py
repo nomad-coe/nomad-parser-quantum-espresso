@@ -185,6 +185,7 @@ class FortranNamelistParser(object):
         m = cRE_end_group.match(line, pos_in_line)
         if m is not None:
             # we just closed a NL group
+            self.annotate(m.group(), ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_GREEN)
             if self.__target is not None:
                 self.onClose_value_assignment(
                     self.__nl_group,
@@ -197,12 +198,12 @@ class FortranNamelistParser(object):
             self.__nvalues_after_comma = 0
             self.onClose_namelist_group(self.__nl_group)
             self.__nl_group = None
-            self.annotate(m.group(), ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_GREEN)
             self.state = self.parse_line_root
             return m.end()
         m = cRE_identifier.match(line, pos_in_line)
         if m is not None:
             # we have a new identifier (part of left-hand side of assignment)
+            self.annotate(m.group(), ANSI.FG_GREEN)
             if self.__target is not None:
                 self.onClose_value_assignment(
                     self.__nl_group,
@@ -213,15 +214,14 @@ class FortranNamelistParser(object):
             self.__values = []
             self.__types = []
             self.__nvalues_after_comma = 0
-            self.annotate(m.group(), ANSI.FG_GREEN)
             return m.end()
         m = cRE_assignment_subscript_open.match(line, pos_in_line)
         if m is not None:
             # we have opened a new subscript (part of left-hand side of assignment)
-            self.__subscript = m.group('subscript')
-            self.state = self.parse_line_open_subscript
             self.annotate(line[pos_in_line:m.start('subscript')], ANSI.FG_GREEN)
             self.annotate(m.group('subscript'), ANSI.FG_CYAN)
+            self.__subscript = m.group('subscript')
+            self.state = self.parse_line_open_subscript
             return m.end()
         m = cRE_assignment_equals.match(line, pos_in_line)
         if m is not None:
@@ -246,6 +246,7 @@ class FortranNamelistParser(object):
                 self.annotate(m.group(), ANSI.FG_BLUE)
                 self.onComment(m.group('comment'))
             else:
+                self.annotate(m.group(), ANSI.FG_YELLOW)
                 if m.group('num') is not None:
                     (value, dtype) = match_to_float(m, group_offset=1)
                     self.__values.append(value)
@@ -280,16 +281,15 @@ class FortranNamelistParser(object):
                     self.__types.append('C')
                     self.__cre_closing = cRE_str_d_close
                 self.__nvalues_after_comma += 1
-                self.annotate(m.group(), ANSI.FG_YELLOW)
             return m.end()
         # special meaning of comma: may indicate Null values in array assignments
         m = cRE_comma.match(line, pos_in_line)
         if m is not None:
+            self.annotate(m.group(), ANSI.FG_MAGENTA)
             if self.__nvalues_after_comma is 0:
                 self.__values.append(None)
                 self.__types.append(None)
             self.__nvalues_after_comma = 0
-            self.annotate(m.group(), ANSI.FG_MAGENTA)
             return m.end()
         if not line[pos_in_line:].strip():
             # remaining part of line is empty
@@ -334,9 +334,9 @@ class FortranNamelistParser(object):
             self.onComment(m.group('comment'))
             self.__subscript += line[pos_in_line:m.start()]
             return m.end()
+        self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED)
         LOGGER.error("ERROR: leftover chars in line while inside subscript: '%s'", line[pos_in_line:])
         self.bad_input = True
-        self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED)
         return None
 
     def parse_line(self, line):
