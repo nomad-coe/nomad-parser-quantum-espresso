@@ -73,7 +73,6 @@ cRE_comment = re.compile(r"\s*!.*")
 RE_identifier = r"[a-zA-Z]\w*" # fortran identifier
 cRE_start_group = re.compile(r'\s*&(' + RE_identifier + r')') # beginning of namelist group 
 cRE_end_group = re.compile(r'\s*/')
-cRE_start_assignment = re.compile(r'\s*(?P<target>' + RE_identifier + r')(?:\((?P<subscript>[^\)]*)\))?\s*=\s*')
 cRE_assigned_value = re.compile(
     r'\s*(?:' + '|'.join([
         r'(?P<num>' + RE_f + r')', # integers and floats
@@ -89,6 +88,12 @@ cRE_assigned_value = re.compile(
 cRE_str_s_close = re.compile(r"([^']*(?:[^']|'')*'(?!'))") # single-quoted string, closing
 cRE_str_d_close = re.compile(r'([^"]*(?:[^"]|"")*"(?!"))') # double-quoted string, closing
 cRE_comma = re.compile(r'\s*,')
+
+cRE_identifier = re.compile(r'\s*(?P<target>' + RE_identifier + r')')
+cRE_assignment_subscript_open = re.compile(r'\s*\((?P<subscript>[^\)!]*)')
+cRE_assignment_subscript_continue = re.compile(r'(?P<subscript>[^\)!]+)')
+cRE_assignment_subscript_close = re.compile(r'(?P<subscript>[^\)!]*)\)')
+cRE_assignment_equals = re.compile(r'\s*=')
 
 cRE_subscript = re.compile(r'\s*,?\s*(?:(\d*)\s*:\s*(\d*)|(\d+))')
 
@@ -195,26 +200,32 @@ class FortranNamelistParser(object):
             self.annotate(m.group(), ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_GREEN)
             self.state = self.parse_line_root
             return m.end()
-        m = cRE_start_assignment.match(line, pos_in_line)
+        m = cRE_identifier.match(line, pos_in_line)
         if m is not None:
-            # we have a new assignment
+            # we have a new identifier (part of left-hand side of assignment)
             if self.__target is not None:
                 self.onClose_value_assignment(
                     self.__nl_group,
                     self.__target, self.__subscript,
                     self.__values, self.__types)
-            if m.group('subscript') is None:
-                self.__subscript = None
-                self.annotate(m.group(), ANSI.FG_GREEN)
-            else:
-                self.annotate(line[pos_in_line:m.start('subscript')], ANSI.FG_GREEN)
-                self.annotate(m.group('subscript'), ANSI.FG_CYAN)
-                self.__subscript = self.parse_subscript(m.group('subscript'))
-                self.annotate(line[m.end('subscript'):m.end()], ANSI.FG_GREEN)
             self.__target = m.group('target').lower()
+            self.__subscript = None
             self.__values = []
             self.__types = []
             self.__nvalues_after_comma = 0
+            self.annotate(m.group(), ANSI.FG_GREEN)
+            return m.end()
+        m = cRE_assignment_subscript_open.match(line, pos_in_line)
+        if m is not None:
+            # we have opened a new subscript (part of left-hand side of assignment)
+            self.__subscript = m.group('subscript')
+            self.state = self.parse_line_open_subscript
+            self.annotate(line[pos_in_line:m.start('subscript')], ANSI.FG_GREEN)
+            self.annotate(m.group('subscript'), ANSI.FG_CYAN)
+            return m.end()
+        m = cRE_assignment_equals.match(line, pos_in_line)
+        if m is not None:
+            self.annotate(line[pos_in_line:m.end()], ANSI.FG_GREEN)
             self.onOpen_value_assignment(
                 self.__nl_group,
                 self.__target, self.__subscript)
@@ -296,6 +307,29 @@ class FortranNamelistParser(object):
             self.__cre_closing = None
             self.state = self.parse_line_values
             return m.end()
+        return None
+
+    def parse_line_open_subscript(self, line, pos_in_line):
+        m = cRE_assignment_subscript_close.match(line, pos_in_line)
+        if m is not None:
+            self.annotate(m.group('subscript'), ANSI.FG_CYAN)
+            self.annotate(line[m.end('subscript'):m.end()], ANSI.FG_GREEN)
+            self.__subscript = self.parse_subscript(self.__subscript + m.group('subscript'))
+            self.state = self.parse_line_open_group
+            return m.end()
+        m = cRE_assignment_subscript_continue.match(line, pos_in_line)
+        if m is not None:
+            self.annotate(m.group('subscript'), ANSI.FG_CYAN)
+            self.__subscript += m.group('subscript')
+            return m.end()
+        m = cRE_comment.match(line, pos_in_line)
+        if m is not None:
+            self.annotate(m.group(), ANSI.FG_BLUE)
+            self.__subscript += line[pos_in_line:m.start()]
+            return m.end()
+        LOGGER.error("ERROR: leftover chars in line while inside subscript: '%s'", line[pos_in_line:])
+        self.bad_input = True
+        self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED)
         return None
 
     def parse_line(self, line):
