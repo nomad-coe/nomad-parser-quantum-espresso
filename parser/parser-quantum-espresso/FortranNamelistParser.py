@@ -90,7 +90,7 @@ cRE_str_s_close = re.compile(r"([^']*(?:[^']|'')*'(?!'))") # single-quoted strin
 cRE_str_d_close = re.compile(r'([^"]*(?:[^"]|"")*"(?!"))') # double-quoted string, closing
 cRE_comma = re.compile(r'\s*,')
 
-cRE_subscript = re.compile(r'\s*,?\s*(?:(\d*):\s*(\d*)|(\d*))')
+cRE_subscript = re.compile(r'\s*,?\s*(?:(\d*)\s*:\s*(\d*)|(\d+))')
 
 cRE_end_newline = re.compile(r'(.*?)(\n*)$')
 
