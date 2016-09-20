@@ -117,6 +117,7 @@ class FortranNamelistParser(object):
         self.__nvalues_after_comma = 0
         self.__cre_closing = None
         self.bad_input = False
+        self.cache = {}
 
     def parse(self):
         with open(self.file_path, "r") as fIn:
@@ -359,14 +360,21 @@ class FortranNamelistParser(object):
             else:
                 self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BLUE)
 
-    # Hooks to be overloaded in derived classes in order to do stuff
+    # Hooks to be overloaded in derived classes in order to do stuff beyond caching
     def onComment(self, comment):
         pass
 
     def onOpen_namelist_group(self, groupname):
-        pass
+        if groupname in self.cache:
+            LOGGER.error("ERROR: multiple definitions of group &%s", groupname)
+            self.bad_input = True
+        else:
+            self.cache[groupname]={}
 
     def onClose_namelist_group(self, groupname):
+        LOGGER.error("group: %s", groupname)
+        for identifier in sorted(self.cache[groupname]):
+            LOGGER.error("  %s: %s", identifier, str(self.cache[groupname][identifier]))
         pass
 
     def onOpen_value_assignment(self, groupname, target, subscript):
@@ -374,9 +382,12 @@ class FortranNamelistParser(object):
 
     def onClose_value_assignment(self, groupname, target, subscript, values, dtypes):
         if subscript is None:
-            LOGGER.error("SET %s/%s = %s (types: %s)", groupname, target, str(values), str(dtypes))
+            LOGGER.debug("SET %s/%s = %s (types: %s)", groupname, target, str(values), str(dtypes))
         else:
-            LOGGER.error("SET %s/%s(%s) = %s (types: %s)", groupname, target, subscript, str(values), str(dtypes))
+            LOGGER.debug("SET %s/%s(%s) = %s (types: %s)", groupname, target, subscript, str(values), str(dtypes))
+        if target not in self.cache[groupname]:
+            self.cache[groupname][target] = []
+        self.cache[groupname][target].append([subscript, values, dtypes])
 
     def onBad_input(self):
         pass
