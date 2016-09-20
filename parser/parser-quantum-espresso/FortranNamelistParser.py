@@ -134,7 +134,6 @@ class FortranNamelistParser(object):
             if m is None:
                 break
             elif m.group(3) is not None:
-                self.annotate(subscript[last_end:m.end()], ANSI.FG_CYAN)
                 # prepend to result list, making ranges explicit:
                 #    fortran has fastest-running index first
                 #  while
@@ -143,7 +142,6 @@ class FortranNamelistParser(object):
                 last_end = m.end()
                 continue
             elif m.group(1) is not None:
-                self.annotate(subscript[last_end:m.end()], ANSI.FG_BRIGHT_CYAN)
                 # prepend to result list, making ranges explicit
                 #    fortran has fastest-running index first
                 #  while
@@ -153,12 +151,9 @@ class FortranNamelistParser(object):
                 continue
             break
         if last_end < len(subscript):
-            if subscript[last_end:].stript():
+            if subscript[last_end:].strip():
                 LOGGER.error("ERROR: leftover chars in subscript: '%s'", subscript[last_end:])
-                self.annotate(subscript[last_end:], ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED)
                 self.bad_input = True
-            else:
-                self.annotate(subscript[last_end:], ANSI.BEGIN_INVERT + ANSI.FG_BLUE)
         return result
 
     def parse_line_root(self, line, pos_in_line):
@@ -214,6 +209,7 @@ class FortranNamelistParser(object):
                 self.annotate(m.group(), ANSI.FG_GREEN)
             else:
                 self.annotate(line[pos_in_line:m.start('subscript')], ANSI.FG_GREEN)
+                self.annotate(m.group('subscript'), ANSI.FG_CYAN)
                 self.__subscript = self.parse_subscript(m.group('subscript'))
                 self.annotate(line[m.end('subscript'):m.end()], ANSI.FG_GREEN)
             self.__target = m.group('target').lower()
