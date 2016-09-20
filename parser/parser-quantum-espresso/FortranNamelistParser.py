@@ -304,11 +304,11 @@ class FortranNamelistParser(object):
         m = self.__cre_closing.match(line, pos_in_line)
         if m is None:
             self.annotate(line[pos_in_line:], ANSI.FG_YELLOW)
-            self.__values[-1] += "\n" + line
+            self.__values[-1] += line
             return len(line)
         else:
             self.annotate(m.group(), ANSI.FG_YELLOW)
-            self.__values[-1] += "\n" + m.group(1)
+            self.__values[-1] += m.group(1)
             self.__values[-1] = unquote_string(self.__values[-1])
             self.__cre_closing = None
             self.state = self.parse_line_values
