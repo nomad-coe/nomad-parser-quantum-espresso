@@ -277,16 +277,15 @@ class FortranNamelistParser(object):
                 self.__nvalues_after_comma += 1
                 self.annotate(m.group(), ANSI.FG_YELLOW)
             return m.end()
-        else:
-            # special meaning of comma: may indicate Null values in array assignments
-            m = cRE_comma.match(line, pos_in_line)
-            if m is not None:
-                if self.__nvalues_after_comma is 0:
-                    self.__values.append(None)
-                    self.__types.append(None)
-                self.__nvalues_after_comma = 0
-                self.annotate(m.group(), ANSI.FG_MAGENTA)
-                return m.end()
+        # special meaning of comma: may indicate Null values in array assignments
+        m = cRE_comma.match(line, pos_in_line)
+        if m is not None:
+            if self.__nvalues_after_comma is 0:
+                self.__values.append(None)
+                self.__types.append(None)
+            self.__nvalues_after_comma = 0
+            self.annotate(m.group(), ANSI.FG_MAGENTA)
+            return m.end()
         # check for group-close or new assignment
         new_pos_in_line = self.parse_line_open_group(line, pos_in_line)
         if new_pos_in_line is not None:
