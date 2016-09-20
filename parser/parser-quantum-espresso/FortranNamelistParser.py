@@ -203,7 +203,6 @@ class FortranNamelistParser(object):
                     self.__nl_group,
                     self.__target, self.__subscript,
                     self.__values, self.__types)
-            self.state = self.parse_line_values
             if m.group('subscript') is None:
                 self.__subscript = None
                 self.annotate(m.group(), ANSI.FG_GREEN)
@@ -219,6 +218,7 @@ class FortranNamelistParser(object):
             self.onOpen_value_assignment(
                 self.__nl_group,
                 self.__target, self.__subscript)
+            self.state = self.parse_line_values
             return m.end()
         return None
 
