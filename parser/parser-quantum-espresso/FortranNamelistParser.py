@@ -52,8 +52,10 @@ def match_to_float(m, group_offset=0):
             pyfloat_str += group[7] if len(group[7])>0 else '0'
             dtype = 'f'
     LOGGER.debug("pyfloat_str: %s", pyfloat_str)
-    return (float(pyfloat_str), dtype)
-
+    if dtype == 'f':
+        return (float(pyfloat_str), dtype)
+    else:
+        return (int(pyfloat_str), dtype)
 
 RE_unescape = {
     '"': re.compile(r'""'),
