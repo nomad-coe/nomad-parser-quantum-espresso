@@ -142,13 +142,8 @@ class FortranNamelistParser(object):
             else:
                 pos_in_line = new_pos_in_line
         if pos_in_line < len(line):
-            if self.state != self.state_root and line[pos_in_line:].strip():
-                # states we as the base class are handling, but with leftover chars on a line
-                LOGGER.error("ERROR: leftover chars in line while inside namelist group: '%s', state %s", line[pos_in_line:], str(self.state))
-                self.bad_input = True
-                self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED)
-            else:
-                self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BLUE)
+            self.bad_input = True
+            self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED)
 
     def annotate(self, what, highlight):
         """write string to annotateFile with ANSI highlight/reset sequences"""
@@ -204,6 +199,11 @@ class FortranNamelistParser(object):
             if m is not None:
                 self.annotate(m.group(), ANSI.FG_BLUE)
                 self.onComment(m.group('comment'))
+                return m.end()
+            # as well as whitespace-only lines
+            m = cRE_trailing_whitespace.match(line, pos_in_line)
+            if m is not None:
+                self.annotate(m.group(), ANSI.BG_WHITE)
                 return m.end()
         return None
 
@@ -265,6 +265,11 @@ class FortranNamelistParser(object):
         if m is not None:
             self.annotate(m.group(), ANSI.FG_BLUE)
             self.onComment(m.group('comment'))
+            return m.end()
+        # check for trailing whitespace
+        m = cRE_trailing_whitespace.match(line, pos_in_line)
+        if m is not None:
+            self.annotate(m.group(), ANSI.BG_WHITE)
             return m.end()
         return None
 
@@ -332,10 +337,11 @@ class FortranNamelistParser(object):
                 self.__types.append(None)
             self.__nvalues_after_comma = 0
             return m.end()
-        if not line[pos_in_line:].strip():
-            # remaining part of line is empty
-            self.annotate(line[pos_in_line:], ANSI.BG_BRIGHT_BLACK)
-            return len(line)
+        # check for trailing whitespace
+        m = cRE_trailing_whitespace.match(line, pos_in_line)
+        if m is not None:
+            self.annotate(m.group(), ANSI.BG_WHITE)
+            return m.end()
         # if none of the above matched, switch back to checking for new assignment
         self.state = self.state_inside_group
         return pos_in_line
