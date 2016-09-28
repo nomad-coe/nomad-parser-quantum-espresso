@@ -120,19 +120,24 @@ class FortranNamelistParser(object):
         self.cache = {}
 
     def parse(self):
+        """open file and parse line-by-line"""
         with open(self.file_path, "r") as fIn:
-            # split lines into 'line' and 'comment' parts
+            # process line-by-line
             for line in fIn:
                 self.parse_line(line)
+        # check if there was input flagged as 'bad'/'syntactically incorrect'
         if self.bad_input:
+            # call bad-input hook
             self.onBad_input()
 
     def annotate(self, what, highlight):
+        """write string to annotateFile with ANSI highlight/reset sequences"""
         if self.__annotateFile:
             m = cRE_end_newline.match(what)
             self.__annotateFile.write(highlight + m.group(1) + ANSI.RESET + m.group(2))
 
     def parse_subscript(self, subscript):
+        """parse fully captured subscript string into python array"""
         if subscript is None:
             return None
         result = []
@@ -165,7 +170,7 @@ class FortranNamelistParser(object):
         return result
 
     def parse_line_root(self, line, pos_in_line):
-        # we have no open group
+        """state: no open namelist groups, i.e. at the root of the namelist"""
         m = cRE_start_group.match(line, pos_in_line)
         if m is not None:
             self.__nl_group = m.group(1).lower()
@@ -183,8 +188,8 @@ class FortranNamelistParser(object):
         return None
 
     def parse_line_open_group(self, line, pos_in_line):
-        # we are inside opened group, but have no open assignment
-        #   check for group-closing /
+        """state: inside opened group, but no open assignment"""
+        # check for group-closing /
         m = cRE_end_group.match(line, pos_in_line)
         if m is not None:
             # we just closed a NL group
@@ -203,9 +208,9 @@ class FortranNamelistParser(object):
             self.__nl_group = None
             self.state = self.parse_line_root
             return m.end()
+        # check for new identifier (part of left-hand side of assignment)
         m = cRE_identifier.match(line, pos_in_line)
         if m is not None:
-            # we have a new identifier (part of left-hand side of assignment)
             self.annotate(m.group(), ANSI.FG_GREEN)
             if self.__target is not None:
                 self.onClose_value_assignment(
@@ -218,14 +223,15 @@ class FortranNamelistParser(object):
             self.__types = []
             self.__nvalues_after_comma = 0
             return m.end()
+        # check for new subscript (part of left-hand side of assignment)
         m = cRE_assignment_subscript_open.match(line, pos_in_line)
         if m is not None:
-            # we have opened a new subscript (part of left-hand side of assignment)
             self.annotate(line[pos_in_line:m.start('subscript')], ANSI.FG_GREEN)
             self.annotate(m.group('subscript'), ANSI.FG_CYAN)
             self.__subscript = m.group('subscript')
             self.state = self.parse_line_open_subscript
             return m.end()
+        # check for '=' sign in assignment, separating target from values
         m = cRE_assignment_equals.match(line, pos_in_line)
         if m is not None:
             self.annotate(line[pos_in_line:m.end()], ANSI.FG_GREEN)
@@ -234,6 +240,7 @@ class FortranNamelistParser(object):
                 self.__target, self.__subscript)
             self.state = self.parse_line_values
             return m.end()
+        # check for comments ('!' character up until end of line)
         m = cRE_comment.match(line, pos_in_line)
         if m is not None:
             self.annotate(m.group(), ANSI.FG_BLUE)
@@ -242,47 +249,56 @@ class FortranNamelistParser(object):
         return None
 
     def parse_line_values(self, line, pos_in_line):
-        # we are inside the values-part of an assignment
+        """state: parse values, i.e. right-hand side of assignment"""
+        # match value literals, groups decide on data type
         m = cRE_assigned_value.match(line, pos_in_line)
         if m is not None:
             if m.group('comment') is not None:
+                # found a comment
                 self.annotate(m.group(), ANSI.FG_BLUE)
                 self.onComment(m.group('comment'))
             else:
                 self.annotate(m.group(), ANSI.FG_YELLOW)
                 if m.group('num') is not None:
+                    # literal is single integer or float
                     (value, dtype) = match_to_float(m, group_offset=1)
                     self.__values.append(value)
                     self.__types.append(dtype)
                 elif m.group('cnum_r') is not None:
+                    # literal is complex: (float, float)
                     (cnum_r, dtype) = match_to_float(m, group_offset=10)
                     (cnum_i, dtype) = match_to_float(m, group_offset=19)
                     self.__values.append(complex(cnum_r, cnum_i))
                     self.__types.append('complex')
                 elif m.group('bool_t') is not None:
+                    # literal is a true-value bool
                     self.__values.append(True)
                     self.__types.append('b')
                 elif m.group('bool_f') is not None:
+                    # literal is a false-value bool
                     self.__values.append(False)
                     self.__types.append('b')
                 elif m.group('str_s') is not None:
+                    # literal is a closed, single-quoted string
                     self.__values.append(unquote_string(m.group('str_s')))
                     self.__types.append('C')
                 elif m.group('str_d') is not None:
+                    # literal is a closed, double-quoted string
                     self.__values.append(unquote_string(m.group('str_d')))
                     self.__types.append('C')
                 elif m.group('str_s_nc') is not None:
-                    # non-closed single-quoted string
+                    # literal is a non-closed, single-quoted string
                     self.state = self.parse_line_multiline_string
                     self.__values.append(m.group('str_s_nc'))
                     self.__types.append('C')
                     self.__cre_closing = cRE_str_s_close
                 elif m.group('str_d_nc') is not None:
-                    # non-closed double-quoted string
+                    # literal is a non-closed, double-quoted string
                     self.state = self.parse_line_multiline_string
                     self.__values.append(m.group('str_d_nc'))
                     self.__types.append('C')
                     self.__cre_closing = cRE_str_d_close
+                # keep track if there were values following the previous comma
                 self.__nvalues_after_comma += 1
             return m.end()
         # special meaning of comma: may indicate Null values in array assignments
@@ -290,6 +306,8 @@ class FortranNamelistParser(object):
         if m is not None:
             self.annotate(m.group(), ANSI.FG_MAGENTA)
             if self.__nvalues_after_comma is 0:
+                # there were no value literals preceeding the comma, which
+                # means a null value
                 self.__values.append(None)
                 self.__types.append(None)
             self.__nvalues_after_comma = 0
@@ -303,15 +321,19 @@ class FortranNamelistParser(object):
         return pos_in_line
 
     def parse_line_multiline_string(self, line, pos_in_line):
-        # we are inside quoted multiline string
+        """state: parse multiline string in right-hand side of assignment"""
+        # check for closing quotes
         m = self.__cre_closing.match(line, pos_in_line)
         if m is None:
+            # no closing quotes, append data to value
             self.annotate(line[pos_in_line:], ANSI.FG_YELLOW)
             self.__values[-1] += line
             return len(line)
         else:
+            # closing quotes, postprocess string
             self.annotate(m.group(), ANSI.FG_YELLOW)
             self.__values[-1] += m.group(1)
+            # remove enclosing quotes and resolve escaped quotes in string
             self.__values[-1] = unquote_string(self.__values[-1])
             self.__cre_closing = None
             self.state = self.parse_line_values
@@ -319,18 +341,23 @@ class FortranNamelistParser(object):
         return None
 
     def parse_line_open_subscript(self, line, pos_in_line):
+        """state: capture subscipt, possibly spanning multiple lines"""
+        # check for closing bracket
         m = cRE_assignment_subscript_close.match(line, pos_in_line)
         if m is not None:
+            # subscript closed, convert string form to python array
             self.annotate(m.group('subscript'), ANSI.FG_CYAN)
             self.annotate(line[m.end('subscript'):m.end()], ANSI.FG_GREEN)
             self.__subscript = self.parse_subscript(self.__subscript + m.group('subscript'))
             self.state = self.parse_line_open_group
             return m.end()
+        # check for new indices in subscript
         m = cRE_assignment_subscript_continue.match(line, pos_in_line)
         if m is not None:
             self.annotate(m.group('subscript'), ANSI.FG_CYAN)
             self.__subscript += m.group('subscript')
             return m.end()
+        # comments may appear within subscripts spanning multiple lines
         m = cRE_comment.match(line, pos_in_line)
         if m is not None:
             self.annotate(m.group(), ANSI.FG_BLUE)
@@ -343,6 +370,7 @@ class FortranNamelistParser(object):
         return None
 
     def parse_line(self, line):
+        """parse one line, delegating to the parser state handlers"""
         pos_in_line = 0
         while pos_in_line<len(line):
             new_pos_in_line = self.state(line, pos_in_line)
@@ -362,9 +390,11 @@ class FortranNamelistParser(object):
 
     # Hooks to be overloaded in derived classes in order to do stuff beyond caching
     def onComment(self, comment):
+        """hook: called whan a comment was found"""
         pass
 
     def onOpen_namelist_group(self, groupname):
+        """hook: called when a namelist group opens"""
         if groupname in self.cache:
             LOGGER.error("ERROR: multiple definitions of group &%s", groupname)
             self.bad_input = True
@@ -372,15 +402,20 @@ class FortranNamelistParser(object):
             self.cache[groupname]={}
 
     def onClose_namelist_group(self, groupname):
+        """hook: called when a namelist group closes"""
         LOGGER.error("group: %s", groupname)
         for identifier in sorted(self.cache[groupname]):
             LOGGER.error("  %s: %s", identifier, str(self.cache[groupname][identifier]))
-        pass
 
     def onOpen_value_assignment(self, groupname, target, subscript):
+        """hook: called when a value assignment within a namelist group starts"""
         pass
 
     def onClose_value_assignment(self, groupname, target, subscript, values, dtypes):
+        """hook: called when a value assignment within a namelist group closes
+        Arguments are: NL group name, identifier/subscript, values and assumed
+        data types
+        """
         if subscript is None:
             LOGGER.debug("SET %s/%s = %s (types: %s)", groupname, target, str(values), str(dtypes))
         else:
@@ -390,6 +425,7 @@ class FortranNamelistParser(object):
         self.cache[groupname][target].append([subscript, values, dtypes])
 
     def onBad_input(self):
+        """hook: called at the end of parsing if there was any bad input"""
         pass
 
 if __name__ == "__main__":
