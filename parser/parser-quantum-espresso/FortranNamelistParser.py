@@ -90,6 +90,7 @@ cRE_assigned_value = re.compile(
 cRE_str_s_close = re.compile(r"([^']*(?:[^']|'')*'(?!'))") # single-quoted string, closing
 cRE_str_d_close = re.compile(r'([^"]*(?:[^"]|"")*"(?!"))') # double-quoted string, closing
 cRE_comma = re.compile(r'\s*,')
+cRE_trailing_whitespace = re.compile(r'\s+$')
 
 cRE_identifier = re.compile(r'\s*(?P<target>' + RE_identifier + r')')
 cRE_assignment_subscript_open = re.compile(r'\s*\((?P<subscript>[^\)!]*)')
