@@ -130,6 +130,25 @@ class FortranNamelistParser(object):
             # call bad-input hook
             self.onBad_input()
 
+    def parse_line(self, line):
+        """parse one line, delegating to the parser state handlers"""
+        pos_in_line = 0
+        while pos_in_line<len(line):
+            new_pos_in_line = self.state(line, pos_in_line)
+            # check if anything was parsed, otherwise cancel that line
+            if new_pos_in_line is None:
+                break
+            else:
+                pos_in_line = new_pos_in_line
+        if pos_in_line < len(line):
+            if self.state != self.parse_line_root and line[pos_in_line:].strip():
+                # states we as the base class are handling, but with leftover chars on a line
+                LOGGER.error("ERROR: leftover chars in line while inside namelist group: '%s', state %s", line[pos_in_line:], str(self.state))
+                self.bad_input = True
+                self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED)
+            else:
+                self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BLUE)
+
     def annotate(self, what, highlight):
         """write string to annotateFile with ANSI highlight/reset sequences"""
         if self.__annotateFile:
@@ -368,25 +387,6 @@ class FortranNamelistParser(object):
         LOGGER.error("ERROR: leftover chars in line while inside subscript: '%s'", line[pos_in_line:])
         self.bad_input = True
         return None
-
-    def parse_line(self, line):
-        """parse one line, delegating to the parser state handlers"""
-        pos_in_line = 0
-        while pos_in_line<len(line):
-            new_pos_in_line = self.state(line, pos_in_line)
-            # check if anything was parsed, otherwise cancel that line
-            if new_pos_in_line is None:
-                break
-            else:
-                pos_in_line = new_pos_in_line
-        if pos_in_line < len(line):
-            if self.state != self.parse_line_root and line[pos_in_line:].strip():
-                # states we as the base class are handling, but with leftover chars on a line
-                LOGGER.error("ERROR: leftover chars in line while inside namelist group: '%s', state %s", line[pos_in_line:], str(self.state))
-                self.bad_input = True
-                self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BRIGHT_RED)
-            else:
-                self.annotate(line[pos_in_line:], ANSI.BEGIN_INVERT + ANSI.FG_BLUE)
 
     # Hooks to be overloaded in derived classes in order to do stuff beyond caching
     def onComment(self, comment):
