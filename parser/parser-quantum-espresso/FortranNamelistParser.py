@@ -136,7 +136,7 @@ class FortranNamelistParser(object):
             m = cRE_end_newline.match(what)
             self.__annotateFile.write(highlight + m.group(1) + ANSI.RESET + m.group(2))
 
-    def parse_subscript(self, subscript):
+    def parse_subscript_string(self, subscript):
         """parse fully captured subscript string into python array"""
         if subscript is None:
             return None
@@ -348,7 +348,7 @@ class FortranNamelistParser(object):
             # subscript closed, convert string form to python array
             self.annotate(m.group('subscript'), ANSI.FG_CYAN)
             self.annotate(line[m.end('subscript'):m.end()], ANSI.FG_GREEN)
-            self.__subscript = self.parse_subscript(self.__subscript + m.group('subscript'))
+            self.__subscript = self.parse_subscript_string(self.__subscript + m.group('subscript'))
             self.state = self.parse_line_open_group
             return m.end()
         # check for new indices in subscript
