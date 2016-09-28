@@ -107,7 +107,7 @@ class FortranNamelistParser(object):
     def __init__(self, file_path):
         self.input_tree = {}
         self.file_path = file_path
-        self.state = self.parse_line_root
+        self.state = self.state_root
         self.__annotateFile = sys.stdout
         self.__nl_group = None
         self.__target = None
@@ -141,7 +141,7 @@ class FortranNamelistParser(object):
             else:
                 pos_in_line = new_pos_in_line
         if pos_in_line < len(line):
-            if self.state != self.parse_line_root and line[pos_in_line:].strip():
+            if self.state != self.state_root and line[pos_in_line:].strip():
                 # states we as the base class are handling, but with leftover chars on a line
                 LOGGER.error("ERROR: leftover chars in line while inside namelist group: '%s', state %s", line[pos_in_line:], str(self.state))
                 self.bad_input = True
@@ -188,13 +188,13 @@ class FortranNamelistParser(object):
                 self.bad_input = True
         return result
 
-    def parse_line_root(self, line, pos_in_line):
+    def state_root(self, line, pos_in_line):
         """state: no open namelist groups, i.e. at the root of the namelist"""
         m = cRE_start_group.match(line, pos_in_line)
         if m is not None:
             self.__nl_group = m.group(1).lower()
             self.annotate(m.group(), ANSI.FG_BRIGHT_GREEN)
-            self.state = self.parse_line_open_group
+            self.state = self.state_inside_group
             self.onOpen_namelist_group(self.__nl_group)
             return m.end()
         else:
@@ -206,7 +206,7 @@ class FortranNamelistParser(object):
                 return m.end()
         return None
 
-    def parse_line_open_group(self, line, pos_in_line):
+    def state_inside_group(self, line, pos_in_line):
         """state: inside opened group, but no open assignment"""
         # check for group-closing /
         m = cRE_end_group.match(line, pos_in_line)
@@ -225,7 +225,7 @@ class FortranNamelistParser(object):
             self.__nvalues_after_comma = 0
             self.onClose_namelist_group(self.__nl_group)
             self.__nl_group = None
-            self.state = self.parse_line_root
+            self.state = self.state_root
             return m.end()
         # check for new identifier (part of left-hand side of assignment)
         m = cRE_identifier.match(line, pos_in_line)
@@ -248,7 +248,7 @@ class FortranNamelistParser(object):
             self.annotate(line[pos_in_line:m.start('subscript')], ANSI.FG_GREEN)
             self.annotate(m.group('subscript'), ANSI.FG_CYAN)
             self.__subscript = m.group('subscript')
-            self.state = self.parse_line_open_subscript
+            self.state = self.state_assignment_subscript
             return m.end()
         # check for '=' sign in assignment, separating target from values
         m = cRE_assignment_equals.match(line, pos_in_line)
@@ -257,7 +257,7 @@ class FortranNamelistParser(object):
             self.onOpen_value_assignment(
                 self.__nl_group,
                 self.__target, self.__subscript)
-            self.state = self.parse_line_values
+            self.state = self.state_assignment_values
             return m.end()
         # check for comments ('!' character up until end of line)
         m = cRE_comment.match(line, pos_in_line)
@@ -267,7 +267,7 @@ class FortranNamelistParser(object):
             return m.end()
         return None
 
-    def parse_line_values(self, line, pos_in_line):
+    def state_assignment_values(self, line, pos_in_line):
         """state: parse values, i.e. right-hand side of assignment"""
         # match value literals, groups decide on data type
         m = cRE_assigned_value.match(line, pos_in_line)
@@ -307,13 +307,13 @@ class FortranNamelistParser(object):
                     self.__types.append('C')
                 elif m.group('str_s_nc') is not None:
                     # literal is a non-closed, single-quoted string
-                    self.state = self.parse_line_multiline_string
+                    self.state = self.state_assignment_values_multiline_string
                     self.__values.append(m.group('str_s_nc'))
                     self.__types.append('C')
                     self.__cre_closing = cRE_str_s_close
                 elif m.group('str_d_nc') is not None:
                     # literal is a non-closed, double-quoted string
-                    self.state = self.parse_line_multiline_string
+                    self.state = self.state_assignment_values_multiline_string
                     self.__values.append(m.group('str_d_nc'))
                     self.__types.append('C')
                     self.__cre_closing = cRE_str_d_close
@@ -336,10 +336,10 @@ class FortranNamelistParser(object):
             self.annotate(line[pos_in_line:], ANSI.BG_BRIGHT_BLACK)
             return len(line)
         # if none of the above matched, switch back to checking for new assignment
-        self.state = self.parse_line_open_group
+        self.state = self.state_inside_group
         return pos_in_line
 
-    def parse_line_multiline_string(self, line, pos_in_line):
+    def state_assignment_values_multiline_string(self, line, pos_in_line):
         """state: parse multiline string in right-hand side of assignment"""
         # check for closing quotes
         m = self.__cre_closing.match(line, pos_in_line)
@@ -355,11 +355,11 @@ class FortranNamelistParser(object):
             # remove enclosing quotes and resolve escaped quotes in string
             self.__values[-1] = unquote_string(self.__values[-1])
             self.__cre_closing = None
-            self.state = self.parse_line_values
+            self.state = self.state_assignment_values
             return m.end()
         return None
 
-    def parse_line_open_subscript(self, line, pos_in_line):
+    def state_assignment_subscript(self, line, pos_in_line):
         """state: capture subscipt, possibly spanning multiple lines"""
         # check for closing bracket
         m = cRE_assignment_subscript_close.match(line, pos_in_line)
@@ -368,7 +368,7 @@ class FortranNamelistParser(object):
             self.annotate(m.group('subscript'), ANSI.FG_CYAN)
             self.annotate(line[m.end('subscript'):m.end()], ANSI.FG_GREEN)
             self.__subscript = self.parse_subscript_string(self.__subscript + m.group('subscript'))
-            self.state = self.parse_line_open_group
+            self.state = self.state_inside_group
             return m.end()
         # check for new indices in subscript
         m = cRE_assignment_subscript_continue.match(line, pos_in_line)
