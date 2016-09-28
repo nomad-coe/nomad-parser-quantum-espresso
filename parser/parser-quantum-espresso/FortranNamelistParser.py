@@ -205,7 +205,8 @@ class FortranNamelistParser(object):
             if m is not None:
                 self.annotate(m.group(), ANSI.BG_WHITE)
                 return m.end()
-        return None
+        # nothing matched, call hook
+        return self.onRoot_data(line, pos_in_line)
 
     def state_inside_group(self, line, pos_in_line):
         """state: inside opened group, but no open assignment"""
@@ -430,6 +431,14 @@ class FortranNamelistParser(object):
         if target not in self.cache[groupname]:
             self.cache[groupname][target] = []
         self.cache[groupname][target].append([subscript, values, dtypes])
+
+    def onRoot_data(self, line, pos_in_line):
+        """hook: called if data appears outside namelists groups, directly
+        at root level within the file;
+        data means: line is not empty or a comment
+        useful for code-specific extensions beyond the F90 namelist standard
+        """
+        return None
 
     def onBad_input(self):
         """hook: called at the end of parsing if there was any bad input"""
