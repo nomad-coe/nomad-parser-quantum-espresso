@@ -105,11 +105,11 @@ cRE_end_newline = re.compile(r'(.*?)(\n*)$')
 class FortranNamelistParser(object):
     """Parser for Fortran 90 Namelists
     """
-    def __init__(self, file_path):
+    def __init__(self, file_path, annotateFile = None):
         self.input_tree = {}
         self.file_path = file_path
         self.state = self.state_root
-        self.__annotateFile = sys.stdout
+        self.__annotateFile = annotateFile
         self.__nl_group = None
         self.__target = None
         self.__subscript = None
@@ -451,5 +451,5 @@ class FortranNamelistParser(object):
         pass
 
 if __name__ == "__main__":
-    parser = FortranNamelistParser(sys.argv[1])
+    parser = FortranNamelistParser(sys.argv[1], annotateFile=sys.stdout)
     parser.parse()
