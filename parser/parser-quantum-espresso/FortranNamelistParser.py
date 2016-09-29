@@ -130,6 +130,8 @@ class FortranNamelistParser(object):
         if self.bad_input:
             # call bad-input hook
             self.onBad_input()
+        # call end-of-file hook
+        self.onEnd_of_file()
 
     def parse_line(self, line):
         """parse one line, delegating to the parser state handlers"""
@@ -442,6 +444,10 @@ class FortranNamelistParser(object):
 
     def onBad_input(self):
         """hook: called at the end of parsing if there was any bad input"""
+        pass
+
+    def onEnd_of_file(self):
+        """hook: called at the end of parsing"""
         pass
 
 if __name__ == "__main__":
