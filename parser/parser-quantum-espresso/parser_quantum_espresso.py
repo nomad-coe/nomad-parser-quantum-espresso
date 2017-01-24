@@ -77,6 +77,10 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             'J', 'rydberg')
         backend.addValue('basis_set_cell_dependent_name', 'PW_%.1f' % (pwc_ry))
         backend.addValue('basis_set_cell_dependent_kind', 'plane_waves')
+        method_basis_set_gIndex = backend.openSection('section_method_basis_set')
+        backend.addValue('mapping_section_method_basis_set_cell_associated', gIndex)
+        backend.addValue('method_basis_set_kind', 'wavefunction')
+        backend.closeSection('section_method_basis_set', method_basis_set_gIndex)
 
     def onOpen_section_method(
             self, backend, gIndex, section):
