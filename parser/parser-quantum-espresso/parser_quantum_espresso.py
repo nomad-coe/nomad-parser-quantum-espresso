@@ -79,7 +79,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         backend.addValue('basis_set_cell_dependent_kind', 'plane_waves')
         method_basis_set_gIndex = backend.openSection('section_method_basis_set')
         backend.addValue('mapping_section_method_basis_set_cell_associated', gIndex)
-        backend.addValue('method_basis_set_kind', 'wavefunction')
+        backend.addValue('method_basis_set_kind', self.tmp['method_basis_set_kind'])
         backend.closeSection('section_method_basis_set', method_basis_set_gIndex)
 
     def onOpen_section_method(
@@ -775,11 +775,13 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                    SM(name='nbnd', required=True,
                        startReStr=r"\s*number of Kohn-Sham states\s*=\s*(?P<x_qe_number_of_states>" + RE_i + r")\s*$"
                    ),
-                   SM(name='ecutwfc', required=True,
-                      startReStr=r"\s*kinetic-energy cutoff\s*=\s*(?P<basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
+                   SM(name='ecutwfc', required=True, sections=['section_basis_set_cell_dependent'],
+                      startReStr=r"\s*kinetic-energy cutoff\s*=\s*(?P<basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$",
+                      adHoc=lambda p: self.setTmp('method_basis_set_kind', 'wavefunction'),
                    ),
-                   SM(name='ecut_density', required=True,
-                      startReStr=r"\s*charge density cutoff\s*=\s*(?P<x_qe_density_basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
+                   SM(name='ecut_density', required=True, sections=['section_basis_set_cell_dependent'],
+                      startReStr=r"\s*charge density cutoff\s*=\s*(?P<basis_set_planewave_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$",
+                      adHoc=lambda p: self.setTmp('method_basis_set_kind', 'density'),
                    ),
                    SM(name='ecutfock',
                       startReStr=r"\s*cutoff for Fock operator\s*=\s*(?P<x_qe_fock_operator_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
@@ -1519,7 +1521,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         ]
 
     def header_sections(self):
-        return ['section_basis_set_cell_dependent', 'section_method',
+        return ['section_method',
                 'section_system', 'x_qe_section_parallel',
                 'x_qe_section_compile_options']
 
