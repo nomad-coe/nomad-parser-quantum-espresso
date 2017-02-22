@@ -394,7 +394,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             # odd number of k points cannot describe spin-polarized case
             nspin = 1
         else:
-            kd = (k_point_cartesian[0:nk/2,:] - k_point_cartesian[nk/2:,:])
+            kd = (k_point_cartesian[0:nk//2,:] - k_point_cartesian[nk//2:,:])
             kd_len = np.sqrt(np.einsum('ij,ij->i', kd, kd))
             # LOGGER.error("kdl: %s", str(kd_len))
             # difference in k coordinates
@@ -415,16 +415,16 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             raise Exception("total fuckup: kspin=%d" % (len_kspin))
         # transform spin-polarized case
         if nspin == 2:
-            k_point_cartesian[0:nk/2,:]
+            k_point_cartesian[0:nk//2,:]
             if npw is not None:
-                npw = npw[0:nk/2]
+                npw = npw[0:nk//2]
             # put spin channel into first dimension
             k_energies = np.concatenate((
-                k_energies[:,0:nk/2,:],
-                k_energies[:,nk/2:,:]), axis=0)
+                k_energies[:,0:nk//2,:],
+                k_energies[:,nk//2:,:]), axis=0)
             k_occupations = np.concatenate((
-                k_occupations[:,0:nk/2,:],
-                k_occupations[:,nk/2:,:]), axis=0)
+                k_occupations[:,0:nk//2,:],
+                k_occupations[:,nk//2:,:]), axis=0)
         # k-points are in cartesian, but metaInfo specifies crystal
         k_point_crystal = self.bmat_inv.dot(k_point_cartesian.T).T
         # emit data
