@@ -787,7 +787,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                       startReStr=r"\s*cutoff for Fock operator\s*=\s*(?P<x_qe_fock_operator_cutoff__rydberg>" + RE_f + r")\s*Ry\s*$"
                    ),
                    SM(name='convergence_threshold',
-                      startReStr=r"\s*convergence threshold\s*=\s*(?P<x_qe_potential_convergence_threshold>" + RE_f + r")\s*$",
+                      startReStr=r"\s*convergence threshold\s*=\s*(?P<scf_threshold_energy_change>" + RE_f + r")\s*$",
                    ),
                    SM(name='mixing_beta',
                       startReStr=r"\s*mixing beta\s*=\s*(?P<x_qe_potential_mixing_beta>" + RE_f + r")\s*$",
