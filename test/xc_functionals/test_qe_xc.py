@@ -14,19 +14,19 @@ PP = pprint.PrettyPrinter(indent=2, width=190)
 def process_line(line):
     lr = line.rstrip()
     print("qe_xc: %s" % (lr))
-    m = re.match(r".*\(([^\)]+)\)",lr)
+    m = re.match(r"\s*\d+\s+([0-9\.]+)\s+.*\(([^\)]+)\)",lr)
     if m is None:
         LOGGER.error("unrecognized line:",lr)
         return None
     qe_xc = None
     try:
-        qe_xc=translate_qe_xc_num(m.group(1))
+        qe_xc=translate_qe_xc_num(m.group(2), float(m.group(1)))
     except RuntimeError as e:
         print("Error: %s" % (str(e)))
     if qe_xc is None:
         print("None")
     else:
-        print(PP.pprint(qe_xc))
+        print(PP.pformat(qe_xc))
 
 
 if __name__ == '__main__':
