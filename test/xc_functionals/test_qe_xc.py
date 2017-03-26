@@ -22,11 +22,11 @@ def process_line(line):
     try:
         qe_xc=translate_qe_xc_num(m.group(2), float(m.group(1)))
     except RuntimeError as e:
-        print("Error: %s" % (str(e)))
+        print("  Error: %s" % (str(e)))
     if qe_xc is None:
-        print("None")
+        print("  None")
     else:
-        print(PP.pformat(qe_xc))
+        print(re.sub(r"(^\s*)", r"  \g<1>", PP.pformat(qe_xc), flags=re.M))
 
 
 if __name__ == '__main__':
