@@ -6,10 +6,8 @@ import logging
 import re
 import pprint
 
-
 LOGGER = logging.getLogger(__name__)
 PP = pprint.PrettyPrinter(indent=2, width=190)
-
 
 def process_line(line):
     lr = line.rstrip()
@@ -27,7 +25,6 @@ def process_line(line):
         print("  None")
     else:
         print(re.sub(r"(^\s*)", r"  \g<1>", PP.pformat(qe_xc), flags=re.M))
-
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
