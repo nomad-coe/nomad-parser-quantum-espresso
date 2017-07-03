@@ -209,9 +209,10 @@ class ParserQuantumEspresso(object):
     def strValueTransform_strQeTimespan(self, espresso_timespan):
         if espresso_timespan is None:
             return None
-        match = re.match(r"(?:\s*(?P<minutes>\d+)\s*m)?" +
-                         r"(?:\s*(?P<seconds>" + RE_f + ")\s*s)?",
-                         espresso_timespan)
+        match = re.match(
+            r"(?:\s*(?P<minutes>\d+)\s*m)?" +
+            r"(?:\s*(?P<seconds>" + RE_f + ")\s*s)?",
+            espresso_timespan)
         if not match:
             raise RuntimeError(
                 "unparsable timespan (regex match failed): %s",
