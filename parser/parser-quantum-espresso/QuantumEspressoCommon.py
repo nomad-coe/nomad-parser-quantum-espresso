@@ -209,7 +209,9 @@ class ParserQuantumEspresso(object):
     def strValueTransform_strQeTimespan(self, espresso_timespan):
         if espresso_timespan is None:
             return None
-        match = re.match(r"(?:(\d+)\s*m)?\s*(" + RE_f + ")\s*s", espresso_timespan)
+        match = re.match(r"(?:\s*(\d+)\s*m)?" + # minutes (optional)
+                         r"\s*(" + RE_f + ")\s*s", # seconds
+                         espresso_timespan)
         if match:
             timespan_seconds = float(match.group(2))
             if match.group(1) is not None:
