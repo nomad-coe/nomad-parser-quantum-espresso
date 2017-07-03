@@ -210,15 +210,24 @@ class ParserQuantumEspresso(object):
         if espresso_timespan is None:
             return None
         match = re.match(r"(?:\s*(\d+)\s*m)?" + # minutes (optional)
-                         r"\s*(" + RE_f + ")\s*s", # seconds
+                         r"(?:\s*(" + RE_f + ")\s*s)?", # seconds (optional)
                          espresso_timespan)
         if not match:
             raise RuntimeError(
                 "unparsable timespan (regex match failed): %s",
                 espresso_timespan)
-        timespan_seconds = float(match.group(2))
+        had_time_components = 0
+        timespan_seconds = 0.0
+        if match.group(2) is not None:
+            timespan_seconds += float(match.group(2))
+            had_time_components += 1
         if match.group(1) is not None:
             timespan_seconds += float(match.group(1))*60
+            had_time_components += 1
+        if had_time_components == 0:
+            raise RuntimeError(
+                "unparsable timespan (no time components extracted): %s",
+                espresso_timespan)
         return(timespan_seconds)
     strValueTransform_strQeTimespan.units = 's'
 
