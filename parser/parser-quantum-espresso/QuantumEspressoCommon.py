@@ -209,12 +209,7 @@ class ParserQuantumEspresso(object):
     def strValueTransform_strQeTimespan(self, espresso_timespan):
         if espresso_timespan is None:
             return None
-        match = re.match(
-            r"(?:\s*(?P<days>\d+)\s*d)?" +
-            r"(?:\s*(?P<hours>\d+)\s*h)?" +
-            r"(?:\s*(?P<minutes>\d+)\s*m)?" +
-            r"(?:\s*(?P<seconds>" + RE_f + ")\s*s)?" +
-            r"\s*$", # all groups are optional, end-anchor with rubber-space
+        match = ParserQuantumEspresso.strValueTransform_strQeTimespan.re.match(
             espresso_timespan)
         if not match:
             raise RuntimeError(
@@ -239,6 +234,13 @@ class ParserQuantumEspresso(object):
                 "unparsable timespan (no time components extracted): %s",
                 espresso_timespan)
         return(timespan_seconds)
+    strValueTransform_strQeTimespan.re = re.compile(
+            r"(?:\s*(?P<days>\d+)\s*d)?" +
+            r"(?:\s*(?P<hours>\d+)\s*h)?" +
+            r"(?:\s*(?P<minutes>\d+)\s*m)?" +
+            r"(?:\s*(?P<seconds>" + RE_f + ")\s*s)?" +
+            r"\s*$" # all groups are optional, end-anchor with rubber-space
+    )
     strValueTransform_strQeTimespan.units = 's'
 
     def addSectionDict(self, backend, section_name, section_dict):
