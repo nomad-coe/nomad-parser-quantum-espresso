@@ -213,7 +213,8 @@ class ParserQuantumEspresso(object):
             r"(?:\s*(?P<days>\d+)\s*d)?" +
             r"(?:\s*(?P<hours>\d+)\s*h)?" +
             r"(?:\s*(?P<minutes>\d+)\s*m)?" +
-            r"(?:\s*(?P<seconds>" + RE_f + ")\s*s)?",
+            r"(?:\s*(?P<seconds>" + RE_f + ")\s*s)?" +
+            r"\s*$", # all groups are optional, end-anchor with rubber-space
             espresso_timespan)
         if not match:
             raise RuntimeError(
