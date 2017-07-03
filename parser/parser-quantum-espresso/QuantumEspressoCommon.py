@@ -210,6 +210,8 @@ class ParserQuantumEspresso(object):
         if espresso_timespan is None:
             return None
         match = re.match(
+            r"(?:\s*(?P<days>\d+)\s*d)?" +
+            r"(?:\s*(?P<hours>\d+)\s*h)?" +
             r"(?:\s*(?P<minutes>\d+)\s*m)?" +
             r"(?:\s*(?P<seconds>" + RE_f + ")\s*s)?",
             espresso_timespan)
@@ -224,6 +226,12 @@ class ParserQuantumEspresso(object):
             had_time_components += 1
         if match.group('minutes') is not None:
             timespan_seconds += float(match.group('minutes'))*60
+            had_time_components += 1
+        if match.group('hours') is not None:
+            timespan_seconds += float(match.group('hours'))*60*60
+            had_time_components += 1
+        if match.group('days') is not None:
+            timespan_seconds += float(match.group('days'))*60*60*24
             had_time_components += 1
         if had_time_components == 0:
             raise RuntimeError(
