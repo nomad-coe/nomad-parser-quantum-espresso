@@ -4,10 +4,9 @@ from QuantumEspressoXC import translate_qe_xc_num
 import sys
 import logging
 import re
-import pprint
+import json
 
 LOGGER = logging.getLogger(__name__)
-PP = pprint.PrettyPrinter(indent=2, width=190)
 
 def process_line(line):
     lr = line.rstrip()
@@ -24,7 +23,7 @@ def process_line(line):
     if qe_xc is None:
         print("  None")
     else:
-        print(re.sub(r"(^\s*)", r"  \g<1>", PP.pformat(qe_xc), flags=re.M))
+        print(json.dumps(qe_xc, indent=2, sort_keys=True))
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
