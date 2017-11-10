@@ -9,9 +9,10 @@ import json
 LOGGER = logging.getLogger(__name__)
 
 re_line = re.compile(
-    r"\s*\d+"
-    r"\s+(?P<exact_exchange_fraction>[0-9\.]+)"
-    r"\s+.*\((?P<xc_functional_num>[^\)]+)\)"
+    r"^\s*\d+\s+(?P<testcase>" + (
+        r"(?P<exact_exchange_fraction>[0-9\.]+)"
+        r"\s+.*\((?P<xc_functional_num>[^\)]+)\)"
+    ) + r")\s*$"
 )
 
 re_comment = re.compile(r"^\s*#.*")
@@ -19,12 +20,11 @@ re_comment = re.compile(r"^\s*#.*")
 def process_line(line):
     if re_comment.match(line):
         return
-    lr = line.rstrip()
-    print("qe_xc: %s" % (lr))
-    m = re_line.match(lr)
+    m = re_line.match(line)
     if m is None:
-        LOGGER.error("unrecognized line:",lr)
+        LOGGER.error("unrecognized line:",line)
         return None
+    print("qe_xc: %s" % (m.group('testcase')))
     qe_xc = None
     try:
         qe_xc=translate_qe_xc_num(
