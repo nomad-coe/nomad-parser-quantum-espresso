@@ -10,8 +10,8 @@ LOGGER = logging.getLogger(__name__)
 
 re_line = re.compile(
     r"\s*\d+"
-    r"\s+([0-9\.]+)"
-    r"\s+.*\(([^\)]+)\)"
+    r"\s+(?P<exact_exchange_fraction>[0-9\.]+)"
+    r"\s+.*\((?P<xc_functional_num>[^\)]+)\)"
 )
 
 def process_line(line):
@@ -23,7 +23,10 @@ def process_line(line):
         return None
     qe_xc = None
     try:
-        qe_xc=translate_qe_xc_num(m.group(2), float(m.group(1)))
+        qe_xc=translate_qe_xc_num(
+            m.group('xc_functional_num'),
+            float(m.group('exact_exchange_fraction'))
+        )
     except RuntimeError as e:
         print("  Error: %s" % (str(e)))
     if qe_xc is None:
