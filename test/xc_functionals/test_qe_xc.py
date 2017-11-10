@@ -8,10 +8,16 @@ import json
 
 LOGGER = logging.getLogger(__name__)
 
+re_line = re.compile(
+    r"\s*\d+"
+    r"\s+([0-9\.]+)"
+    r"\s+.*\(([^\)]+)\)"
+)
+
 def process_line(line):
     lr = line.rstrip()
     print("qe_xc: %s" % (lr))
-    m = re.match(r"\s*\d+\s+([0-9\.]+)\s+.*\(([^\)]+)\)",lr)
+    m = re_line.match(lr)
     if m is None:
         LOGGER.error("unrecognized line:",lr)
         return None
