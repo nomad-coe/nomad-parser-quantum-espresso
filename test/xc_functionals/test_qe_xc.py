@@ -14,7 +14,11 @@ re_line = re.compile(
     r"\s+.*\((?P<xc_functional_num>[^\)]+)\)"
 )
 
+re_comment = re.compile(r"^\s*#.*")
+
 def process_line(line):
+    if re_comment.match(line):
+        return
     lr = line.rstrip()
     print("qe_xc: %s" % (lr))
     m = re_line.match(lr)
