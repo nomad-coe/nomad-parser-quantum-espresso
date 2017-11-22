@@ -243,11 +243,11 @@ class ParserQuantumEspresso(object):
     )
     strValueTransform_strQeTimespan.units = 's'
 
+    def addDict(self, backend, this_dict):
+        for key, value in sorted(this_dict.items()):
+            backend.addValue(key, value)
+
     def addSectionDict(self, backend, section_name, section_dict):
         gIndex = backend.openSection(section_name)
-        for key, value in sorted(section_dict.items()):
-            if isinstance(value, (list,dict)):
-                backend.addValue(key, value)
-            else:
-                backend.addValue(key, value)
+        self.addDict(backend, section_dict)
         backend.closeSection(section_name, gIndex)
