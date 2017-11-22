@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import setup_paths
 from QuantumEspressoXC import translate_qe_xc_num
 import sys
