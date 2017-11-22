@@ -180,6 +180,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         if section['x_qe_t_xc_functional_shortname_enforced'] is not None:
             backend.addValue('x_qe_xc_functional_user_enforced', True)
         # translate XC functional to section_xc_functionals
+        method_xc_functionals = None
         xc_functionals = None
         if section['x_qe_xc_functional_num'] is not None:
             xc_functional_num = section['x_qe_xc_functional_num'][-1]
@@ -191,9 +192,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 exx_fraction = 0.0
             elif section['x_qe_exact_exchange_fraction']:
                 exx_fraction = section['x_qe_exact_exchange_fraction'][-1]
-            xc_functionals = translate_qe_xc_num(xc_functional_num, exx_fraction)
+            (method_xc_functionals, xc_functionals) = translate_qe_xc_num(xc_functional_num, exx_fraction)
         else:
             LOGGER.error("x_qe_xc_functional_num is not set")
+        if method_xc_functionals is not None:
+            self.addDict(backend, method_xc_functionals)
         if xc_functionals is not None:
             for xc_functional in xc_functionals:
                 self.addSectionDict(backend, 'section_XC_functionals', xc_functional)

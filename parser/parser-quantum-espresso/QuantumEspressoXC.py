@@ -48,6 +48,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
     #   exchange/correlation functionals may be combined into _XC_, and we
     #   only want to emit such combinations once
     xc_data = {}
+    xc_section_method = {}
     for component_i in range(6):
         this_xf_num = xf_num[component_i]
         if this_xf_num == 0:
@@ -95,7 +96,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
     result = []
     for k,v in sorted(xc_data.items()):
         result.append(v)
-    return result
+    return (xc_section_method, result)
 
 
 # origin: espresso-5.4.0/Modules/funct.f90

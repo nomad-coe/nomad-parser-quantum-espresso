@@ -27,7 +27,7 @@ def process_line(line):
     print("qe_xc: %s" % (m.group('testcase')))
     qe_xc = None
     try:
-        qe_xc=translate_qe_xc_num(
+        (method_qe_xc, qe_xc) = translate_qe_xc_num(
             m.group('xc_functional_num'),
             float(m.group('exact_exchange_fraction'))
         )
