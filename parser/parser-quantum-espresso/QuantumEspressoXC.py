@@ -104,34 +104,44 @@ EXCHANGE = [
     None,
     {
         'XC_functional_name': 'LDA_X',
-        'x_qe_xc_iexch_name':       'sla',
-        'x_qe_xc_iexch_comment':    'Slater (alpha=2/3)',
-        'x_qe_xc_iexch':      1,
+        'xc_section_method': {
+            'x_qe_xc_iexch_name':       'sla',
+            'x_qe_xc_iexch_comment':    'Slater (alpha=2/3)',
+            'x_qe_xc_iexch':      1,
+        },
     },
     {
         'XC_functional_name': 'LDA_X',
         'XC_functional_parameters': { 'alpha': 1.0 },
-        'x_qe_xc_iexch_name':       'sl1',
-        'x_qe_xc_iexch_comment':    'Slater (alpha=1.0)',
-        'x_qe_xc_iexch':      2,
+        'xc_section_method': {
+            'x_qe_xc_iexch_name':       'sl1',
+            'x_qe_xc_iexch_comment':    'Slater (alpha=1.0)',
+            'x_qe_xc_iexch':      2,
+        },
     },
     {
         'XC_functional_name': 'x_qe_LDA_X_RELATIVISTIC',
-        'x_qe_xc_iexch_name':       'rxc',
-        'x_qe_xc_iexch_comment':    'Relativistic Slater',
-        'x_qe_xc_iexch':      3,
+        'xc_section_method': {
+            'x_qe_xc_iexch_name':       'rxc',
+            'x_qe_xc_iexch_comment':    'Relativistic Slater',
+            'x_qe_xc_iexch':      3,
+        },
     },
     {
         'XC_functional_name': 'x_qe_OEP_X',
-        'x_qe_xc_iexch_name':       'oep',
-        'x_qe_xc_iexch_comment':    'Optimized Effective Potential',
-        'x_qe_xc_iexch':      4,
+        'xc_section_method': {
+            'x_qe_xc_iexch_name':       'oep',
+            'x_qe_xc_iexch_comment':    'Optimized Effective Potential',
+            'x_qe_xc_iexch':      4,
+        },
     },
     {
         'XC_functional_name': 'HF_X',
-        'x_qe_xc_iexch_name':       'hf',
-        'x_qe_xc_iexch_comment':    'Hartree-Fock',
-        'x_qe_xc_iexch':      5,
+        'xc_section_method': {
+            'x_qe_xc_iexch_name':       'hf',
+            'x_qe_xc_iexch_comment':    'Hartree-Fock',
+            'x_qe_xc_iexch':      5,
+        },
     },
     {
         'x_qe_t_xc_terms': [{
@@ -141,9 +151,11 @@ EXCHANGE = [
             'XC_functional_name': 'LDA_X',
             'XC_functional_weight': 0.75,
         }],
-        'x_qe_xc_iexch_name':       "pb0x",
-        'x_qe_xc_iexch_comment':    'PBE0 (Slater*0.75+HF*0.25)',
-        'x_qe_xc_iexch':      6,
+        'xc_section_method': {
+            'x_qe_xc_iexch_name':       "pb0x",
+            'x_qe_xc_iexch_comment':    'PBE0 (Slater*0.75+HF*0.25)',
+            'x_qe_xc_iexch':      6,
+        },
     },
     {
         'x_qe_t_xc_terms': [{
@@ -153,15 +165,19 @@ EXCHANGE = [
             'XC_functional_name': 'LDA_X',
             'XC_functional_weight': 0.8,
         }],
-        'x_qe_xc_iexch_name':       "b3lp",
-        'x_qe_xc_iexch_comment':    "B3LYP(Slater*0.80+HF*0.20)",
-        'x_qe_xc_iexch':      7,
+        'xc_section_method': {
+            'x_qe_xc_iexch_name':       "b3lp",
+            'x_qe_xc_iexch_comment':    "B3LYP(Slater*0.80+HF*0.20)",
+            'x_qe_xc_iexch':      7,
+        },
     },
     {
         'XC_functional_name': "x_qe_LDA_X_KZK",
-        'x_qe_xc_iexch_name':       "kzk",
-        'x_qe_xc_iexch_comment':    "Finite-size corrections",
-        'x_qe_xc_iexch':      8,
+        'xc_section_method': {
+            'x_qe_xc_iexch_name':       "kzk",
+            'x_qe_xc_iexch_comment':    "Finite-size corrections",
+            'x_qe_xc_iexch':      8,
+        },
     },
     {
         'x_qe_t_xc_terms': [{
@@ -171,9 +187,11 @@ EXCHANGE = [
             'XC_functional_name': 'LDA_X',
             'XC_functional_weight': 0.782,
         }],
-        'x_qe_xc_iexch_name':       "x3lp",
-        'x_qe_xc_iexch_comment':    "X3LYP(Slater*0.782+HF*0.218)",
-        'x_qe_xc_iexch':      9,
+        'xc_section_method': {
+            'x_qe_xc_iexch_name':       "x3lp",
+            'x_qe_xc_iexch_comment':    "X3LYP(Slater*0.782+HF*0.218)",
+            'x_qe_xc_iexch':      9,
+        },
     },
 ]
 
@@ -182,69 +200,91 @@ CORRELATION = [
     None,
     {
         'XC_functional_name': 'LDA_C_PZ',
-        'x_qe_xc_icorr_name':       "pz",
-        'x_qe_xc_icorr_comment':    "Perdew-Zunger",
-        'x_qe_xc_icorr':      1,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "pz",
+            'x_qe_xc_icorr_comment':    "Perdew-Zunger",
+            'x_qe_xc_icorr':      1,
+        },
     },
     {
         'XC_functional_name': 'LDA_C_VWN',
-        'x_qe_xc_icorr_name':       "vwn",
-        'x_qe_xc_icorr_comment':    "Vosko-Wilk-Nusair",
-        'x_qe_xc_icorr':      2,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "vwn",
+            'x_qe_xc_icorr_comment':    "Vosko-Wilk-Nusair",
+            'x_qe_xc_icorr':      2,
+        },
     },
     {
         'XC_functional_name': 'LDA_C_LYP',
-        'x_qe_xc_icorr_name':       "lyp",
-        'x_qe_xc_icorr_comment':    "Lee-Yang-Parr",
-        'x_qe_xc_icorr':      3,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "lyp",
+            'x_qe_xc_icorr_comment':    "Lee-Yang-Parr",
+            'x_qe_xc_icorr':      3,
+        },
     },
     {
         'XC_functional_name': "LDA_C_PW",
-        'x_qe_xc_icorr_name':       "pw",
-        'x_qe_xc_icorr_comment':    "Perdew-Wang",
-        'x_qe_xc_icorr':      4,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "pw",
+            'x_qe_xc_icorr_comment':    "Perdew-Wang",
+            'x_qe_xc_icorr':      4,
+        },
     },
     {
         'XC_functional_name': 'LDA_C_WIGNER',
-        'x_qe_xc_icorr_name':       "wig",
-        'x_qe_xc_icorr_comment':    "Wigner",
-        'x_qe_xc_icorr':      5,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "wig",
+            'x_qe_xc_icorr_comment':    "Wigner",
+            'x_qe_xc_icorr':      5,
+        },
     },
     {
         'XC_functional_name': 'LDA_C_HL',
-        'x_qe_xc_icorr_name':       "hl",
-        'x_qe_xc_icorr_comment':    "Hedin-Lunqvist",
-        'x_qe_xc_icorr':      6,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "hl",
+            'x_qe_xc_icorr_comment':    "Hedin-Lunqvist",
+            'x_qe_xc_icorr':      6,
+        },
     },
     {
         'XC_functional_name': 'LDA_C_OB_PZ',
-        'x_qe_xc_icorr_name':       "obz",
-        'x_qe_xc_icorr_comment':    "Ortiz-Ballone form for PZ",
-        'x_qe_xc_icorr':      7,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "obz",
+            'x_qe_xc_icorr_comment':    "Ortiz-Ballone form for PZ",
+            'x_qe_xc_icorr':      7,
+        },
     },
     {
         'XC_functional_name': 'LDA_C_OB_PW',
-        'x_qe_xc_icorr_name':       "obw",
-        'x_qe_xc_icorr_comment':    "Ortiz-Ballone form for PW",
-        'x_qe_xc_icorr':      8,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "obw",
+            'x_qe_xc_icorr_comment':    "Ortiz-Ballone form for PW",
+            'x_qe_xc_icorr':      8,
+        },
     },
     {
         'XC_functional_name': 'LDA_C_GL',
-        'x_qe_xc_icorr_name':       "gl",
-        'x_qe_xc_icorr_comment':    "Gunnarson-Lunqvist",
-        'x_qe_xc_icorr':      9,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "gl",
+            'x_qe_xc_icorr_comment':    "Gunnarson-Lunqvist",
+            'x_qe_xc_icorr':      9,
+        },
     },
     {
         'XC_functional_name': "x_qe_LDA_C_KZK",
-        'x_qe_xc_icorr_name':       "kzk",
-        'x_qe_xc_icorr_comment':    "Finite-size corrections",
-        'x_qe_xc_icorr':      10,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "kzk",
+            'x_qe_xc_icorr_comment':    "Finite-size corrections",
+            'x_qe_xc_icorr':      10,
+        },
     },
     {
         'XC_functional_name': 'LDA_C_VWN_RPA',
-        'x_qe_xc_icorr_name':       "vwn-rpa",
-        'x_qe_xc_icorr_comment':    "Vosko-Wilk-Nusair, alt param",
-        'x_qe_xc_icorr':      11,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "vwn-rpa",
+            'x_qe_xc_icorr_comment':    "Vosko-Wilk-Nusair, alt param",
+            'x_qe_xc_icorr':      11,
+        },
     },
     {
         'x_qe_t_xc_terms': [{
@@ -254,9 +294,11 @@ CORRELATION = [
             'XC_functional_name': 'LDA_C_LYP',
             'XC_functional_weight': 0.81,
         }],
-        'x_qe_xc_icorr_name':       "b3lp",
-        'x_qe_xc_icorr_comment':    "B3LYP (0.19*vwn+0.81*lyp)",
-        'x_qe_xc_icorr':      12,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "b3lp",
+            'x_qe_xc_icorr_comment':    "B3LYP (0.19*vwn+0.81*lyp)",
+            'x_qe_xc_icorr':      12,
+        },
     },
     {
         'x_qe_t_xc_terms': [{
@@ -266,9 +308,11 @@ CORRELATION = [
             'XC_functional_name': 'LDA_C_LYP',
             'XC_functional_weight': 0.81,
         }],
-        'x_qe_xc_icorr_name':       "b3lpv1r",
-        'x_qe_xc_icorr_comment':    "B3LYP-VWN-1-RPA (0.19*vwn_rpa+0.81*lyp)",
-        'x_qe_xc_icorr':      13,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "b3lpv1r",
+            'x_qe_xc_icorr_comment':    "B3LYP-VWN-1-RPA (0.19*vwn_rpa+0.81*lyp)",
+            'x_qe_xc_icorr':      13,
+        },
     },
     {
         'x_qe_t_xc_terms': [{
@@ -278,9 +322,11 @@ CORRELATION = [
             'XC_functional_name': 'LDA_C_LYP',
             'XC_functional_weight': 0.871,
         }],
-        'x_qe_xc_icorr_name':       "x3lp",
-        'x_qe_xc_icorr_comment':    "X3LYP (0.129*vwn_rpa+0.871*lyp)",
-        'x_qe_xc_icorr':      14,
+        'xc_section_method': {
+            'x_qe_xc_icorr_name':       "x3lp",
+            'x_qe_xc_icorr_comment':    "X3LYP (0.129*vwn_rpa+0.871*lyp)",
+            'x_qe_xc_icorr':      14,
+        },
     },
 ]
 
@@ -288,173 +334,227 @@ EXCHANGE_GRADIENT_CORRECTION = [
     None,
     {
         'XC_functional_name': "GGA_X_B88",
-        'x_qe_xc_igcx_name':       "b88",
-        'x_qe_xc_igcx_comment':    "Becke88 (beta=0.0042)",
-        'x_qe_xc_igcx':      1,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "b88",
+            'x_qe_xc_igcx_comment':    "Becke88 (beta=0.0042)",
+            'x_qe_xc_igcx':      1,
+        },
     },
     {
         'XC_functional_name': "GGA_X_PW91",
-        'x_qe_xc_igcx_name':       "ggx",
-        'x_qe_xc_igcx_comment':    "Perdew-Wang 91",
-        'x_qe_xc_igcx':      2,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "ggx",
+            'x_qe_xc_igcx_comment':    "Perdew-Wang 91",
+            'x_qe_xc_igcx':      2,
+        },
     },
     {
         'XC_functional_name': "GGA_X_PBE",
-        'x_qe_xc_igcx_name':       "pbx",
-        'x_qe_xc_igcx_comment':    "Perdew-Burke-Ernzenhof exch",
-        'x_qe_xc_igcx':      3,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "pbx",
+            'x_qe_xc_igcx_comment':    "Perdew-Burke-Ernzenhof exch",
+            'x_qe_xc_igcx':      3,
+        },
     },
     {
         'XC_functional_name': "GGA_X_PBE_R'",
-        'x_qe_xc_igcx_name':       "rpb",
-        'x_qe_xc_igcx_comment':    "revised PBE by Zhang-Yang",
-        'x_qe_xc_igcx':      4,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "rpb",
+            'x_qe_xc_igcx_comment':    "revised PBE by Zhang-Yang",
+            'x_qe_xc_igcx':      4,
+        },
     },
     {
         'XC_functional_name': "GGA_XC_HCTH_120",
-        'x_qe_xc_igcx_name':       "hcth",
-        'x_qe_xc_igcx_comment':    "Cambridge exch, Handy et al, HCTH/120",
-        'x_qe_xc_igcx':      5,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "hcth",
+            'x_qe_xc_igcx_comment':    "Cambridge exch, Handy et al, HCTH/120",
+            'x_qe_xc_igcx':      5,
+        },
     },
     {
         'XC_functional_name': "GGA_X_OPTX",
-        'x_qe_xc_igcx_name':       "optx",
-        'x_qe_xc_igcx_comment':    "Handy's exchange functional",
-        'x_qe_xc_igcx':      6,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "optx",
+            'x_qe_xc_igcx_comment':    "Handy's exchange functional",
+            'x_qe_xc_igcx':      6,
+        },
     },
     {
         # igcx=7 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         'XC_functional_name': "MGGA_X_TPSS",
-        'x_qe_xc_igcx_name':       "tpss",
-        'x_qe_xc_igcx_comment':    "TPSS Meta-GGA (Espresso-version < 5.1)",
-        'x_qe_xc_igcx':      7,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "tpss",
+            'x_qe_xc_igcx_comment':    "TPSS Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcx':      7,
+        },
     },
     {
         'XC_functional_name': "GGA_X_PBE",
         'XC_functional_weight': 0.75,
-        'x_qe_xc_igcx_name':       "pb0x",
-        'x_qe_xc_igcx_comment':    "PBE0 (PBE exchange*0.75)",
-        'x_qe_xc_igcx':      8,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "pb0x",
+            'x_qe_xc_igcx_comment':    "PBE0 (PBE exchange*0.75)",
+            'x_qe_xc_igcx':      8,
+        },
     },
     {
         'XC_functional_name': "GGA_X_B88",
         'XC_functional_weight': 0.72,
-        'x_qe_xc_igcx_name':       "b3lp",
-        'x_qe_xc_igcx_comment':    "B3LYP (Becke88*0.72)",
-        'x_qe_xc_igcx':      9,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "b3lp",
+            'x_qe_xc_igcx_comment':    "B3LYP (Becke88*0.72)",
+            'x_qe_xc_igcx':      9,
+        },
     },
     {
         'XC_functional_name': "GGA_X_PBE_SOL",
-        'x_qe_xc_igcx_name':       "psx",
-        'x_qe_xc_igcx_comment':    "PBEsol exchange",
-        'x_qe_xc_igcx':      10,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "psx",
+            'x_qe_xc_igcx_comment':    "PBEsol exchange",
+            'x_qe_xc_igcx':      10,
+        },
     },
     {
         'XC_functional_name': "GGA_X_WC",
-        'x_qe_xc_igcx_name':       "wcx",
-        'x_qe_xc_igcx_comment':    "Wu-Cohen",
-        'x_qe_xc_igcx':      11,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "wcx",
+            'x_qe_xc_igcx_comment':    "Wu-Cohen",
+            'x_qe_xc_igcx':      11,
+        },
     },
     {
         'XC_functional_name': "HYB_GGA_XC_HSE06",
-        'x_qe_xc_igcx_name':       "hse",
-        'x_qe_xc_igcx_comment':    "HSE screened exchange",
-        'x_qe_xc_igcx':      12,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "hse",
+            'x_qe_xc_igcx_comment':    "HSE screened exchange",
+            'x_qe_xc_igcx':      12,
+        },
     },
     {
         'XC_functional_name': "GGA_X_RPW86",
-        'x_qe_xc_igcx_name':       "rw86",
-        'x_qe_xc_igcx_comment':    "revised PW86",
-        'x_qe_xc_igcx':      13,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "rw86",
+            'x_qe_xc_igcx_comment':    "revised PW86",
+            'x_qe_xc_igcx':      13,
+        },
     },
     {
         'XC_functional_name': "GGA_X_PBE",
-        'x_qe_xc_igcx_name':       "pbe",
-        'x_qe_xc_igcx_comment':    "same as PBX, back-comp.",
-        'x_qe_xc_igcx':      14,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "pbe",
+            'x_qe_xc_igcx_comment':    "same as PBX, back-comp.",
+            'x_qe_xc_igcx':      14,
+        },
     },
     {
         # igcx=15 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         'XC_functional_name': "MGGA_X_TB09",
-        'x_qe_xc_igcx_name':       "tb09",
-        'x_qe_xc_igcx_comment':    "TB09 Meta-GGA (Espresso-version < 5.1)",
-        'x_qe_xc_igcx':      15,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "tb09",
+            'x_qe_xc_igcx_comment':    "TB09 Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcx':      15,
+        },
     },
     {
         'XC_functional_name': "GGA_X_C09X",
-        'x_qe_xc_igcx_name':       "c09x",
-        'x_qe_xc_igcx_comment':    "Cooper 09",
-        'x_qe_xc_igcx':      16,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "c09x",
+            'x_qe_xc_igcx_comment':    "Cooper 09",
+            'x_qe_xc_igcx':      16,
+        },
     },
     {
         'XC_functional_name': "GGA_X_SOGGA",
-        'x_qe_xc_igcx_name':       "sox",
-        'x_qe_xc_igcx_comment':    "sogga",
-        'x_qe_xc_igcx':      17,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "sox",
+            'x_qe_xc_igcx_comment':    "sogga",
+            'x_qe_xc_igcx':      17,
+        },
     },
     {
         # igcx=18 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         'XC_functional_name': "MGGA_X_M06_L",
-        'x_qe_xc_igcx_name':       "m6lx",
-        'x_qe_xc_igcx_comment':    "M06L Meta-GGA (Espresso-version < 5.1)",
-        'x_qe_xc_igcx':      18,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "m6lx",
+            'x_qe_xc_igcx_comment':    "M06L Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcx':      18,
+        },
     },
     {
         'XC_functional_name': "GGA_X_Q2D",
-        'x_qe_xc_igcx_name':       "q2dx",
-        'x_qe_xc_igcx_comment':    "Q2D exchange grad corr",
-        'x_qe_xc_igcx':      19,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "q2dx",
+            'x_qe_xc_igcx_comment':    "Q2D exchange grad corr",
+            'x_qe_xc_igcx':      19,
+        },
     },
     {
         'XC_functional_name': "x_qe_GGA_X_GAUP",
-        'x_qe_xc_igcx_name':       "gaup",
-        'x_qe_xc_igcx_comment':    "Gau-PBE hybrid exchange",
-        'x_qe_xc_igcx':      20,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "gaup",
+            'x_qe_xc_igcx_comment':    "Gau-PBE hybrid exchange",
+            'x_qe_xc_igcx':      20,
+        },
     },
     {
         'XC_functional_name': "GGA_X_PW86",
-        'x_qe_xc_igcx_name':       "pw86",
-        'x_qe_xc_igcx_comment':    "Perdew-Wang (1986) exchange",
-        'x_qe_xc_igcx':      21,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "pw86",
+            'x_qe_xc_igcx_comment':    "Perdew-Wang (1986) exchange",
+            'x_qe_xc_igcx':      21,
+        },
     },
     {
         'XC_functional_name': "GGA_X_B86_MGC",
-        'x_qe_xc_igcx_name':       "b86b",
-        'x_qe_xc_igcx_comment':    "Becke (1986) exchange",
-        'x_qe_xc_igcx':      22,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "b86b",
+            'x_qe_xc_igcx_comment':    "Becke (1986) exchange",
+            'x_qe_xc_igcx':      22,
+        },
     },
     {
         'XC_functional_name': "GGA_X_OPTB88_VDW",
-        'x_qe_xc_igcx_name':       "obk8",
-        'x_qe_xc_igcx_comment':    "optB88  exchange",
-        'x_qe_xc_igcx':      23,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "obk8",
+            'x_qe_xc_igcx_comment':    "optB88  exchange",
+            'x_qe_xc_igcx':      23,
+        },
     },
     {
         'XC_functional_name': "x_qe_GGA_X_OPTB86_VDW",
-        'x_qe_xc_igcx_name':       "ob86",
-        'x_qe_xc_igcx_comment':    "optB86b exchange",
-        'x_qe_xc_igcx':      24,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "ob86",
+            'x_qe_xc_igcx_comment':    "optB86b exchange",
+            'x_qe_xc_igcx':      24,
+        },
     },
     {
         'XC_functional_name': "GGA_X_EV93",
-        'x_qe_xc_igcx_name':       "evx",
-        'x_qe_xc_igcx_comment':    "Engel-Vosko exchange",
-        'x_qe_xc_igcx':      25,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "evx",
+            'x_qe_xc_igcx_comment':    "Engel-Vosko exchange",
+            'x_qe_xc_igcx':      25,
+        },
     },
     {
         'XC_functional_name': "GGA_X_B86_R",
-        'x_qe_xc_igcx_name':       "b86r",
-        'x_qe_xc_igcx_comment':    "revised Becke (b86b)",
-        'x_qe_xc_igcx':      26,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "b86r",
+            'x_qe_xc_igcx_comment':    "revised Becke (b86b)",
+            'x_qe_xc_igcx':      26,
+        },
     },
     {
         'XC_functional_name': "GGA_X_LV_RPW86",
-        'x_qe_xc_igcx_name':       "cx13",
-        'x_qe_xc_igcx_comment':    "consistent exchange",
-        'x_qe_xc_igcx':      27,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "cx13",
+            'x_qe_xc_igcx_comment':    "consistent exchange",
+            'x_qe_xc_igcx':      27,
+        },
     },
     {
         'x_qe_t_xc_terms': [{
@@ -464,9 +564,11 @@ EXCHANGE_GRADIENT_CORRECTION = [
             'XC_functional_name': "GGA_X_PW91",
             'XC_functional_weight': 0.167,
         }],
-        'x_qe_xc_igcx_name':       "x3lp",
-        'x_qe_xc_igcx_comment':    "X3LYP (Becke88*0.542 + Perdew-Wang91*0.167)",
-        'x_qe_xc_igcx':      28,
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':       "x3lp",
+            'x_qe_xc_igcx_comment':    "X3LYP (Becke88*0.542 + Perdew-Wang91*0.167)",
+            'x_qe_xc_igcx':      28,
+        },
     },
 ]
 
@@ -474,90 +576,116 @@ CORRELATION_GRADIENT_CORRECTION = [
     None,
     {
         'XC_functional_name': "GGA_C_P86",
-        'x_qe_xc_igcc_name':       "p86",
-        'x_qe_xc_igcc_comment':    "Perdew86",
-        'x_qe_xc_igcc':      1,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "p86",
+            'x_qe_xc_igcc_comment':    "Perdew86",
+            'x_qe_xc_igcc':      1,
+        },
     },
     {
         'XC_functional_name': "GGA_C_PW91",
-        'x_qe_xc_igcc_name':       "ggc",
-        'x_qe_xc_igcc_comment':    "Perdew-Wang 91 corr.",
-        'x_qe_xc_igcc':      2,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "ggc",
+            'x_qe_xc_igcc_comment':    "Perdew-Wang 91 corr.",
+            'x_qe_xc_igcc':      2,
+        },
     },
     {
         'XC_functional_name': "GGA_C_LYP",
-        'x_qe_xc_igcc_name':       "blyp",
-        'x_qe_xc_igcc_comment':    "Lee-Yang-Parr",
-        'x_qe_xc_igcc':      3,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "blyp",
+            'x_qe_xc_igcc_comment':    "Lee-Yang-Parr",
+            'x_qe_xc_igcc':      3,
+        },
     },
     {
         'XC_functional_name': "GGA_C_PBE",
-        'x_qe_xc_igcc_name':       "pbc",
-        'x_qe_xc_igcc_comment':    "Perdew-Burke-Ernzenhof corr",
-        'x_qe_xc_igcc':      4,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "pbc",
+            'x_qe_xc_igcc_comment':    "Perdew-Burke-Ernzenhof corr",
+            'x_qe_xc_igcc':      4,
+        },
     },
     {
         'XC_functional_name': "GGA_XC_HCTH_120",
-        'x_qe_xc_igcc_name':       "hcth",
-        'x_qe_xc_igcc_comment':    "Cambridge exch, Handy et al, HCTH/120",
-        'x_qe_xc_igcc':      5,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "hcth",
+            'x_qe_xc_igcc_comment':    "Cambridge exch, Handy et al, HCTH/120",
+            'x_qe_xc_igcc':      5,
+        },
     },
     {
         # igcc=6 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         'XC_functional_name': "MGGA_C_TPSS",
-        'x_qe_xc_igcc_name':       "tpss",
-        'x_qe_xc_igcc_comment':    "TPSS Meta-GGA (Espresso-version < 5.1)",
-        'x_qe_xc_igcc':      6,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "tpss",
+            'x_qe_xc_igcc_comment':    "TPSS Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcc':      6,
+        },
     },
     {
         'XC_functional_name': "GGA_C_LYP",
         'XC_functional_weight': 0.81,
-        'x_qe_xc_igcc_name':       "b3lp",
-        'x_qe_xc_igcc_comment':    "B3LYP (Lee-Yang-Parr*0.81)",
-        'x_qe_xc_igcc':      7,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "b3lp",
+            'x_qe_xc_igcc_comment':    "B3LYP (Lee-Yang-Parr*0.81)",
+            'x_qe_xc_igcc':      7,
+        },
     },
     {
         'XC_functional_name': "GGA_C_PBE_SOL",
-        'x_qe_xc_igcc_name':       "psc",
-        'x_qe_xc_igcc_comment':    "PBEsol corr",
-        'x_qe_xc_igcc':      8,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "psc",
+            'x_qe_xc_igcc_comment':    "PBEsol corr",
+            'x_qe_xc_igcc':      8,
+        },
     },
     {
         'XC_functional_name': "GGA_C_PBE",
-        'x_qe_xc_igcc_name':       "pbe",
-        'x_qe_xc_igcc_comment':    "same as PBX, back-comp.",
-        'x_qe_xc_igcc':      9,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "pbe",
+            'x_qe_xc_igcc_comment':    "same as PBX, back-comp.",
+            'x_qe_xc_igcc':      9,
+        },
     },
     {
         # igcc=10 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         #        functionals.f90 tells that correlation is taken from tpss
         'XC_functional_name': "MGGA_C_TPSS",
-        'x_qe_xc_igcc_name':       "tb09",
-        'x_qe_xc_igcc_comment':    "TB09 Meta-GGA (Espresso-version < 5.1)",
-        'x_qe_xc_igcc':      10,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "tb09",
+            'x_qe_xc_igcc_comment':    "TB09 Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcc':      10,
+        },
     },
     {
         # igcc=11 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         'XC_functional_name': "MGGA_C_M06_L",
-        'x_qe_xc_igcc_name':       "m6lx",
-        'x_qe_xc_igcc_comment':    "M06L Meta-GGA (Espresso-version < 5.1)",
-        'x_qe_xc_igcc':      2,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "m6lx",
+            'x_qe_xc_igcc_comment':    "M06L Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcc':      2,
+        },
     },
     {
         'XC_functional_name': "GGA_C_Q2D",
-        'x_qe_xc_igcc_name':       "q2dc",
-        'x_qe_xc_igcc_comment':    "Q2D correlation grad corr",
-        'x_qe_xc_igcc':      12,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "q2dc",
+            'x_qe_xc_igcc_comment':    "Q2D correlation grad corr",
+            'x_qe_xc_igcc':      12,
+        },
     },
     {
         'XC_functional_name': "GGA_C_LYP",
         'XC_functional_weight': 0.871,
-        'x_qe_xc_igcc_name':       "x3lp",
-        'x_qe_xc_igcc_comment':    "X3LYP (Lee-Yang-Parr*0.871)",
-        'x_qe_xc_igcc':      13,
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':       "x3lp",
+            'x_qe_xc_igcc_comment':    "X3LYP (Lee-Yang-Parr*0.871)",
+            'x_qe_xc_igcc':      13,
+        },
     },
 ]
 
@@ -570,9 +698,11 @@ META_GGA= [
         }, {
             'XC_functional_name': "MGGA_C_TPSS",
         }],
-        'x_qe_xc_imeta_name':       "tpss",
-        'x_qe_xc_imeta_comment':    "TPSS Meta-GGA",
-        'x_qe_xc_imeta':      1,
+        'xc_section_method': {
+            'x_qe_xc_imeta_name':       "tpss",
+            'x_qe_xc_imeta_comment':    "TPSS Meta-GGA",
+            'x_qe_xc_imeta':      1,
+        },
     },
     {
         'x_qe_t_xc_terms': [{
@@ -580,9 +710,11 @@ META_GGA= [
         }, {
             'XC_functional_name': "MGGA_C_M06_L",
         }],
-        'x_qe_xc_imeta_name':       "m6lx",
-        'x_qe_xc_imeta_comment':    "M06L Meta-GGA",
-        'x_qe_xc_imeta':      2,
+        'xc_section_method': {
+            'x_qe_xc_imeta_name':       "m6lx",
+            'x_qe_xc_imeta_comment':    "M06L Meta-GGA",
+            'x_qe_xc_imeta':      2,
+        },
     },
     {
         'x_qe_t_xc_terms': [{
@@ -591,9 +723,11 @@ META_GGA= [
             # confirmed by looking into functionals.f90
             'XC_functional_name': "MGGA_C_TPSS",
         }],
-        'x_qe_xc_imeta_name':       "tb09",
-        'x_qe_xc_imeta_comment':    "TB09 Meta-GGA",
-        'x_qe_xc_imeta':      3,
+        'xc_section_method': {
+            'x_qe_xc_imeta_name':       "tb09",
+            'x_qe_xc_imeta_comment':    "TB09 Meta-GGA",
+            'x_qe_xc_imeta':      3,
+        },
     },
 ]
 
@@ -601,39 +735,51 @@ VAN_DER_WAALS = [
     None,
     {
         'XC_functional_name': "x_qe_VDW_DF1",
-        'x_qe_xc_inlc_name':       "vdw1",
-        'x_qe_xc_inlc_comment':    "vdW-DF1",
-        'x_qe_xc_inlc':      1,
+        'xc_section_method': {
+            'x_qe_xc_inlc_name':       "vdw1",
+            'x_qe_xc_inlc_comment':    "vdW-DF1",
+            'x_qe_xc_inlc':      1,
+        },
     },
     {
         'XC_functional_name': "x_qe_VDW_DF2",
-        'x_qe_xc_inlc_name':       "vdw2",
-        'x_qe_xc_inlc_comment':    "vdW-DF2",
-        'x_qe_xc_inlc':      2,
+        'xc_section_method': {
+            'x_qe_xc_inlc_name':       "vdw2",
+            'x_qe_xc_inlc_comment':    "vdW-DF2",
+            'x_qe_xc_inlc':      2,
+        },
     },
     {
         'XC_functional_name': "x_qe_VDW_RVV10",
-        'x_qe_xc_inlc_name':       "vv10",
-        'x_qe_xc_inlc_comment':    "rVV10",
-        'x_qe_xc_inlc':      3,
+        'xc_section_method': {
+            'x_qe_xc_inlc_name':       "vv10",
+            'x_qe_xc_inlc_comment':    "rVV10",
+            'x_qe_xc_inlc':      3,
+        },
     },
     {
         'XC_functional_name': "x_qe_VDW_DFX",
-        'x_qe_xc_inlc_name':       "vdwx",
-        'x_qe_xc_inlc_comment':    "vdW-DF-x (reserved Thonhauser, not implemented)",
-        'x_qe_xc_inlc':      4,
+        'xc_section_method': {
+            'x_qe_xc_inlc_name':       "vdwx",
+            'x_qe_xc_inlc_comment':    "vdW-DF-x (reserved Thonhauser, not implemented)",
+            'x_qe_xc_inlc':      4,
+        },
     },
     {
         'XC_functional_name': "x_qe_VDW_DFY",
-        'x_qe_xc_inlc_name':       "vdwy",
-        'x_qe_xc_inlc_comment':    "vdW-DF-y (reserved Thonhauser, not implemented)",
-        'x_qe_xc_inlc':      5,
+        'xc_section_method': {
+            'x_qe_xc_inlc_name':       "vdwy",
+            'x_qe_xc_inlc_comment':    "vdW-DF-y (reserved Thonhauser, not implemented)",
+            'x_qe_xc_inlc':      5,
+        },
     },
     {
         'XC_functional_name': "x_qe_VDW_DFZ",
-        'x_qe_xc_inlc_name':       "vdwz",
-        'x_qe_xc_inlc_comment':    "vdW-DF-z (reserved Thonhauser, not implemented)",
-        'x_qe_xc_inlc':      6,
+        'xc_section_method': {
+            'x_qe_xc_inlc_name':       "vdwz",
+            'x_qe_xc_inlc_comment':    "vdW-DF-z (reserved Thonhauser, not implemented)",
+            'x_qe_xc_inlc':      6,
+        },
     },
 ]
 
