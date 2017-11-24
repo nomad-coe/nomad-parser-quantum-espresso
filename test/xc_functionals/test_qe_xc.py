@@ -36,6 +36,7 @@ def process_line(line):
     if qe_xc is None:
         print("  None")
     else:
+        print(json.dumps(method_qe_xc, indent=2, sort_keys=True))
         print(json.dumps(qe_xc, indent=2, sort_keys=True))
 
 if __name__ == '__main__':
