@@ -65,6 +65,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
         if this_component is None:
             raise RuntimeError("Undefined XC component %s[%d]" % (
                 XC_COMPONENT_NAME[component_i], this_xf_num))
+        xc_section_method.update(this_component['xc_section_method'])
         if 'x_qe_t_xc_terms' in this_component:
             other_exchange_fraction = None
             for term in this_component['x_qe_t_xc_terms']:
