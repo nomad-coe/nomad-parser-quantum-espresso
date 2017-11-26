@@ -72,7 +72,6 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
             raise RuntimeError("Undefined XC component %s[%d]" % (
                 XC_COMPONENT_NAME[component_i], this_xf_num))
         xc_section_method.update(this_component['xc_section_method'])
-        other_exchange_fraction = None
         for this_term in this_component['xc_terms']:
             term = this_term.copy()
             if term['XC_functional_name'] == 'HYB_GGA_XC_HSE06':
@@ -81,14 +80,18 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
                     term['XC_functional_parameters'] = {
                         'exx_mixing': exact_exchange_fraction,
                     }
-            elif term['XC_functional_name'] == 'HF_X':
-                if exact_exchange_fraction is not None:
-                    # we are at HF_X component, with explicit exact_exchange_fraction
-                    term['XC_functional_weight'] = exact_exchange_fraction
-                    other_exchange_fraction = dft_exchange_fraction
-            elif (other_exchange_fraction is not None):
-                # assign remainder to weight of remaining component
-                term['XC_functional_weight'] = other_exchange_fraction
+            if term.get('t_qe_XC_functional_weight_scale_exx', None):
+                term['XC_functional_weight'] = (
+                    term['t_qe_XC_functional_weight_scale_exx'] *
+                    exact_exchange_fraction
+                )
+                del term['t_qe_XC_functional_weight_scale_exx']
+            if term.get('t_qe_XC_functional_weight_scale_dft', None):
+                term['XC_functional_weight'] = (
+                    term['t_qe_XC_functional_weight_scale_dft'] *
+                    dft_exchange_fraction
+                )
+                del term['t_qe_XC_functional_weight_scale_dft']
             if term['XC_functional_name'] not in xc_data:
                 xc_data[term['XC_functional_name']] = term
     result = []
