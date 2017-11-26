@@ -41,6 +41,11 @@ def parse_qe_xc_num(xc_functional_num):
 
 
 def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
+    # all remainders of excact_exchange_fraction must be ordinary DFT
+    if exact_exchange_fraction is None:
+        dft_exchange_fraction = 1.0
+    else:
+        dft_exchange_fraction = 1.0 - exact_exchange_fraction
     xf_num = parse_qe_xc_num(xc_functional_num)
     LOGGER.debug('num <- input: %s <- %s, exx_fraction: %s',  str(xf_num),
                  xc_functional_num, str(exact_exchange_fraction))
@@ -49,10 +54,6 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
     #   only want to emit such combinations once
     xc_data = {}
     xc_section_method = {}
-    if exact_exchange_fraction is None:
-        dft_exchange_fraction = 1.0
-    else:
-        dft_exchange_fraction = 1.0 - exact_exchange_fraction
     for component_i in range(6):
         this_xf_num = xf_num[component_i]
         if this_xf_num == 0:
