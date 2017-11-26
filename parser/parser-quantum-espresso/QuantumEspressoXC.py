@@ -69,10 +69,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
         if 'x_qe_t_xc_terms' in this_component:
             other_exchange_fraction = None
             for term in this_component['x_qe_t_xc_terms']:
-                sub_component = this_component.copy()
-                sub_component.pop('x_qe_t_xc_terms')
-                for k,v in term.items():
-                    sub_component[k]=v
+                sub_component = term.copy()
                 if sub_component.get('XC_functional_name', None) == 'HF_X':
                     if exact_exchange_fraction is not None:
                         # we are at HF_X component, with explicit exact_exchange_fraction
