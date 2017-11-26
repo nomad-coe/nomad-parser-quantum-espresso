@@ -136,7 +136,7 @@ EXCHANGE = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'x_qe_OEP_X',
+            'XC_functional_name': 'OEP_EXX',
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       'oep',
