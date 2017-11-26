@@ -154,9 +154,11 @@ EXCHANGE = [
     {
         'xc_terms': [{
             'XC_functional_name': 'HF_X',
+            't_qe_XC_functional_weight_scale_exx': 1.0,
             'XC_functional_weight': 0.25,
         }, {
             'XC_functional_name': 'LDA_X',
+            't_qe_XC_functional_weight_scale_dft': 1.0,
             'XC_functional_weight': 0.75,
         }],
         'xc_section_method': {
@@ -168,9 +170,11 @@ EXCHANGE = [
     {
         'xc_terms': [{
             'XC_functional_name': 'HF_X',
+            't_qe_XC_functional_weight_scale_exx': 1.0,
             'XC_functional_weight': 0.20,
         }, {
             'XC_functional_name': 'LDA_X',
+            't_qe_XC_functional_weight_scale_dft': 1.0,
             'XC_functional_weight': 0.8,
         }],
         'xc_section_method': {
@@ -192,9 +196,11 @@ EXCHANGE = [
     {
         'xc_terms': [{
             'XC_functional_name': 'HF_X',
+            't_qe_XC_functional_weight_scale_exx': 1.0,
             'XC_functional_weight': 0.218,
         }, {
             'XC_functional_name': 'LDA_X',
+            't_qe_XC_functional_weight_scale_dft': 1.0,
             'XC_functional_weight': 0.782,
         }],
         'xc_section_method': {
