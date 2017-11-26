@@ -40,9 +40,10 @@ def parse_qe_xc_num(xc_functional_num):
     return xf_num_split_i
 
 
-def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
+def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
     # all remainders of excact_exchange_fraction must be ordinary DFT
     if exact_exchange_fraction is None:
+        exact_exchange_fraction = 0.0
         dft_exchange_fraction = 1.0
     else:
         dft_exchange_fraction = 1.0 - exact_exchange_fraction
