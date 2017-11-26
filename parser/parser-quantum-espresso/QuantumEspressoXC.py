@@ -439,8 +439,8 @@ EXCHANGE_GRADIENT_CORRECTION = [
     {
         'x_qe_t_xc_terms': [{
             'XC_functional_name': "GGA_X_PBE",
+            'XC_functional_weight': 0.75,
         }],
-        'XC_functional_weight': 0.75,
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "pb0x",
             'x_qe_xc_igcx_comment':    "PBE0 (PBE exchange*0.75)",
@@ -450,8 +450,8 @@ EXCHANGE_GRADIENT_CORRECTION = [
     {
         'x_qe_t_xc_terms': [{
             'XC_functional_name': "GGA_X_B88",
+            'XC_functional_weight': 0.72,
         }],
-        'XC_functional_weight': 0.72,
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "b3lp",
             'x_qe_xc_igcx_comment':    "B3LYP (Becke88*0.72)",
@@ -725,8 +725,8 @@ CORRELATION_GRADIENT_CORRECTION = [
     {
         'x_qe_t_xc_terms': [{
             'XC_functional_name': "GGA_C_LYP",
+            'XC_functional_weight': 0.81,
         }],
-        'XC_functional_weight': 0.81,
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "b3lp",
             'x_qe_xc_igcc_comment':    "B3LYP (Lee-Yang-Parr*0.81)",
@@ -791,8 +791,8 @@ CORRELATION_GRADIENT_CORRECTION = [
     {
         'x_qe_t_xc_terms': [{
             'XC_functional_name': "GGA_C_LYP",
+            'XC_functional_weight': 0.871,
         }],
-        'XC_functional_weight': 0.871,
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "x3lp",
             'x_qe_xc_igcc_comment':    "X3LYP (Lee-Yang-Parr*0.871)",
