@@ -49,6 +49,10 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
     #   only want to emit such combinations once
     xc_data = {}
     xc_section_method = {}
+    if exact_exchange_fraction is None:
+        dft_exchange_fraction = 1.0
+    else:
+        dft_exchange_fraction = 1.0 - exact_exchange_fraction
     for component_i in range(6):
         this_xf_num = xf_num[component_i]
         if this_xf_num == 0:
@@ -74,8 +78,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction):
                     if exact_exchange_fraction is not None:
                         # we are at HF_X component, with explicit exact_exchange_fraction
                         sub_component['XC_functional_weight'] = exact_exchange_fraction
-                        # assume max. 2 components
-                        other_exchange_fraction = 1.0 - exact_exchange_fraction
+                        other_exchange_fraction = dft_exchange_fraction
                 elif (other_exchange_fraction is not None):
                     # assign remainder to weight of remaining component
                     sub_component['XC_functional_weight'] = other_exchange_fraction
