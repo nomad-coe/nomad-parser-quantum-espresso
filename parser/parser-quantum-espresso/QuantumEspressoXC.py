@@ -75,12 +75,12 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
         other_exchange_fraction = None
         for this_term in this_component['xc_terms']:
             term = this_term.copy()
-            if term.get('XC_functional_name', None) == 'HF_X':
+            if term['XC_functional_name'] == 'HF_X':
                 if exact_exchange_fraction is not None:
                     # we are at HF_X component, with explicit exact_exchange_fraction
                     term['XC_functional_weight'] = exact_exchange_fraction
                     other_exchange_fraction = dft_exchange_fraction
-            elif term.get('XC_functional_name', None) == 'HYB_GGA_XC_HSE06':
+            elif term['XC_functional_name'] == 'HYB_GGA_XC_HSE06':
                 if exact_exchange_fraction is not None:
                     # we are at HSE06 component, with explicit exact_exchange_fraction
                     term['XC_functional_parameters'] = {
