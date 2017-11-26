@@ -73,24 +73,24 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
                 XC_COMPONENT_NAME[component_i], this_xf_num))
         xc_section_method.update(this_component['xc_section_method'])
         other_exchange_fraction = None
-        for term in this_component['xc_terms']:
-            sub_component = term.copy()
-            if sub_component.get('XC_functional_name', None) == 'HF_X':
+        for this_term in this_component['xc_terms']:
+            term = this_term.copy()
+            if term.get('XC_functional_name', None) == 'HF_X':
                 if exact_exchange_fraction is not None:
                     # we are at HF_X component, with explicit exact_exchange_fraction
-                    sub_component['XC_functional_weight'] = exact_exchange_fraction
+                    term['XC_functional_weight'] = exact_exchange_fraction
                     other_exchange_fraction = dft_exchange_fraction
-            elif sub_component.get('XC_functional_name', None) == 'HYB_GGA_XC_HSE06':
+            elif term.get('XC_functional_name', None) == 'HYB_GGA_XC_HSE06':
                 if exact_exchange_fraction is not None:
                     # we are at HSE06 component, with explicit exact_exchange_fraction
-                    sub_component['XC_functional_parameters'] = {
+                    term['XC_functional_parameters'] = {
                         'exx_mixing': exact_exchange_fraction,
                     }
             elif (other_exchange_fraction is not None):
                 # assign remainder to weight of remaining component
-                sub_component['XC_functional_weight'] = other_exchange_fraction
-            if sub_component['XC_functional_name'] not in xc_data:
-                xc_data[sub_component['XC_functional_name']] = sub_component
+                term['XC_functional_weight'] = other_exchange_fraction
+            if term['XC_functional_name'] not in xc_data:
+                xc_data[term['XC_functional_name']] = term
     result = []
     for k,v in sorted(xc_data.items()):
         result.append(v)
