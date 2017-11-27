@@ -73,34 +73,41 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
                 XC_COMPONENT_NAME[component_i], this_xf_num))
         xc_section_method.update(this_component['xc_section_method'])
         for this_term in this_component['xc_terms']:
-            term = this_term.copy()
-            if term['XC_functional_name'] == 'HYB_GGA_XC_HSE06':
-                if exact_exchange_fraction is not None:
-                    # we are at HSE06 component, with explicit exact_exchange_fraction
-                    term['XC_functional_parameters'] = {
-                        'exx_mixing': exact_exchange_fraction,
-                    }
-            if term.get('t_qe_XC_functional_weight_scale_exx', None):
-                term['XC_functional_weight'] = (
-                    term['t_qe_XC_functional_weight_scale_exx'] *
-                    exact_exchange_fraction
-                )
-                del term['t_qe_XC_functional_weight_scale_exx']
-            if term.get('t_qe_XC_functional_weight_scale_dft', None):
-                term['XC_functional_weight'] = (
-                    term['t_qe_XC_functional_weight_scale_dft'] *
-                    dft_exchange_fraction
-                )
-                del term['t_qe_XC_functional_weight_scale_dft']
-            if term['XC_functional_name'] not in xc_data:
-                xc_data[term['XC_functional_name']] = term
-            else:
-                LOGGER.info("pre-existing XC term: %s",
-                            term['XC_functional_name'])
+            add_term(xc_data, this_term,
+                     exact_exchange_fraction, dft_exchange_fraction)
     result = []
     for k,v in sorted(xc_data.items()):
         result.append(v)
     return (xc_section_method, result)
+
+
+def add_term(xc_data, this_term,
+             exact_exchange_fraction, dft_exchange_fraction):
+    term = this_term.copy()
+    if term['XC_functional_name'] == 'HYB_GGA_XC_HSE06':
+        if exact_exchange_fraction is not None:
+            # we are at HSE06 component, with explicit exact_exchange_fraction
+            term['XC_functional_parameters'] = {
+                'exx_mixing': exact_exchange_fraction,
+            }
+    if term.get('t_qe_XC_functional_weight_scale_exx', None):
+        term['XC_functional_weight'] = (
+            term['t_qe_XC_functional_weight_scale_exx'] *
+            exact_exchange_fraction
+        )
+        del term['t_qe_XC_functional_weight_scale_exx']
+    if term.get('t_qe_XC_functional_weight_scale_dft', None):
+        term['XC_functional_weight'] = (
+            term['t_qe_XC_functional_weight_scale_dft'] *
+            dft_exchange_fraction
+        )
+        del term['t_qe_XC_functional_weight_scale_dft']
+    if term['XC_functional_name'] not in xc_data:
+        xc_data[term['XC_functional_name']] = term
+    else:
+        LOGGER.info("pre-existing XC term: %s",
+                    term['XC_functional_name'])
+    return xc_data
 
 
 # origin: espresso-5.4.0/Modules/funct.f90
