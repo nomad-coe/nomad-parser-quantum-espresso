@@ -94,6 +94,9 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
                 del term['t_qe_XC_functional_weight_scale_dft']
             if term['XC_functional_name'] not in xc_data:
                 xc_data[term['XC_functional_name']] = term
+            else:
+                LOGGER.info("pre-existing XC term: %s",
+                            term['XC_functional_name'])
     result = []
     for k,v in sorted(xc_data.items()):
         result.append(v)
