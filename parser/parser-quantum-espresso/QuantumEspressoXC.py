@@ -1,5 +1,6 @@
 import logging
 import re
+import copy
 
 
 LOGGER = logging.getLogger(__name__)
@@ -83,7 +84,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
 
 def add_term(xc_data, this_term,
              exact_exchange_fraction, dft_exchange_fraction):
-    term = this_term.copy()
+    term = copy.deepcopy(this_term)
     if term['XC_functional_name'] == 'HYB_GGA_XC_HSE06':
         if exact_exchange_fraction is not None:
             # we are at HSE06 component, with explicit exact_exchange_fraction
