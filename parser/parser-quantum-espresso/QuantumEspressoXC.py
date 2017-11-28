@@ -103,6 +103,8 @@ def add_term(xc_data, this_term,
             dft_exchange_fraction
         )
         del term['t_qe_XC_functional_weight_scale_dft']
+    if 'XC_functional_weight' not in term:
+        term['XC_functional_weight'] = 1.0
     if term['XC_functional_name'] not in xc_data:
         xc_data[term['XC_functional_name']] = term
     else:
