@@ -102,13 +102,11 @@ def add_term(xc_data, this_term,
             term['t_qe_XC_functional_weight_scale_exx'] *
             exact_exchange_fraction
         )
-        del term['t_qe_XC_functional_weight_scale_exx']
     if term.get('t_qe_XC_functional_weight_scale_dft', None):
         term['XC_functional_weight'] = (
             term['t_qe_XC_functional_weight_scale_dft'] *
             dft_exchange_fraction
         )
-        del term['t_qe_XC_functional_weight_scale_dft']
     if 'XC_functional_weight' not in term:
         term['XC_functional_weight'] = 1.0
     if term['XC_functional_name'] not in xc_data:
@@ -121,10 +119,13 @@ def add_term(xc_data, this_term,
 
 def apply_filter_terms(xc_data):
     for (k, v) in list(xc_data.items()):
-        if abs(v['XC_functional_weight'] - 1.0) < 0.01:
-            del v['XC_functional_weight']
-        elif abs(v['XC_functional_weight']) < 0.01:
+        if abs(v['XC_functional_weight']) < 0.01:
             del xc_data[k]
+        else:
+            if abs(v['XC_functional_weight'] - 1.0) < 0.01:
+                del v['XC_functional_weight']
+            v.pop('t_qe_XC_functional_weight_scale_exx', None)
+            v.pop('t_qe_XC_functional_weight_scale_dft', None)
 
 
 # origin: espresso-5.4.0/Modules/funct.f90
