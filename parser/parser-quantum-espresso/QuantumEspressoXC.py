@@ -81,6 +81,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
             for this_term in this_component['xc_terms_subtract']:
                 add_term(xc_data_subtract, this_term,
                          exact_exchange_fraction, dft_exchange_fraction)
+    apply_filter_terms(xc_data)
     result = []
     for k,v in sorted(xc_data.items()):
         result.append(v)
@@ -116,6 +117,14 @@ def add_term(xc_data, this_term,
         LOGGER.info("pre-existing XC term: %s",
                     term['XC_functional_name'])
     return xc_data
+
+
+def apply_filter_terms(xc_data):
+    for (k, v) in list(xc_data.items()):
+        if abs(v['XC_functional_weight'] - 1.0) < 0.01:
+            del v['XC_functional_weight']
+        elif abs(v['XC_functional_weight']) < 0.01:
+            del xc_data[k]
 
 
 # origin: espresso-5.4.0/Modules/funct.f90
