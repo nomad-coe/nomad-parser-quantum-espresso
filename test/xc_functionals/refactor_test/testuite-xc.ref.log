@@ -212,9 +212,6 @@ qe_xc: 0.00 WC ( 1  4 11  4 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 REVPBE ( 1  4  4  4 0 0)
