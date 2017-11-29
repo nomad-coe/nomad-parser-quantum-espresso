@@ -608,6 +608,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_X_C09X",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "c09x",
             'x_qe_xc_igcx_comment':    "Cooper 09",
