@@ -495,6 +495,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "MGGA_X_TPSS",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+        }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':    "tpss",
             'x_qe_xc_igcx_comment': "TPSS Meta-GGA (Espresso-version < 5.1)",
@@ -876,6 +879,9 @@ META_GGA = [
             'XC_functional_name': "MGGA_X_TPSS",
         }, {
             'XC_functional_name': "MGGA_C_TPSS",
+        }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_imeta_name':       "tpss",

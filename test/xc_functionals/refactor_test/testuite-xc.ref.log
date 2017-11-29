@@ -61,9 +61,6 @@ qe_xc: 0.00 SLA  PW   TPSS TPSS ( 1 4 7 6 0)
     "XC_functional_name": "LDA_C_PW"
   },
   {
-    "XC_functional_name": "LDA_X"
-  },
-  {
     "XC_functional_name": "MGGA_C_TPSS"
   },
   {
@@ -183,9 +180,6 @@ qe_xc: 0.00 SLA  PW   TPSS TPSS ( 1  4  0  0 0 1)
 [
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   },
   {
     "XC_functional_name": "MGGA_C_TPSS"
@@ -950,9 +944,6 @@ qe_xc: 0.00 SLA  PW   TPSS TPSS (1476)
 [
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   },
   {
     "XC_functional_name": "MGGA_C_TPSS"
