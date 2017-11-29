@@ -16,28 +16,32 @@ def parse_qe_xc_num(xc_functional_num):
                 inlc         - non-local term of Van der Waals functionals
     """
     xf_num_split_i = []
-    xf_num_split = re.split(r'\s+',xc_functional_num.strip())
+    xf_num_split = re.split(r'\s+', xc_functional_num.strip())
     if len(xf_num_split) > 6:
         # tested versions of espresso <=5.4.0 have 6 elements
-        raise RuntimeError("unsupported number of XC components: %d" % (len(xf_num_split)))
+        raise RuntimeError("unsupported number of XC components: %d" % (
+            len(xf_num_split)))
     elif len(xf_num_split) == 6:
         # trivial case: we got 6 components from simply splitting
-        xf_num_split_i = [ int(x) for x in xf_num_split ]
-    elif len(xf_num_split) == 1 and len(xc_functional_num)==4:
+        xf_num_split_i = [int(x) for x in xf_num_split]
+    elif len(xf_num_split) == 1 and len(xc_functional_num) == 4:
         # old 4-component form without space separator
-        xf_num_split_i = [ int(x) for x in re.findall('(\d)', xc_functional_num) ]
-    elif len(xc_functional_num)==10:
-        # intermediate versions used 2-digit, 5 component form, occasionally missing spaces
+        xf_num_split_i = [int(x) for x in re.findall(
+            '(\d)', xc_functional_num)]
+    elif len(xc_functional_num) == 10:
+        # intermediate versions used 2-digit, 5 component form,
+        # occasionally missing spaces
         # examples:
         # ( 1 4 4 0 1)
         # ( 0 413 0 2)  <- missing space
-        xf_num_split_i = [ int(x) for x in re.findall('([ \d]\d)',xc_functional_num) ]
+        xf_num_split_i = [int(x) for x in re.findall(
+            '([ \d]\d)', xc_functional_num)]
     else:
         raise RuntimeError("unparsable input: '%s'", xc_functional_num)
-    if len(xf_num_split_i)<1:
+    if len(xf_num_split_i) < 1:
         raise RuntimeError("this should not happen")
     # zero-pad up to 6 elements
-    xf_num_split_i += [ 0 ] * (6 - len(xf_num_split_i))
+    xf_num_split_i += [0] * (6 - len(xf_num_split_i))
     return xf_num_split_i
 
 
@@ -69,28 +73,30 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
                 "%s[%d] beyond limit of %d",
                 XC_COMPONENT_NAME[component_i], this_xf_num, component_max)
         else:
-            this_component=XC_COMPONENT[component_i][this_xf_num]
+            this_component = XC_COMPONENT[component_i][this_xf_num]
         if this_component is None:
             raise RuntimeError("Undefined XC component %s[%d]" % (
                 XC_COMPONENT_NAME[component_i], this_xf_num))
         xc_section_method.update(this_component['xc_section_method'])
         for this_term in this_component['xc_terms']:
-            apply_term_add(xc_data, this_term,
-                     exact_exchange_fraction, dft_exchange_fraction)
+            apply_term_add(
+                xc_data, this_term,
+                exact_exchange_fraction, dft_exchange_fraction)
         if 'xc_terms_subtract' in this_component:
             for this_term in this_component['xc_terms_subtract']:
-                apply_term_add(xc_data_subtract, this_term,
-                         exact_exchange_fraction, dft_exchange_fraction)
+                apply_term_add(
+                    xc_data_subtract, this_term,
+                    exact_exchange_fraction, dft_exchange_fraction)
     apply_terms_subtract(xc_data, xc_data_subtract)
     apply_terms_filter(xc_data)
     result = []
-    for k,v in sorted(xc_data.items()):
+    for (k, v) in sorted(xc_data.items()):
         result.append(v)
     return (xc_section_method, result)
 
 
 def apply_term_add(xc_data, this_term,
-             exact_exchange_fraction, dft_exchange_fraction):
+                   exact_exchange_fraction, dft_exchange_fraction):
     term = copy.deepcopy(this_term)
     if term['XC_functional_name'] == 'HYB_GGA_XC_HSE06':
         if exact_exchange_fraction is not None:
@@ -154,7 +160,7 @@ EXCHANGE = [
     {
         'xc_terms': [{
             'XC_functional_name': 'LDA_X',
-            'XC_functional_parameters': { 'alpha': 1.0 },
+            'XC_functional_parameters': {'alpha': 1.0},
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       'sl1',
@@ -388,9 +394,9 @@ CORRELATION = [
             'XC_functional_weight': 0.81,
         }],
         'xc_section_method': {
-            'x_qe_xc_icorr_name':       "b3lpv1r",
-            'x_qe_xc_icorr_comment':    "B3LYP-VWN-1-RPA (0.19*vwn_rpa+0.81*lyp)",
-            'x_qe_xc_icorr':      13,
+            'x_qe_xc_icorr_name':    "b3lpv1r",
+            'x_qe_xc_icorr_comment': "B3LYP-VWN-1-RPA (0.19*vwn_rpa+0.81*lyp)",
+            'x_qe_xc_icorr':         13,
         },
     },
     {
@@ -481,9 +487,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
             'XC_functional_name': "MGGA_X_TPSS",
         }],
         'xc_section_method': {
-            'x_qe_xc_igcx_name':       "tpss",
-            'x_qe_xc_igcx_comment':    "TPSS Meta-GGA (Espresso-version < 5.1)",
-            'x_qe_xc_igcx':      7,
+            'x_qe_xc_igcx_name':    "tpss",
+            'x_qe_xc_igcx_comment': "TPSS Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcx':         7,
         },
     },
     {
@@ -566,9 +572,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
             'XC_functional_name': "MGGA_X_TB09",
         }],
         'xc_section_method': {
-            'x_qe_xc_igcx_name':       "tb09",
-            'x_qe_xc_igcx_comment':    "TB09 Meta-GGA (Espresso-version < 5.1)",
-            'x_qe_xc_igcx':      15,
+            'x_qe_xc_igcx_name':    "tb09",
+            'x_qe_xc_igcx_comment': "TB09 Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcx':         15,
         },
     },
     {
@@ -598,9 +604,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
             'XC_functional_name': "MGGA_X_M06_L",
         }],
         'xc_section_method': {
-            'x_qe_xc_igcx_name':       "m6lx",
-            'x_qe_xc_igcx_comment':    "M06L Meta-GGA (Espresso-version < 5.1)",
-            'x_qe_xc_igcx':      18,
+            'x_qe_xc_igcx_name':    "m6lx",
+            'x_qe_xc_igcx_comment': "M06L Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcx':         18,
         },
     },
     {
@@ -702,9 +708,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
             'XC_functional_weight': 0.167,
         }],
         'xc_section_method': {
-            'x_qe_xc_igcx_name':       "x3lp",
-            'x_qe_xc_igcx_comment':    "X3LYP (Becke88*0.542 + Perdew-Wang91*0.167)",
-            'x_qe_xc_igcx':      28,
+            'x_qe_xc_igcx_name':    "x3lp",
+            'x_qe_xc_igcx_comment': "X3LYP (Becke88*0.542 "
+                                    " + Perdew-Wang91*0.167)",
+            'x_qe_xc_igcx':         28,
         },
     },
 ]
@@ -768,9 +775,9 @@ CORRELATION_GRADIENT_CORRECTION = [
             'XC_functional_name': "MGGA_C_TPSS",
         }],
         'xc_section_method': {
-            'x_qe_xc_igcc_name':       "tpss",
-            'x_qe_xc_igcc_comment':    "TPSS Meta-GGA (Espresso-version < 5.1)",
-            'x_qe_xc_igcc':      6,
+            'x_qe_xc_igcc_name':    "tpss",
+            'x_qe_xc_igcc_comment': "TPSS Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcc':         6,
         },
     },
     {
@@ -812,9 +819,9 @@ CORRELATION_GRADIENT_CORRECTION = [
             'XC_functional_name': "MGGA_C_TPSS",
         }],
         'xc_section_method': {
-            'x_qe_xc_igcc_name':       "tb09",
-            'x_qe_xc_igcc_comment':    "TB09 Meta-GGA (Espresso-version < 5.1)",
-            'x_qe_xc_igcc':      10,
+            'x_qe_xc_igcc_name':    "tb09",
+            'x_qe_xc_igcc_comment': "TB09 Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcc':         10,
         },
     },
     {
@@ -824,9 +831,9 @@ CORRELATION_GRADIENT_CORRECTION = [
             'XC_functional_name': "MGGA_C_M06_L",
         }],
         'xc_section_method': {
-            'x_qe_xc_igcc_name':       "m6lx",
-            'x_qe_xc_igcc_comment':    "M06L Meta-GGA (Espresso-version < 5.1)",
-            'x_qe_xc_igcc':      2,
+            'x_qe_xc_igcc_name':    "m6lx",
+            'x_qe_xc_igcc_comment': "M06L Meta-GGA (Espresso-version < 5.1)",
+            'x_qe_xc_igcc':         2,
         },
     },
     {
@@ -853,7 +860,7 @@ CORRELATION_GRADIENT_CORRECTION = [
 ]
 
 
-META_GGA= [
+META_GGA = [
     None,
     {
         'xc_terms': [{
@@ -931,9 +938,10 @@ VAN_DER_WAALS = [
             'XC_functional_name': "x_qe_VDW_DFX",
         }],
         'xc_section_method': {
-            'x_qe_xc_inlc_name':       "vdwx",
-            'x_qe_xc_inlc_comment':    "vdW-DF-x (reserved Thonhauser, not implemented)",
-            'x_qe_xc_inlc':      4,
+            'x_qe_xc_inlc_name':    "vdwx",
+            'x_qe_xc_inlc_comment': "vdW-DF-x (reserved Thonhauser,"
+                                    " not implemented)",
+            'x_qe_xc_inlc':         4,
         },
     },
     {
@@ -941,9 +949,10 @@ VAN_DER_WAALS = [
             'XC_functional_name': "x_qe_VDW_DFY",
         }],
         'xc_section_method': {
-            'x_qe_xc_inlc_name':       "vdwy",
-            'x_qe_xc_inlc_comment':    "vdW-DF-y (reserved Thonhauser, not implemented)",
-            'x_qe_xc_inlc':      5,
+            'x_qe_xc_inlc_name':    "vdwy",
+            'x_qe_xc_inlc_comment': "vdW-DF-y (reserved Thonhauser,"
+                                    " not implemented)",
+            'x_qe_xc_inlc':         5,
         },
     },
     {
@@ -951,9 +960,10 @@ VAN_DER_WAALS = [
             'XC_functional_name': "x_qe_VDW_DFZ",
         }],
         'xc_section_method': {
-            'x_qe_xc_inlc_name':       "vdwz",
-            'x_qe_xc_inlc_comment':    "vdW-DF-z (reserved Thonhauser, not implemented)",
-            'x_qe_xc_inlc':      6,
+            'x_qe_xc_inlc_name':    "vdwz",
+            'x_qe_xc_inlc_comment': "vdW-DF-z (reserved Thonhauser,"
+                                    " not implemented)",
+            'x_qe_xc_inlc':         6,
         },
     },
 ]
