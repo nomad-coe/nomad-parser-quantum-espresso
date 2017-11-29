@@ -595,6 +595,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "MGGA_X_TB09",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':    "tb09",
             'x_qe_xc_igcx_comment': "TB09 Meta-GGA (Espresso-version < 5.1)",
