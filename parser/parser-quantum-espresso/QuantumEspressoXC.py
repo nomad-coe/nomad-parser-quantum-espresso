@@ -75,11 +75,11 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
                 XC_COMPONENT_NAME[component_i], this_xf_num))
         xc_section_method.update(this_component['xc_section_method'])
         for this_term in this_component['xc_terms']:
-            add_term(xc_data, this_term,
+            apply_term_add(xc_data, this_term,
                      exact_exchange_fraction, dft_exchange_fraction)
         if 'xc_terms_subtract' in this_component:
             for this_term in this_component['xc_terms_subtract']:
-                add_term(xc_data_subtract, this_term,
+                apply_term_add(xc_data_subtract, this_term,
                          exact_exchange_fraction, dft_exchange_fraction)
     apply_subtract_terms(xc_data, xc_data_subtract)
     apply_filter_terms(xc_data)
@@ -89,7 +89,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
     return (xc_section_method, result)
 
 
-def add_term(xc_data, this_term,
+def apply_term_add(xc_data, this_term,
              exact_exchange_fraction, dft_exchange_fraction):
     term = copy.deepcopy(this_term)
     if term['XC_functional_name'] == 'HYB_GGA_XC_HSE06':
