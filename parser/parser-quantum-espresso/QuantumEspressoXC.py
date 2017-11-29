@@ -510,6 +510,11 @@ EXCHANGE_GRADIENT_CORRECTION = [
             'XC_functional_weight': 0.75,
             't_qe_XC_functional_weight_scale_dft': 1.0,
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+            'XC_functional_weight': 0.75,
+            't_qe_XC_functional_weight_scale_dft': 1.0,
+        }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "pb0x",
             'x_qe_xc_igcx_comment':    "PBE0 (PBE exchange*0.75)",

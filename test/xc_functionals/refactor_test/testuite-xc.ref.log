@@ -1100,10 +1100,6 @@ qe_xc: 0.25 PBE0 ( 6  4  8  4 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X",
-    "XC_functional_weight": 0.75
   }
 ]
 qe_xc: 0.00 PBE0 ( 6  4  8  4 0 0)
@@ -1130,9 +1126,6 @@ qe_xc: 0.00 PBE0 ( 6  4  8  4 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBE  PBE ( 1  4  3  4 0 0)
