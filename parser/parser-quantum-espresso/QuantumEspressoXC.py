@@ -49,9 +49,6 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
     # all remainders of excact_exchange_fraction must be ordinary DFT
     if exact_exchange_fraction is None:
         exact_exchange_fraction = 0.0
-        dft_exchange_fraction = 1.0
-    else:
-        dft_exchange_fraction = 1.0 - exact_exchange_fraction
     xf_num = parse_qe_xc_num(xc_functional_num)
     LOGGER.debug('num <- input: %s <- %s, exx_fraction: %s',  str(xf_num),
                  xc_functional_num, str(exact_exchange_fraction))
@@ -80,13 +77,11 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
         xc_section_method.update(this_component['xc_section_method'])
         for this_term in this_component['xc_terms']:
             apply_term_add(
-                xc_data, this_term,
-                exact_exchange_fraction, dft_exchange_fraction)
+                xc_data, this_term, exact_exchange_fraction)
         if 'xc_terms_subtract' in this_component:
             for this_term in this_component['xc_terms_subtract']:
                 apply_term_add(
-                    xc_data_subtract, this_term,
-                    exact_exchange_fraction, dft_exchange_fraction)
+                    xc_data_subtract, this_term, exact_exchange_fraction)
     apply_terms_subtract(xc_data, xc_data_subtract)
     apply_terms_filter(xc_data)
     result = []
@@ -95,8 +90,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
     return (xc_section_method, result)
 
 
-def apply_term_add(xc_data, this_term,
-                   exact_exchange_fraction, dft_exchange_fraction):
+def apply_term_add(xc_data, this_term, exact_exchange_fraction):
     term = copy.deepcopy(this_term)
     if term['XC_functional_name'] == 'HYB_GGA_XC_HSE06':
         if exact_exchange_fraction is not None:
