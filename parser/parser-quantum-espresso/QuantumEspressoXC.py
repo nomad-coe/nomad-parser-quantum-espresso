@@ -567,6 +567,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_X_RPW86",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "rw86",
             'x_qe_xc_igcx_comment':    "revised PW86",
