@@ -1,3 +1,37 @@
+XC functionals in Quantum Espresso
+==================================
+QE provides more flexibility in XC functionals than the present NOMAD standard
+(based on libXC) can provide.
+
+
+Reference Documentation
+-----------------------
+Verbatim-quotes from Modules/funct.f90 (QE 5.4.0).
+Beyond this, the NOMAD-QE-parser also implements some fallbacks for
+earlier versions.
+
+
+Internal QE XC indices
+----------------------
+```fortran
+  ! internal indices for exchange-correlation
+  !    iexch: type of exchange
+  !    icorr: type of correlation
+  !    igcx:  type of gradient correction on exchange
+  !    igcc:  type of gradient correction on correlation
+  !    inlc:  type of non local correction on correlation
+  !    inlc:  type of meta-GGA
+```
+
+
+Exact-Exchange / Hybrids
+------------------------
+Beyond those discrete indices, the mixing-factor of Fock-exchange is an
+input value to QE-XC; HF/Hybrid calculations are (as of 5.4.0) performed in 2 steps:
+  1) conventional DFT-SCF with exx_fraction == 0
+  2) HYBRID-DFT-SCF, using orbitals from (1) to evaluate the Fock-Operator
+
+
 QE Definition of functionals
 ----------------------------
 ```fortran
