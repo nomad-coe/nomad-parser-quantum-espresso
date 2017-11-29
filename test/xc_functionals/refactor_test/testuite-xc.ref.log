@@ -1165,8 +1165,7 @@ qe_xc: 0.00 PBE0 ( 6  4  8  4 0 0)
     "XC_functional_name": "GGA_C_PBE"
   },
   {
-    "XC_functional_name": "GGA_X_PBE",
-    "XC_functional_weight": 0.75
+    "XC_functional_name": "GGA_X_PBE"
   },
   {
     "XC_functional_name": "LDA_C_PW"
