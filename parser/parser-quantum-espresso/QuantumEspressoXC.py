@@ -421,6 +421,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_X_B88",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+        }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "b88",
             'x_qe_xc_igcx_comment':    "Becke88 (beta=0.0042)",
@@ -430,6 +433,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
     {
         'xc_terms': [{
             'XC_functional_name': "GGA_X_PW91",
+        }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "ggx",
