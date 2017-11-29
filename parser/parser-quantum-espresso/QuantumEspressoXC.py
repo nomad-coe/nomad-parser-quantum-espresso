@@ -458,7 +458,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_PBE_R'",
+            'XC_functional_name': "GGA_X_PBE_R",
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "rpb",

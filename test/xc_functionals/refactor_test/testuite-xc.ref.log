@@ -243,7 +243,7 @@ qe_xc: 0.00 REVPBE ( 1  4  4  4 0 0)
     "XC_functional_name": "GGA_C_PBE"
   },
   {
-    "XC_functional_name": "GGA_X_PBE_R'"
+    "XC_functional_name": "GGA_X_PBE_R"
   },
   {
     "XC_functional_name": "LDA_C_PW"
@@ -578,7 +578,7 @@ qe_xc: 0.00 VDW-DF ( 1 4 4 0 1)
 }
 [
   {
-    "XC_functional_name": "GGA_X_PBE_R'"
+    "XC_functional_name": "GGA_X_PBE_R"
   },
   {
     "XC_functional_name": "LDA_C_PW"
@@ -636,7 +636,7 @@ qe_xc: 0.00 VDW-DF ( 1  4  4  0 1 0)
 }
 [
   {
-    "XC_functional_name": "GGA_X_PBE_R'"
+    "XC_functional_name": "GGA_X_PBE_R"
   },
   {
     "XC_functional_name": "LDA_C_PW"
