@@ -763,8 +763,7 @@ qe_xc: 0.00 B3LYP ( 7 12  9  7 0 0)
     "XC_functional_weight": 0.81
   },
   {
-    "XC_functional_name": "GGA_X_B88",
-    "XC_functional_weight": 0.72
+    "XC_functional_name": "GGA_X_B88"
   },
   {
     "XC_functional_name": "LDA_C_LYP",
