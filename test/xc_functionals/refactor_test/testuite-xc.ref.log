@@ -162,6 +162,10 @@ qe_xc: 0.00 VDW-DF2 ( 0 413 0 2)
     "XC_functional_name": "LDA_C_PW"
   },
   {
+    "XC_functional_name": "LDA_X",
+    "XC_functional_weight": -1.0
+  },
+  {
     "XC_functional_name": "x_qe_VDW_DF2"
   }
 ]
