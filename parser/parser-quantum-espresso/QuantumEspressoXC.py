@@ -104,16 +104,6 @@ def apply_term_add(xc_data, this_term,
             term['XC_functional_parameters'] = {
                 'exx_mixing': exact_exchange_fraction,
             }
-    if term.get('t_qe_XC_functional_weight_scale_exx', None):
-        term['XC_functional_weight'] = (
-            term['t_qe_XC_functional_weight_scale_exx'] *
-            exact_exchange_fraction
-        )
-    if term.get('t_qe_XC_functional_weight_scale_dft', None):
-        term['XC_functional_weight'] = (
-            term['t_qe_XC_functional_weight_scale_dft'] *
-            dft_exchange_fraction
-        )
     if 'exx_compute_weight' in term:
         term['XC_functional_weight'] = term['exx_compute_weight'](
             exact_exchange_fraction)
@@ -143,8 +133,6 @@ def apply_terms_filter(xc_data):
         else:
             if abs(v['XC_functional_weight'] - 1.0) < 0.01:
                 del v['XC_functional_weight']
-            v.pop('t_qe_XC_functional_weight_scale_exx', None)
-            v.pop('t_qe_XC_functional_weight_scale_dft', None)
             v.pop('exx_compute_weight', None)
 
 
@@ -205,11 +193,11 @@ EXCHANGE = [
     {
         'xc_terms': [{
             'XC_functional_name': 'HF_X',
-            't_qe_XC_functional_weight_scale_exx': 1.0,
+            'exx_compute_weight': lambda exx: exx,
             'XC_functional_weight': 0.25,
         }, {
             'XC_functional_name': 'LDA_X',
-            't_qe_XC_functional_weight_scale_dft': 1.0,
+            'exx_compute_weight': lambda exx: (1.0 - exx),
             'XC_functional_weight': 0.75,
         }],
         'xc_section_method': {
@@ -221,11 +209,11 @@ EXCHANGE = [
     {
         'xc_terms': [{
             'XC_functional_name': 'HF_X',
-            't_qe_XC_functional_weight_scale_exx': 1.0,
+            'exx_compute_weight': lambda exx: exx,
             'XC_functional_weight': 0.20,
         }, {
             'XC_functional_name': 'LDA_X',
-            't_qe_XC_functional_weight_scale_dft': 1.0,
+            'exx_compute_weight': lambda exx: (1.0 - exx),
             'XC_functional_weight': 0.8,
         }],
         'xc_section_method': {
@@ -247,11 +235,11 @@ EXCHANGE = [
     {
         'xc_terms': [{
             'XC_functional_name': 'HF_X',
-            't_qe_XC_functional_weight_scale_exx': 1.0,
+            'exx_compute_weight': lambda exx: exx,
             'XC_functional_weight': 0.218,
         }, {
             'XC_functional_name': 'LDA_X',
-            't_qe_XC_functional_weight_scale_dft': 1.0,
+            'exx_compute_weight': lambda exx: (1.0 - exx),
             'XC_functional_weight': 0.782,
         }],
         'xc_section_method': {
@@ -512,12 +500,12 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_X_PBE",
             'XC_functional_weight': 0.75,
-            't_qe_XC_functional_weight_scale_dft': 1.0,
+            'exx_compute_weight': lambda exx: (1.0 - exx),
         }],
         'xc_terms_subtract': [{
             'XC_functional_name': 'LDA_X',
             'XC_functional_weight': 0.75,
-            't_qe_XC_functional_weight_scale_dft': 1.0,
+            'exx_compute_weight': lambda exx: (1.0 - exx),
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "pb0x",
