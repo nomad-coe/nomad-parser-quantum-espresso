@@ -772,9 +772,6 @@ qe_xc: 0.00 B3LYP ( 7 12  9  7 0 0)
   {
     "XC_functional_name": "LDA_C_VWN",
     "XC_functional_weight": 0.19
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.20 B3LYP ( 7 12  9  7 0 0)
@@ -812,10 +809,6 @@ qe_xc: 0.20 B3LYP ( 7 12  9  7 0 0)
   {
     "XC_functional_name": "LDA_C_VWN",
     "XC_functional_weight": 0.19
-  },
-  {
-    "XC_functional_name": "LDA_X",
-    "XC_functional_weight": 0.8
   }
 ]
 qe_xc: 0.00 SLA  PW PBX  PBC (1434)

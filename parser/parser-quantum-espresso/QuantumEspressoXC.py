@@ -513,6 +513,11 @@ EXCHANGE_GRADIENT_CORRECTION = [
             'XC_functional_weight': 0.72,
             'exx_compute_weight': lambda exx: 0.72 if abs(exx) > 0.01 else 1.0
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+            'XC_functional_weight': 0.8,
+            'exx_compute_weight': lambda exx: (1.0 - exx),
+         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "b3lp",
             'x_qe_xc_igcx_comment':    "B3LYP (Becke88*0.72)",
