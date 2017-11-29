@@ -791,10 +791,6 @@ qe_xc: 0.00 B3LYP ( 7 12  9  7 0 0)
     "XC_functional_weight": 0.72
   },
   {
-    "XC_functional_name": "HF_X",
-    "XC_functional_weight": 0.0
-  },
-  {
     "XC_functional_name": "LDA_C_LYP",
     "XC_functional_weight": 0.81
   },
@@ -803,8 +799,7 @@ qe_xc: 0.00 B3LYP ( 7 12  9  7 0 0)
     "XC_functional_weight": 0.19
   },
   {
-    "XC_functional_name": "LDA_X",
-    "XC_functional_weight": 1.0
+    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.20 B3LYP ( 7 12  9  7 0 0)
@@ -1174,15 +1169,10 @@ qe_xc: 0.00 PBE0 ( 6  4  8  4 0 0)
     "XC_functional_weight": 0.75
   },
   {
-    "XC_functional_name": "HF_X",
-    "XC_functional_weight": 0.0
-  },
-  {
     "XC_functional_name": "LDA_C_PW"
   },
   {
-    "XC_functional_name": "LDA_X",
-    "XC_functional_weight": 1.0
+    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBE  PBE ( 1  4  3  4 0 0)
