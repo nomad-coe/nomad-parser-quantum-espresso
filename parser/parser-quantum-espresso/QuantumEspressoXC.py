@@ -114,6 +114,9 @@ def apply_term_add(xc_data, this_term,
             term['t_qe_XC_functional_weight_scale_dft'] *
             dft_exchange_fraction
         )
+    if 'exx_compute_weight' in term:
+        term['XC_functional_weight'] = term['exx_compute_weight'](
+            exact_exchange_fraction)
     if 'XC_functional_weight' not in term:
         term['XC_functional_weight'] = 1.0
     if term['XC_functional_name'] not in xc_data:
@@ -142,6 +145,7 @@ def apply_terms_filter(xc_data):
                 del v['XC_functional_weight']
             v.pop('t_qe_XC_functional_weight_scale_exx', None)
             v.pop('t_qe_XC_functional_weight_scale_dft', None)
+            v.pop('exx_compute_weight', None)
 
 
 # origin: espresso-5.4.0/Modules/funct.f90
@@ -525,6 +529,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_X_B88",
             'XC_functional_weight': 0.72,
+            'exx_compute_weight': lambda exx: 0.72 if abs(exx) > 0.01 else 1.0
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "b3lp",
