@@ -82,7 +82,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
                 apply_term_add(xc_data_subtract, this_term,
                          exact_exchange_fraction, dft_exchange_fraction)
     apply_terms_subtract(xc_data, xc_data_subtract)
-    apply_filter_terms(xc_data)
+    apply_terms_filter(xc_data)
     result = []
     for k,v in sorted(xc_data.items()):
         result.append(v)
@@ -127,7 +127,7 @@ def apply_terms_subtract(xc_data, xc_data_remove):
             xc_data[k]['XC_functional_weight'] *= -1.0
 
 
-def apply_filter_terms(xc_data):
+def apply_terms_filter(xc_data):
     for (k, v) in list(xc_data.items()):
         if abs(v['XC_functional_weight']) < 0.01:
             del xc_data[k]
