@@ -22,9 +22,6 @@ qe_xc: 0.00 PBE ( 1 4 3 4 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 SLA  PZ NOGX NOGC (1100)
@@ -507,9 +504,6 @@ qe_xc: 0.00 PBE ( 1  4  3  4 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 PW91 ( 1  4  2  2 0 0)
@@ -536,9 +530,6 @@ qe_xc: 0.00 PW91 ( 1  4  2  2 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 SLA+PW+Q2DX+Q2DC ( 1  4 19 12 0 0)
@@ -867,9 +858,6 @@ qe_xc: 0.00 SLA  PW PBX  PBC (1434)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.24 GAUP ( 1  4 20  4 0 0)
@@ -925,9 +913,6 @@ qe_xc: 0.00 SLA  PW   PBE  PBE ( 1 4 3 4 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 PBE (1434)
@@ -954,9 +939,6 @@ qe_xc: 0.00 PBE (1434)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 SLA  PW   TPSS TPSS (1476)
@@ -1073,9 +1055,6 @@ qe_xc: 0.00 SLA  PW   PBX  PBC ( 1 4 3 4 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.25 HSE ( 1  4 12  4 0 0)
@@ -1198,9 +1177,6 @@ qe_xc: 0.00 SLA  PW   PBE  PBE ( 1  4  3  4 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBX  PBC ( 1  4  3  4 0 0)
@@ -1227,9 +1203,6 @@ qe_xc: 0.00 SLA  PW   PBX  PBC ( 1  4  3  4 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBE  PBE (1434)
@@ -1256,9 +1229,6 @@ qe_xc: 0.00 SLA  PW   PBE  PBE (1434)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBX  PBC (1434)
@@ -1285,9 +1255,6 @@ qe_xc: 0.00 SLA  PW   PBX  PBC (1434)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 SLA  PZ   NOGX NOGC ( 1 1 0 0 0)
