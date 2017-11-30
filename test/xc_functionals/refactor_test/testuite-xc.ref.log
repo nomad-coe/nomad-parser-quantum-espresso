@@ -458,9 +458,6 @@ qe_xc: 0.00 SOGGA ( 1  4 17  4 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 PBE ( 1  4  3  4 0 0)
