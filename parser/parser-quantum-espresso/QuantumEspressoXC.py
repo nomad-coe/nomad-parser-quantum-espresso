@@ -715,6 +715,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "x_qe_GGA_X_OPTB86_VDW",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+        }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "ob86",
             'x_qe_xc_igcx_comment':    "optB86b exchange",
@@ -725,6 +728,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_X_EV93",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+        }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "evx",
             'x_qe_xc_igcx_comment':    "Engel-Vosko exchange",
@@ -734,6 +740,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
     {
         'xc_terms': [{
             'XC_functional_name': "GGA_X_B86_R",
+        }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "b86r",

@@ -301,9 +301,6 @@ qe_xc: 0.00 VDW-DF-OB86 ( 1  4 24  0 1 0)
     "XC_functional_name": "LDA_C_PW"
   },
   {
-    "XC_functional_name": "LDA_X"
-  },
-  {
     "XC_functional_name": "x_qe_GGA_X_OPTB86_VDW"
   },
   {
@@ -423,9 +420,6 @@ qe_xc: 0.00 EV93 ( 1  4 25  0 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 SOGGA ( 1  4 17  4 0 0)
