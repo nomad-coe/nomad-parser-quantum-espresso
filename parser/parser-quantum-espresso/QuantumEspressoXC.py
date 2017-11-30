@@ -821,6 +821,9 @@ CORRELATION_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_C_LYP",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_C_LYP',
+        }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "blyp",
             'x_qe_xc_igcc_comment':    "Lee-Yang-Parr",

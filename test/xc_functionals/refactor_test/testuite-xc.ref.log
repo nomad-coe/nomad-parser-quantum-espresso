@@ -368,9 +368,6 @@ qe_xc: 0.00 OLYP ( 0  3  6  3 0 0)
   },
   {
     "XC_functional_name": "GGA_X_OPTX"
-  },
-  {
-    "XC_functional_name": "LDA_C_LYP"
   }
 ]
 qe_xc: 0.00 PBESOL ( 1  4 10  8 0 0)
