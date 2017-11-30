@@ -19,9 +19,6 @@ qe_xc: 0.00 PBE ( 1 4 3 4 0)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 SLA  PZ NOGX NOGC (1100)
@@ -105,9 +102,6 @@ qe_xc: 0.00 PW86PBE ( 1  4 21  4 0 0)
   },
   {
     "XC_functional_name": "GGA_X_PW86"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 OPTBK88 ( 1  4 23  1 0 0)
@@ -204,9 +198,6 @@ qe_xc: 0.00 WC ( 1  4 11  4 0 0)
   },
   {
     "XC_functional_name": "GGA_X_WC"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 REVPBE ( 1  4  4  4 0 0)
@@ -230,9 +221,6 @@ qe_xc: 0.00 REVPBE ( 1  4  4  4 0 0)
   },
   {
     "XC_functional_name": "GGA_X_PBE_R"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 VDW-DF-C09 ( 1  4 16  0 1 0)
@@ -328,9 +316,6 @@ qe_xc: 0.00 RVV10 ( 1  4 13  4 3 0)
   },
   {
     "XC_functional_name": "GGA_X_RPW86"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   },
   {
     "XC_functional_name": "x_qe_VDW_RVV10"
@@ -437,9 +422,6 @@ qe_xc: 0.00 SOGGA ( 1  4 17  4 0 0)
   },
   {
     "XC_functional_name": "GGA_X_SOGGA"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 PBE ( 1  4  3  4 0 0)
@@ -463,9 +445,6 @@ qe_xc: 0.00 PBE ( 1  4  3  4 0 0)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 PW91 ( 1  4  2  2 0 0)
@@ -642,9 +621,6 @@ qe_xc: 0.00 B86BPBE ( 1  4 22  4 0 0)
   },
   {
     "XC_functional_name": "GGA_X_B86_MGC"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 'PZ' (1100)
@@ -788,9 +764,6 @@ qe_xc: 0.00 SLA  PW PBX  PBC (1434)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.24 GAUP ( 1  4 20  4 0 0)
@@ -811,9 +784,6 @@ qe_xc: 0.24 GAUP ( 1  4 20  4 0 0)
 [
   {
     "XC_functional_name": "GGA_C_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   },
   {
     "XC_functional_name": "x_qe_HYB_GGA_X_GAUP"
@@ -840,9 +810,6 @@ qe_xc: 0.00 SLA  PW   PBE  PBE ( 1 4 3 4 0)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 PBE (1434)
@@ -866,9 +833,6 @@ qe_xc: 0.00 PBE (1434)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 SLA  PW   TPSS TPSS (1476)
@@ -918,9 +882,6 @@ qe_xc: 0.00 GAUP ( 1  4 20  4 0 0)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 HSE ( 1  4 12  4 0 0)
@@ -947,9 +908,6 @@ qe_xc: 0.00 HSE ( 1  4 12  4 0 0)
     "XC_functional_parameters": {
       "exx_mixing": 0.0
     }
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBX  PBC ( 1 4 3 4 0)
@@ -973,9 +931,6 @@ qe_xc: 0.00 SLA  PW   PBX  PBC ( 1 4 3 4 0)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.25 HSE ( 1  4 12  4 0 0)
@@ -1002,9 +957,6 @@ qe_xc: 0.25 HSE ( 1  4 12  4 0 0)
     "XC_functional_parameters": {
       "exx_mixing": 0.25
     }
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.25 PBE0 ( 6  4  8  4 0 0)
@@ -1033,9 +985,6 @@ qe_xc: 0.25 PBE0 ( 6  4  8  4 0 0)
   {
     "XC_functional_name": "HF_X",
     "XC_functional_weight": 0.25
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 PBE0 ( 6  4  8  4 0 0)
@@ -1059,9 +1008,6 @@ qe_xc: 0.00 PBE0 ( 6  4  8  4 0 0)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBE  PBE ( 1  4  3  4 0 0)
@@ -1085,9 +1031,6 @@ qe_xc: 0.00 SLA  PW   PBE  PBE ( 1  4  3  4 0 0)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBX  PBC ( 1  4  3  4 0 0)
@@ -1111,9 +1054,6 @@ qe_xc: 0.00 SLA  PW   PBX  PBC ( 1  4  3  4 0 0)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBE  PBE (1434)
@@ -1137,9 +1077,6 @@ qe_xc: 0.00 SLA  PW   PBE  PBE (1434)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBX  PBC (1434)
@@ -1163,9 +1100,6 @@ qe_xc: 0.00 SLA  PW   PBX  PBC (1434)
   },
   {
     "XC_functional_name": "GGA_X_PBE"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 SLA  PZ   NOGX NOGC ( 1 1 0 0 0)
