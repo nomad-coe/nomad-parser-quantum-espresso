@@ -134,9 +134,6 @@ qe_xc: 0.00 OPTBK88 ( 1  4 23  1 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 VDW-DF2 ( 0 413 0 2)
@@ -582,9 +579,6 @@ qe_xc: 0.00 VDW-DF-OBK8 ( 1  4 23  0 1 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   },
   {
     "XC_functional_name": "x_qe_VDW_DF1"

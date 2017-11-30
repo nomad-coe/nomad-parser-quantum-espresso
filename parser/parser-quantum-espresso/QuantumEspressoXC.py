@@ -702,6 +702,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_X_OPTB88_VDW",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+        }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "obk8",
             'x_qe_xc_igcx_comment':    "optB88  exchange",
