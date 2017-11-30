@@ -767,9 +767,13 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_X_B88",
             'XC_functional_weight': 0.542,
+            'exx_compute_weight':
+                lambda exx: 0.542 if (abs(exx) > 0.01) else 1.0
         }, {
             'XC_functional_name': "GGA_X_PW91",
             'XC_functional_weight': 0.167,
+            'exx_compute_weight':
+                lambda exx: 0.167 if (abs(exx) > 0.01) else 0.0
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':    "x3lp",
