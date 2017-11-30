@@ -267,9 +267,6 @@ qe_xc: 0.00 VDW-DF-C09 ( 1  4 16  0 1 0)
     "XC_functional_name": "LDA_C_PW"
   },
   {
-    "XC_functional_name": "LDA_X"
-  },
-  {
     "XC_functional_name": "x_qe_VDW_DF1"
   }
 ]
@@ -346,9 +343,6 @@ qe_xc: 0.00 RVV10 ( 1  4 13  4 3 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   },
   {
     "XC_functional_name": "x_qe_VDW_RVV10"
@@ -652,9 +646,6 @@ qe_xc: 0.00 VDW-DF2 ( 1  4 13  0 2 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   },
   {
     "XC_functional_name": "x_qe_VDW_DF2"
