@@ -666,9 +666,6 @@ qe_xc: 0.00 B86BPBE ( 1  4 22  4 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 'PZ' (1100)
