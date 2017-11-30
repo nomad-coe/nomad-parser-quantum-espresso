@@ -795,6 +795,9 @@ CORRELATION_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_C_P86",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_C_PW',
+        }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "p86",
             'x_qe_xc_igcc_comment':    "Perdew86",

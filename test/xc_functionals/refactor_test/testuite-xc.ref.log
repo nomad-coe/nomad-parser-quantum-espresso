@@ -131,9 +131,6 @@ qe_xc: 0.00 OPTBK88 ( 1  4 23  1 0 0)
   },
   {
     "XC_functional_name": "GGA_X_OPTB88_VDW"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 VDW-DF2 ( 0 413 0 2)
