@@ -373,9 +373,6 @@ qe_xc: 0.00 PBESOL ( 1  4 10  8 0 0)
   },
   {
     "XC_functional_name": "GGA_X_PBE_SOL"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 EV93 ( 1  4 25  0 0 0)
