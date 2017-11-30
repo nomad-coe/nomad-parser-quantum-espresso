@@ -492,9 +492,6 @@ qe_xc: 0.00 PW91 ( 1  4  2  2 0 0)
   },
   {
     "XC_functional_name": "GGA_X_PW91"
-  },
-  {
-    "XC_functional_name": "LDA_C_PW"
   }
 ]
 qe_xc: 0.00 SLA+PW+Q2DX+Q2DC ( 1  4 19 12 0 0)
