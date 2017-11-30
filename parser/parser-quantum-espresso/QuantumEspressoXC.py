@@ -978,6 +978,8 @@ META_GGA = [
         }],
         'xc_terms_subtract': [{
             'XC_functional_name': 'LDA_X',
+        }, {
+            'XC_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_imeta_name':       "tpss",
