@@ -932,7 +932,7 @@ CORRELATION_GRADIENT_CORRECTION = [
             'XC_functional_name': "MGGA_C_M06_L",
         }],
         'xc_section_method': {
-            'x_qe_xc_igcc_name':    "m6lx",
+            'x_qe_xc_igcc_name':    "m6lc",
             'x_qe_xc_igcc_comment': "M06L Meta-GGA (Espresso-version < 5.1)",
             'x_qe_xc_igcc':         2,
         },
