@@ -955,6 +955,10 @@ CORRELATION_GRADIENT_CORRECTION = [
             'XC_functional_name': "GGA_C_LYP",
             'XC_functional_weight': 0.871,
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_C_LYP',
+            'XC_functional_weight': 0.871,
+        }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "x3lp",
             'x_qe_xc_igcc_comment':    "X3LYP (Lee-Yang-Parr*0.871)",
