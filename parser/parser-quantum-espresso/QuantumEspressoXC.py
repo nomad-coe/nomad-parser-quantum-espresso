@@ -1006,6 +1006,11 @@ META_GGA = [
             # confirmed by looking into functionals.f90
             'XC_functional_name': "MGGA_C_TPSS",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+        }, {
+            'XC_functional_name': 'LDA_C_PW',
+        }],
         'xc_section_method': {
             'x_qe_xc_imeta_name':       "tb09",
             'x_qe_xc_imeta_comment':    "TB09 Meta-GGA",
