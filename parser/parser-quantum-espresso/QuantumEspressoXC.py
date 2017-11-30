@@ -663,6 +663,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
             'XC_functional_name': "GGA_X_PBE",
             'exx_compute_weight': lambda exx: 0.0 if (abs(exx) > 0.01) else 1.0
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "gaup",
             'x_qe_xc_igcx_comment':    "Gau-PBE hybrid exchange",
