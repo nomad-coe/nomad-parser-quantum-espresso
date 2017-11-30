@@ -536,9 +536,6 @@ qe_xc: 0.00 SLA+PW+Q2DX+Q2DC ( 1  4 19 12 0 0)
   },
   {
     "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "LDA_X"
   }
 ]
 qe_xc: 0.00 VDW-DF ( 1 4 4 0 1)

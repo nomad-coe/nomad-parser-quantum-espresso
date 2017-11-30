@@ -646,6 +646,9 @@ EXCHANGE_GRADIENT_CORRECTION = [
         'xc_terms': [{
             'XC_functional_name': "GGA_X_Q2D",
         }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': 'LDA_X',
+         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "q2dx",
             'x_qe_xc_igcx_comment':    "Q2D exchange grad corr",
