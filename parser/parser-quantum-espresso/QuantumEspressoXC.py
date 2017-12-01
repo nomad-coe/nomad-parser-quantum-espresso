@@ -85,7 +85,8 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
     apply_terms_subtract(xc_data, xc_data_subtract)
     apply_terms_filter(xc_data)
     result = []
-    for (k, v) in sorted(xc_data.items()):
+    for k in sorted(xc_data.keys()):
+        v = xc_data[k]
         result.append(v)
     return (xc_section_method, result)
 
