@@ -1,5 +1,6 @@
 qe_xc: 0.00 PBE ( 1 4 3 4 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -23,6 +24,7 @@ qe_xc: 0.00 PBE ( 1 4 3 4 0)
 ]
 qe_xc: 0.00 SLA  PZ NOGX NOGC (1100)
 {
+  "XC_functional": "LDA_C_PZ+LDA_X",
   "x_qe_xc_icorr": 1,
   "x_qe_xc_icorr_comment": "Perdew-Zunger",
   "x_qe_xc_icorr_name": "pz",
@@ -40,6 +42,7 @@ qe_xc: 0.00 SLA  PZ NOGX NOGC (1100)
 ]
 qe_xc: 0.00 SLA  PW   TPSS TPSS ( 1 4 7 6 0)
 {
+  "XC_functional": "MGGA_C_TPSS+MGGA_X_TPSS",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -63,6 +66,7 @@ qe_xc: 0.00 SLA  PW   TPSS TPSS ( 1 4 7 6 0)
 ]
 qe_xc: 0.00 PZ ( 1 1 0 0 0)
 {
+  "XC_functional": "LDA_C_PZ+LDA_X",
   "x_qe_xc_icorr": 1,
   "x_qe_xc_icorr_comment": "Perdew-Zunger",
   "x_qe_xc_icorr_name": "pz",
@@ -80,6 +84,7 @@ qe_xc: 0.00 PZ ( 1 1 0 0 0)
 ]
 qe_xc: 0.00 PW86PBE ( 1  4 21  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PW86",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -103,6 +108,7 @@ qe_xc: 0.00 PW86PBE ( 1  4 21  4 0 0)
 ]
 qe_xc: 0.00 OPTBK88 ( 1  4 23  1 0 0)
 {
+  "XC_functional": "GGA_C_P86+GGA_X_OPTB88_VDW",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -126,6 +132,7 @@ qe_xc: 0.00 OPTBK88 ( 1  4 23  1 0 0)
 ]
 qe_xc: 0.00 VDW-DF2 ( 0 413 0 2)
 {
+  "XC_functional": "GGA_X_RPW86+LDA_C_PW-1.000*LDA_X+x_qe_VDW_DF2",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -153,6 +160,7 @@ qe_xc: 0.00 VDW-DF2 ( 0 413 0 2)
 ]
 qe_xc: 0.00 SLA  PW   TPSS TPSS ( 1  4  0  0 0 1)
 {
+  "XC_functional": "MGGA_C_TPSS+MGGA_X_TPSS",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -173,6 +181,7 @@ qe_xc: 0.00 SLA  PW   TPSS TPSS ( 1  4  0  0 0 1)
 ]
 qe_xc: 0.00 WC ( 1  4 11  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_WC",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -196,6 +205,7 @@ qe_xc: 0.00 WC ( 1  4 11  4 0 0)
 ]
 qe_xc: 0.00 REVPBE ( 1  4  4  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE_R",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -219,6 +229,7 @@ qe_xc: 0.00 REVPBE ( 1  4  4  4 0 0)
 ]
 qe_xc: 0.00 VDW-DF-C09 ( 1  4 16  0 1 0)
 {
+  "XC_functional": "GGA_X_C09X+LDA_C_PW+x_qe_VDW_DF1",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -245,6 +256,7 @@ qe_xc: 0.00 VDW-DF-C09 ( 1  4 16  0 1 0)
 ]
 qe_xc: 0.00 PZ ( 1  1  0  0 0 0)
 {
+  "XC_functional": "LDA_C_PZ+LDA_X",
   "x_qe_xc_icorr": 1,
   "x_qe_xc_icorr_comment": "Perdew-Zunger",
   "x_qe_xc_icorr_name": "pz",
@@ -262,6 +274,7 @@ qe_xc: 0.00 PZ ( 1  1  0  0 0 0)
 ]
 qe_xc: 0.00 VDW-DF-OB86 ( 1  4 24  0 1 0)
 {
+  "XC_functional": "LDA_C_PW+x_qe_GGA_X_OPTB86_VDW+x_qe_VDW_DF1",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -288,6 +301,7 @@ qe_xc: 0.00 VDW-DF-OB86 ( 1  4 24  0 1 0)
 ]
 qe_xc: 0.00 RVV10 ( 1  4 13  4 3 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_RPW86+x_qe_VDW_RVV10",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -317,6 +331,7 @@ qe_xc: 0.00 RVV10 ( 1  4 13  4 3 0)
 ]
 qe_xc: 0.00 HCTH ( 0  0  5  5 0 0)
 {
+  "XC_functional": "GGA_XC_HCTH_120",
   "x_qe_xc_igcc": 5,
   "x_qe_xc_igcc_comment": "Cambridge exch, Handy et al, HCTH/120",
   "x_qe_xc_igcc_name": "hcth",
@@ -331,6 +346,7 @@ qe_xc: 0.00 HCTH ( 0  0  5  5 0 0)
 ]
 qe_xc: 0.00 OLYP ( 0  3  6  3 0 0)
 {
+  "XC_functional": "GGA_C_LYP+GGA_X_OPTX",
   "x_qe_xc_icorr": 3,
   "x_qe_xc_icorr_comment": "Lee-Yang-Parr",
   "x_qe_xc_icorr_name": "lyp",
@@ -351,6 +367,7 @@ qe_xc: 0.00 OLYP ( 0  3  6  3 0 0)
 ]
 qe_xc: 0.00 PBESOL ( 1  4 10  8 0 0)
 {
+  "XC_functional": "GGA_C_PBE_SOL+GGA_X_PBE_SOL",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -374,6 +391,7 @@ qe_xc: 0.00 PBESOL ( 1  4 10  8 0 0)
 ]
 qe_xc: 0.00 EV93 ( 1  4 25  0 0 0)
 {
+  "XC_functional": "GGA_X_EV93+LDA_C_PW",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -394,6 +412,7 @@ qe_xc: 0.00 EV93 ( 1  4 25  0 0 0)
 ]
 qe_xc: 0.00 SOGGA ( 1  4 17  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_SOGGA",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -417,6 +436,7 @@ qe_xc: 0.00 SOGGA ( 1  4 17  4 0 0)
 ]
 qe_xc: 0.00 PBE ( 1  4  3  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -440,6 +460,7 @@ qe_xc: 0.00 PBE ( 1  4  3  4 0 0)
 ]
 qe_xc: 0.00 PW91 ( 1  4  2  2 0 0)
 {
+  "XC_functional": "GGA_C_PW91+GGA_X_PW91",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -463,6 +484,7 @@ qe_xc: 0.00 PW91 ( 1  4  2  2 0 0)
 ]
 qe_xc: 0.00 SLA+PW+Q2DX+Q2DC ( 1  4 19 12 0 0)
 {
+  "XC_functional": "GGA_C_Q2D+GGA_X_Q2D",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -486,6 +508,7 @@ qe_xc: 0.00 SLA+PW+Q2DX+Q2DC ( 1  4 19 12 0 0)
 ]
 qe_xc: 0.00 VDW-DF ( 1 4 4 0 1)
 {
+  "XC_functional": "GGA_X_PBE_R+LDA_C_PW+x_qe_VDW_DF1",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -512,6 +535,7 @@ qe_xc: 0.00 VDW-DF ( 1 4 4 0 1)
 ]
 qe_xc: 0.00 VDW-DF-OBK8 ( 1  4 23  0 1 0)
 {
+  "XC_functional": "GGA_X_OPTB88_VDW+LDA_C_PW+x_qe_VDW_DF1",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -538,6 +562,7 @@ qe_xc: 0.00 VDW-DF-OBK8 ( 1  4 23  0 1 0)
 ]
 qe_xc: 0.00 VDW-DF ( 1  4  4  0 1 0)
 {
+  "XC_functional": "GGA_X_PBE_R+LDA_C_PW+x_qe_VDW_DF1",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -564,6 +589,7 @@ qe_xc: 0.00 VDW-DF ( 1  4  4  0 1 0)
 ]
 qe_xc: 0.00 VDW-DF2 ( 1  4 13  0 2 0)
 {
+  "XC_functional": "GGA_X_RPW86+LDA_C_PW+x_qe_VDW_DF2",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -590,6 +616,7 @@ qe_xc: 0.00 VDW-DF2 ( 1  4 13  0 2 0)
 ]
 qe_xc: 0.00 B86BPBE ( 1  4 22  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_B86_MGC",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -613,6 +640,7 @@ qe_xc: 0.00 B86BPBE ( 1  4 22  4 0 0)
 ]
 qe_xc: 0.00 'PZ' (1100)
 {
+  "XC_functional": "LDA_C_PZ+LDA_X",
   "x_qe_xc_icorr": 1,
   "x_qe_xc_icorr_comment": "Perdew-Zunger",
   "x_qe_xc_icorr_name": "pz",
@@ -630,6 +658,7 @@ qe_xc: 0.00 'PZ' (1100)
 ]
 qe_xc: 0.00 'P (1100)
 {
+  "XC_functional": "LDA_C_PZ+LDA_X",
   "x_qe_xc_icorr": 1,
   "x_qe_xc_icorr_comment": "Perdew-Zunger",
   "x_qe_xc_icorr_name": "pz",
@@ -647,6 +676,7 @@ qe_xc: 0.00 'P (1100)
 ]
 qe_xc: 0.00 LDA ( 1  1  0  0 0 0)
 {
+  "XC_functional": "LDA_C_PZ+LDA_X",
   "x_qe_xc_icorr": 1,
   "x_qe_xc_icorr_comment": "Perdew-Zunger",
   "x_qe_xc_icorr_name": "pz",
@@ -664,6 +694,7 @@ qe_xc: 0.00 LDA ( 1  1  0  0 0 0)
 ]
 qe_xc: 0.00 B3LYP ( 7 12  9  7 0 0)
 {
+  "XC_functional": "0.810*GGA_C_LYP+GGA_X_B88+0.190*LDA_C_VWN",
   "x_qe_xc_icorr": 12,
   "x_qe_xc_icorr_comment": "B3LYP (0.19*vwn+0.81*lyp)",
   "x_qe_xc_icorr_name": "b3lp",
@@ -692,6 +723,7 @@ qe_xc: 0.00 B3LYP ( 7 12  9  7 0 0)
 ]
 qe_xc: 0.20 B3LYP ( 7 12  9  7 0 0)
 {
+  "XC_functional": "0.810*GGA_C_LYP+0.720*GGA_X_B88+0.200*HF_X+0.190*LDA_C_VWN",
   "x_qe_xc_icorr": 12,
   "x_qe_xc_icorr_comment": "B3LYP (0.19*vwn+0.81*lyp)",
   "x_qe_xc_icorr_name": "b3lp",
@@ -725,6 +757,7 @@ qe_xc: 0.20 B3LYP ( 7 12  9  7 0 0)
 ]
 qe_xc: 0.00 SLA  PW PBX  PBC (1434)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -748,6 +781,7 @@ qe_xc: 0.00 SLA  PW PBX  PBC (1434)
 ]
 qe_xc: 0.24 GAUP ( 1  4 20  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+x_qe_HYB_GGA_X_GAUP",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -771,6 +805,7 @@ qe_xc: 0.24 GAUP ( 1  4 20  4 0 0)
 ]
 qe_xc: 0.00 SLA  PW   PBE  PBE ( 1 4 3 4 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -794,6 +829,7 @@ qe_xc: 0.00 SLA  PW   PBE  PBE ( 1 4 3 4 0)
 ]
 qe_xc: 0.00 PBE (1434)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -817,6 +853,7 @@ qe_xc: 0.00 PBE (1434)
 ]
 qe_xc: 0.00 SLA  PW   TPSS TPSS (1476)
 {
+  "XC_functional": "MGGA_C_TPSS+MGGA_X_TPSS",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -840,6 +877,7 @@ qe_xc: 0.00 SLA  PW   TPSS TPSS (1476)
 ]
 qe_xc: 0.00 GAUP ( 1  4 20  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -863,6 +901,7 @@ qe_xc: 0.00 GAUP ( 1  4 20  4 0 0)
 ]
 qe_xc: 0.00 HSE ( 1  4 12  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+HYB_GGA_XC_HSE06",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -889,6 +928,7 @@ qe_xc: 0.00 HSE ( 1  4 12  4 0 0)
 ]
 qe_xc: 0.00 SLA  PW   PBX  PBC ( 1 4 3 4 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -912,6 +952,7 @@ qe_xc: 0.00 SLA  PW   PBX  PBC ( 1 4 3 4 0)
 ]
 qe_xc: 0.25 HSE ( 1  4 12  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+HYB_GGA_XC_HSE06",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -938,6 +979,7 @@ qe_xc: 0.25 HSE ( 1  4 12  4 0 0)
 ]
 qe_xc: 0.25 PBE0 ( 6  4  8  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+0.750*GGA_X_PBE+0.250*HF_X",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -966,6 +1008,7 @@ qe_xc: 0.25 PBE0 ( 6  4  8  4 0 0)
 ]
 qe_xc: 0.00 PBE0 ( 6  4  8  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -989,6 +1032,7 @@ qe_xc: 0.00 PBE0 ( 6  4  8  4 0 0)
 ]
 qe_xc: 0.00 SLA  PW   PBE  PBE ( 1  4  3  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -1012,6 +1056,7 @@ qe_xc: 0.00 SLA  PW   PBE  PBE ( 1  4  3  4 0 0)
 ]
 qe_xc: 0.00 SLA  PW   PBX  PBC ( 1  4  3  4 0 0)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -1035,6 +1080,7 @@ qe_xc: 0.00 SLA  PW   PBX  PBC ( 1  4  3  4 0 0)
 ]
 qe_xc: 0.00 SLA  PW   PBE  PBE (1434)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -1058,6 +1104,7 @@ qe_xc: 0.00 SLA  PW   PBE  PBE (1434)
 ]
 qe_xc: 0.00 SLA  PW   PBX  PBC (1434)
 {
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -1081,6 +1128,7 @@ qe_xc: 0.00 SLA  PW   PBX  PBC (1434)
 ]
 qe_xc: 0.00 SLA  PZ   NOGX NOGC ( 1 1 0 0 0)
 {
+  "XC_functional": "LDA_C_PZ+LDA_X",
   "x_qe_xc_icorr": 1,
   "x_qe_xc_icorr_comment": "Perdew-Zunger",
   "x_qe_xc_icorr_name": "pz",
@@ -1098,6 +1146,7 @@ qe_xc: 0.00 SLA  PZ   NOGX NOGC ( 1 1 0 0 0)
 ]
 qe_xc: 0.00 SLA  PZ   NOGX NOGC ( 1  1  0  0 0 0)
 {
+  "XC_functional": "LDA_C_PZ+LDA_X",
   "x_qe_xc_icorr": 1,
   "x_qe_xc_icorr_comment": "Perdew-Zunger",
   "x_qe_xc_icorr_name": "pz",
@@ -1115,6 +1164,7 @@ qe_xc: 0.00 SLA  PZ   NOGX NOGC ( 1  1  0  0 0 0)
 ]
 qe_xc: 0.00 SLA  PZ   NOGX NOGC (1100)
 {
+  "XC_functional": "LDA_C_PZ+LDA_X",
   "x_qe_xc_icorr": 1,
   "x_qe_xc_icorr_comment": "Perdew-Zunger",
   "x_qe_xc_icorr_name": "pz",
