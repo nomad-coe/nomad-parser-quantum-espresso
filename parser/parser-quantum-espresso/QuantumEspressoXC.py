@@ -84,6 +84,8 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
                     xc_data_subtract, this_term, exact_exchange_fraction)
     apply_terms_subtract(xc_data, xc_data_subtract)
     apply_terms_filter(xc_data)
+    xc_functional = xc_functional_str(xc_data)
+    xc_section_method['XC_functional'] = xc_functional
     result = []
     for k in sorted(xc_data.keys()):
         v = xc_data[k]
@@ -129,6 +131,18 @@ def apply_terms_filter(xc_data):
             if abs(v['XC_functional_weight'] - 1.0) < 0.01:
                 del v['XC_functional_weight']
             v.pop('exx_compute_weight', None)
+
+
+def xc_functional_str(xc_data):
+    result = ''
+    for k in sorted(xc_data.keys()):
+        v = xc_data[k]
+        if len(result) > 0 and v.get('XC_functional_weight', 1.0) > 0:
+            result += '+'
+        if v.get('XC_functional_weight', None) is not None:
+            result += '%.3f*' % (v['XC_functional_weight'])
+        result += v['XC_functional_name']
+    return result
 
 
 # origin: espresso-5.4.0/Modules/funct.f90
