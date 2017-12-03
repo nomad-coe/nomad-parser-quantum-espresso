@@ -5,7 +5,8 @@
     1 0.00 PZ ( 1 1 0 0 0)
     2 0.00 PW86PBE ( 1  4 21  4 0 0)
     2 0.00 OPTBK88 ( 1  4 23  1 0 0)
-    2 0.00 VDW-DF2 ( 0 413 0 2)
+#    # QE < 5.0.2 had a wrong definition of VDW-DF2
+#    2 0.00 VDW-DF2 ( 0 413 0 2)
     2 0.00 SLA  PW   TPSS TPSS ( 1  4  0  0 0 1)
     2 0.00 WC ( 1  4 11  4 0 0)
     2 0.00 REVPBE ( 1  4  4  4 0 0)

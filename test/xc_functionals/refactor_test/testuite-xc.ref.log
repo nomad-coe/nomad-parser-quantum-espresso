@@ -130,31 +130,6 @@ qe_xc: 0.00 OPTBK88 ( 1  4 23  1 0 0)
     "XC_functional_name": "GGA_X_OPTB88_VDW"
   }
 ]
-qe_xc: 0.00 VDW-DF2 ( 0 413 0 2)
-{
-  "XC_functional": "GGA_X_RPW86-1.000*LDA_X+VDW_C_DF2",
-  "x_qe_xc_icorr": 4,
-  "x_qe_xc_icorr_comment": "Perdew-Wang",
-  "x_qe_xc_icorr_name": "pw",
-  "x_qe_xc_igcx": 13,
-  "x_qe_xc_igcx_comment": "revised PW86",
-  "x_qe_xc_igcx_name": "rw86",
-  "x_qe_xc_inlc": 2,
-  "x_qe_xc_inlc_comment": "vdW-DF2",
-  "x_qe_xc_inlc_name": "vdw2"
-}
-[
-  {
-    "XC_functional_name": "GGA_X_RPW86"
-  },
-  {
-    "XC_functional_name": "LDA_X",
-    "XC_functional_weight": -1.0
-  },
-  {
-    "XC_functional_name": "VDW_C_DF2"
-  }
-]
 qe_xc: 0.00 SLA  PW   TPSS TPSS ( 1  4  0  0 0 1)
 {
   "XC_functional": "MGGA_C_TPSS+MGGA_X_TPSS",
