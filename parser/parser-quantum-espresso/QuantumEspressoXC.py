@@ -56,7 +56,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
     #   exchange/correlation functionals may be combined into _XC_, and we
     #   only want to emit such combinations once
     xc_data = {}
-    xc_data_subtract = {}
+    xc_data_remove = {}
     xc_section_method = {}
     for component_i in range(6):
         this_xf_num = xf_num[component_i]
@@ -81,8 +81,8 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
         if 'xc_terms_subtract' in this_component:
             for this_term in this_component['xc_terms_subtract']:
                 apply_term_add(
-                    xc_data_subtract, this_term, exact_exchange_fraction)
-    apply_terms_subtract(xc_data, xc_data_subtract)
+                    xc_data_remove, this_term, exact_exchange_fraction)
+    apply_terms_subtract(xc_data, xc_data_remove)
     apply_terms_filter(xc_data)
     xc_functional = xc_functional_str(xc_data)
     xc_section_method['XC_functional'] = xc_functional
