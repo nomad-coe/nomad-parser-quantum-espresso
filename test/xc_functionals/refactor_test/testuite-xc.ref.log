@@ -292,7 +292,7 @@ qe_xc: 0.00 VDW-DF-OB86 ( 1  4 24  0 1 0)
 ]
 qe_xc: 0.00 RVV10 ( 1  4 13  4 3 0)
 {
-  "XC_functional": "GGA_C_PBE+GGA_X_RPW86+x_qe_VDW_RVV10",
+  "XC_functional": "GGA_X_RPW86+VDW_C_RVV10",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -311,13 +311,10 @@ qe_xc: 0.00 RVV10 ( 1  4 13  4 3 0)
 }
 [
   {
-    "XC_functional_name": "GGA_C_PBE"
-  },
-  {
     "XC_functional_name": "GGA_X_RPW86"
   },
   {
-    "XC_functional_name": "x_qe_VDW_RVV10"
+    "XC_functional_name": "VDW_C_RVV10"
   }
 ]
 qe_xc: 0.00 HCTH ( 0  0  5  5 0 0)
