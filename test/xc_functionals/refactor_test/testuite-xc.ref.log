@@ -229,7 +229,7 @@ qe_xc: 0.00 REVPBE ( 1  4  4  4 0 0)
 ]
 qe_xc: 0.00 VDW-DF-C09 ( 1  4 16  0 1 0)
 {
-  "XC_functional": "GGA_X_C09X+LDA_C_PW+x_qe_VDW_DF1",
+  "XC_functional": "GGA_X_C09X+VDW_C_DF1",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -248,10 +248,7 @@ qe_xc: 0.00 VDW-DF-C09 ( 1  4 16  0 1 0)
     "XC_functional_name": "GGA_X_C09X"
   },
   {
-    "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "x_qe_VDW_DF1"
+    "XC_functional_name": "VDW_C_DF1"
   }
 ]
 qe_xc: 0.00 PZ ( 1  1  0  0 0 0)
@@ -274,7 +271,7 @@ qe_xc: 0.00 PZ ( 1  1  0  0 0 0)
 ]
 qe_xc: 0.00 VDW-DF-OB86 ( 1  4 24  0 1 0)
 {
-  "XC_functional": "LDA_C_PW+x_qe_GGA_X_OPTB86_VDW+x_qe_VDW_DF1",
+  "XC_functional": "VDW_C_DF1+x_qe_GGA_X_OPTB86_VDW",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -290,13 +287,10 @@ qe_xc: 0.00 VDW-DF-OB86 ( 1  4 24  0 1 0)
 }
 [
   {
-    "XC_functional_name": "LDA_C_PW"
+    "XC_functional_name": "VDW_C_DF1"
   },
   {
     "XC_functional_name": "x_qe_GGA_X_OPTB86_VDW"
-  },
-  {
-    "XC_functional_name": "x_qe_VDW_DF1"
   }
 ]
 qe_xc: 0.00 RVV10 ( 1  4 13  4 3 0)
@@ -508,7 +502,7 @@ qe_xc: 0.00 SLA+PW+Q2DX+Q2DC ( 1  4 19 12 0 0)
 ]
 qe_xc: 0.00 VDW-DF ( 1 4 4 0 1)
 {
-  "XC_functional": "GGA_X_PBE_R+LDA_C_PW+x_qe_VDW_DF1",
+  "XC_functional": "GGA_X_PBE_R+VDW_C_DF1",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -527,15 +521,12 @@ qe_xc: 0.00 VDW-DF ( 1 4 4 0 1)
     "XC_functional_name": "GGA_X_PBE_R"
   },
   {
-    "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "x_qe_VDW_DF1"
+    "XC_functional_name": "VDW_C_DF1"
   }
 ]
 qe_xc: 0.00 VDW-DF-OBK8 ( 1  4 23  0 1 0)
 {
-  "XC_functional": "GGA_X_OPTB88_VDW+LDA_C_PW+x_qe_VDW_DF1",
+  "XC_functional": "GGA_X_OPTB88_VDW+VDW_C_DF1",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -554,15 +545,12 @@ qe_xc: 0.00 VDW-DF-OBK8 ( 1  4 23  0 1 0)
     "XC_functional_name": "GGA_X_OPTB88_VDW"
   },
   {
-    "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "x_qe_VDW_DF1"
+    "XC_functional_name": "VDW_C_DF1"
   }
 ]
 qe_xc: 0.00 VDW-DF ( 1  4  4  0 1 0)
 {
-  "XC_functional": "GGA_X_PBE_R+LDA_C_PW+x_qe_VDW_DF1",
+  "XC_functional": "GGA_X_PBE_R+VDW_C_DF1",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -581,10 +569,7 @@ qe_xc: 0.00 VDW-DF ( 1  4  4  0 1 0)
     "XC_functional_name": "GGA_X_PBE_R"
   },
   {
-    "XC_functional_name": "LDA_C_PW"
-  },
-  {
-    "XC_functional_name": "x_qe_VDW_DF1"
+    "XC_functional_name": "VDW_C_DF1"
   }
 ]
 qe_xc: 0.00 VDW-DF2 ( 1  4 13  0 2 0)
