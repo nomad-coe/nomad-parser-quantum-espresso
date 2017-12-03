@@ -1051,7 +1051,10 @@ VAN_DER_WAALS = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "x_qe_VDW_DF2",
+            'XC_functional_name': "VDW_C_DF2",
+        }],
+        'xc_terms_subtract': [{
+            'XC_functional_name': "LDA_C_PW",
         }],
         'xc_section_method': {
             'x_qe_xc_inlc_name':       "vdw2",
