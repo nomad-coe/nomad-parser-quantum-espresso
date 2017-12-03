@@ -52,11 +52,16 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
     xf_num = parse_qe_xc_num(xc_functional_num)
     LOGGER.debug('num <- input: %s <- %s, exx_fraction: %s',  str(xf_num),
                  xc_functional_num, str(exact_exchange_fraction))
-    # use dictionary to ensure uniqueness:
+    # use dictionaries to ensure uniqueness:
     #   exchange/correlation functionals may be combined into _XC_, and we
     #   only want to emit such combinations once
     xc_data = {}
+    #   libXC definitions of GGAs/Hybrids include the density contribution
+    #   while QE allows to freely combine density, gradient etc. dependency
+    #   so we need to remove at least the default settings to be compliant
+    #   with libXC and NOMAD metaInfo
     xc_data_remove = {}
+    # collect everything that will go to section_method
     xc_section_method = {}
     for component_i in range(6):
         this_xf_num = xf_num[component_i]
@@ -78,11 +83,13 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
         for this_term in this_component['xc_terms']:
             apply_term_add(
                 xc_data, this_term, exact_exchange_fraction)
-        if 'xc_terms_remove' in this_component:
-            for this_term in this_component['xc_terms_remove']:
-                apply_term_add(
-                    xc_data_remove, this_term, exact_exchange_fraction)
+        # collect all to-be-removed terms
+        for this_term in this_component.get('xc_terms_remove', []):
+            apply_term_add(
+                xc_data_remove, this_term, exact_exchange_fraction)
+    # remove all collected terms from xc_terms_remove from xc_data
     apply_terms_remove(xc_data, xc_data_remove)
+    # filter terms in xc_data:
     apply_terms_filter(xc_data)
     xc_functional = xc_functional_str(xc_data)
     xc_section_method['XC_functional'] = xc_functional
