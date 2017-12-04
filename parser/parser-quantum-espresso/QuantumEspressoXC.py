@@ -242,7 +242,7 @@ EXCHANGE = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "x_qe_LDA_X_KZK",
+            'XC_functional_name': "LDA_X_KZK_x_qe",
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       "kzk",
@@ -363,7 +363,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "x_qe_LDA_C_KZK",
+            'XC_functional_name': "LDA_C_KZK_x_qe",
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "kzk",
@@ -688,7 +688,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "HYB_GGA_XC_GAU_PBE",
+            'XC_functional_name': "HYB_GGA_XC_GAU_PBE_x_qe",
             'exx_compute_weight': lambda exx: 1.0 if (abs(exx) > 0.01) else 0.0
         }, {
             'XC_functional_name': "GGA_X_PBE",
@@ -747,7 +747,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "x_qe_GGA_X_OPTB86_VDW",
+            'XC_functional_name': "GGA_X_OPTB86_VDW_x_qe",
         }],
         'xc_terms_remove': [{
             'XC_functional_name': 'LDA_X',
@@ -1096,7 +1096,7 @@ VAN_DER_WAALS = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "x_qe_VDW_DFX",
+            'XC_functional_name': "VDW_DFX_x_qe",
         }],
         'xc_section_method': {
             'x_qe_xc_inlc_name':    "vdwx",
@@ -1107,7 +1107,7 @@ VAN_DER_WAALS = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "x_qe_VDW_DFY",
+            'XC_functional_name': "VDW_DFY_x_qe",
         }],
         'xc_section_method': {
             'x_qe_xc_inlc_name':    "vdwy",
@@ -1118,7 +1118,7 @@ VAN_DER_WAALS = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "x_qe_VDW_DFZ",
+            'XC_functional_name': "VDW_DFZ_x_qe",
         }],
         'xc_section_method': {
             'x_qe_xc_inlc_name':    "vdwz",
