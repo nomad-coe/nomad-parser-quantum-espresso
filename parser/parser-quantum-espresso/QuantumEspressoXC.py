@@ -110,12 +110,6 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
 
 def apply_term_add(xc_data, this_term, exact_exchange_fraction):
     term = copy.deepcopy(this_term)
-    if term['XC_functional_name'] == 'HYB_GGA_XC_HSE06':
-        if exact_exchange_fraction is not None:
-            # we are at HSE06 component, with explicit exact_exchange_fraction
-            term['XC_functional_parameters'] = {
-                'exx_mixing': exact_exchange_fraction,
-            }
     if 'exx_compute_weight' in term:
         term['XC_functional_weight'] = term['exx_compute_weight'](
             exact_exchange_fraction)
@@ -583,10 +577,17 @@ EXCHANGE_GRADIENT_CORRECTION = [
     {
         'xc_terms': [{
             'XC_functional_name': "HYB_GGA_XC_HSE06",
+            'exx_compute_weight': lambda exx: 1.0 if (abs(exx) > 0.01) else 0.0
+        }, {
+            'XC_functional_name': "GGA_X_PBE",
+            'exx_compute_weight': lambda exx: 0.0 if (abs(exx) > 0.01) else 1.0
         }],
         'xc_terms_remove': [{
             'XC_functional_name': 'LDA_X',
-         }],
+        }, {
+            'XC_functional_name': 'GGA_C_PBE',
+            'exx_compute_weight': lambda exx: 1.0 if (abs(exx) > 0.01) else 0.0
+        }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "hse",
             'x_qe_xc_igcx_comment':    "HSE screened exchange",
