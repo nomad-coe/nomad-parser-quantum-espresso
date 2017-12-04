@@ -92,6 +92,14 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
     # filter terms in xc_data:
     apply_terms_filter(xc_data)
     xc_functional = xc_functional_str(xc_data)
+    # apply shortcuts/overrides for libXC compliance
+    if xc_functional in LIBXC_SHORTCUT:
+        xc_data = {}
+        for this_term in LIBXC_SHORTCUT[xc_functional]['xc_terms']:
+            apply_term_add(
+                xc_data, this_term, exact_exchange_fraction)
+        apply_terms_filter(xc_data)
+        xc_functional = xc_functional_str(xc_data)
     xc_section_method['XC_functional'] = xc_functional
     result = []
     for k in sorted(xc_data.keys()):
@@ -1136,3 +1144,16 @@ XC_COMPONENT_NAME = [
     'VAN_DER_WAALS',
     'META_GGA',
 ]
+
+LIBXC_SHORTCUT = {
+    "0.810*GGA_C_LYP+0.720*GGA_X_B88+0.200*HF_X+0.190*LDA_C_VWN": {
+        'xc_terms': [{
+            'XC_functional_name': "HYB_GGA_XC_B3LYP",
+         }]
+    },
+    "GGA_C_PBE+0.750*GGA_X_PBE+0.250*HF_X": {
+        'xc_terms': [{
+            'XC_functional_name': "HYB_GGA_XC_PBEH",
+         }]
+    },
+}
