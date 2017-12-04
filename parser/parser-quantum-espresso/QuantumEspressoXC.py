@@ -397,7 +397,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_LDA_C_VWN_RPA',
+            'XC_functional_name': 'LDA_C_VWN_RPA',
             'XC_functional_weight': 0.19,
         }, {
             'XC_functional_name': 'LDA_C_LYP',
@@ -411,7 +411,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_LDA_C_VWN_RPA',
+            'XC_functional_name': 'LDA_C_VWN_RPA',
             'XC_functional_weight': 0.129,
         }, {
             'XC_functional_name': 'LDA_C_LYP',
