@@ -243,7 +243,7 @@ qe_xc: 0.00 PZ ( 1  1  0  0 0 0)
 ]
 qe_xc: 0.00 VDW-DF-OB86 ( 1  4 24  0 1 0)
 {
-  "XC_functional": "VDW_C_DF1+x_qe_GGA_X_OPTB86_VDW",
+  "XC_functional": "GGA_X_OPTB86_VDW_x_qe+VDW_C_DF1",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -259,10 +259,10 @@ qe_xc: 0.00 VDW-DF-OB86 ( 1  4 24  0 1 0)
 }
 [
   {
-    "XC_functional_name": "VDW_C_DF1"
+    "XC_functional_name": "GGA_X_OPTB86_VDW_x_qe"
   },
   {
-    "XC_functional_name": "x_qe_GGA_X_OPTB86_VDW"
+    "XC_functional_name": "VDW_C_DF1"
   }
 ]
 qe_xc: 0.00 RVV10 ( 1  4 13  4 3 0)
@@ -645,7 +645,7 @@ qe_xc: 0.00 LDA ( 1  1  0  0 0 0)
 ]
 qe_xc: 0.20 B3LYP ( 7 12  9  7 0 0)
 {
-  "XC_functional": "0.810*GGA_C_LYP+0.720*GGA_X_B88+0.200*HF_X+0.190*LDA_C_VWN",
+  "XC_functional": "HYB_GGA_XC_B3LYP",
   "x_qe_xc_icorr": 12,
   "x_qe_xc_icorr_comment": "B3LYP (0.19*vwn+0.81*lyp)",
   "x_qe_xc_icorr_name": "b3lp",
@@ -661,25 +661,12 @@ qe_xc: 0.20 B3LYP ( 7 12  9  7 0 0)
 }
 [
   {
-    "XC_functional_name": "GGA_C_LYP",
-    "XC_functional_weight": 0.81
-  },
-  {
-    "XC_functional_name": "GGA_X_B88",
-    "XC_functional_weight": 0.72
-  },
-  {
-    "XC_functional_name": "HF_X",
-    "XC_functional_weight": 0.2
-  },
-  {
-    "XC_functional_name": "LDA_C_VWN",
-    "XC_functional_weight": 0.19
+    "XC_functional_name": "HYB_GGA_XC_B3LYP"
   }
 ]
 qe_xc: 0.00 B3LYP ( 7 12  9  7 0 0)
 {
-  "XC_functional": "0.810*GGA_C_LYP+GGA_X_B88+0.190*LDA_C_VWN",
+  "XC_functional": "GGA_XC_B3LYP_x_qe",
   "x_qe_xc_icorr": 12,
   "x_qe_xc_icorr_comment": "B3LYP (0.19*vwn+0.81*lyp)",
   "x_qe_xc_icorr_name": "b3lp",
@@ -695,15 +682,7 @@ qe_xc: 0.00 B3LYP ( 7 12  9  7 0 0)
 }
 [
   {
-    "XC_functional_name": "GGA_C_LYP",
-    "XC_functional_weight": 0.81
-  },
-  {
-    "XC_functional_name": "GGA_X_B88"
-  },
-  {
-    "XC_functional_name": "LDA_C_VWN",
-    "XC_functional_weight": 0.19
+    "XC_functional_name": "GGA_XC_B3LYP_x_qe"
   }
 ]
 qe_xc: 0.00 SLA  PW PBX  PBC (1434)
@@ -732,7 +711,7 @@ qe_xc: 0.00 SLA  PW PBX  PBC (1434)
 ]
 qe_xc: 0.24 GAUP ( 1  4 20  4 0 0)
 {
-  "XC_functional": "GGA_C_PBE+x_qe_HYB_GGA_X_GAUP",
+  "XC_functional": "HYB_GGA_XC_GAU_PBE_x_qe",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -748,10 +727,7 @@ qe_xc: 0.24 GAUP ( 1  4 20  4 0 0)
 }
 [
   {
-    "XC_functional_name": "GGA_C_PBE"
-  },
-  {
-    "XC_functional_name": "x_qe_HYB_GGA_X_GAUP"
+    "XC_functional_name": "HYB_GGA_XC_GAU_PBE_x_qe"
   }
 ]
 qe_xc: 0.00 GAUP ( 1  4 20  4 0 0)
@@ -852,7 +828,7 @@ qe_xc: 0.00 SLA  PW   TPSS TPSS (1476)
 ]
 qe_xc: 0.25 HSE ( 1  4 12  4 0 0)
 {
-  "XC_functional": "GGA_C_PBE+HYB_GGA_XC_HSE06",
+  "XC_functional": "HYB_GGA_XC_HSE06",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -868,18 +844,12 @@ qe_xc: 0.25 HSE ( 1  4 12  4 0 0)
 }
 [
   {
-    "XC_functional_name": "GGA_C_PBE"
-  },
-  {
-    "XC_functional_name": "HYB_GGA_XC_HSE06",
-    "XC_functional_parameters": {
-      "exx_mixing": 0.25
-    }
+    "XC_functional_name": "HYB_GGA_XC_HSE06"
   }
 ]
 qe_xc: 0.00 HSE ( 1  4 12  4 0 0)
 {
-  "XC_functional": "GGA_C_PBE+HYB_GGA_XC_HSE06",
+  "XC_functional": "GGA_C_PBE+GGA_X_PBE",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -898,10 +868,7 @@ qe_xc: 0.00 HSE ( 1  4 12  4 0 0)
     "XC_functional_name": "GGA_C_PBE"
   },
   {
-    "XC_functional_name": "HYB_GGA_XC_HSE06",
-    "XC_functional_parameters": {
-      "exx_mixing": 0.0
-    }
+    "XC_functional_name": "GGA_X_PBE"
   }
 ]
 qe_xc: 0.00 SLA  PW   PBX  PBC ( 1 4 3 4 0)
@@ -930,7 +897,7 @@ qe_xc: 0.00 SLA  PW   PBX  PBC ( 1 4 3 4 0)
 ]
 qe_xc: 0.25 PBE0 ( 6  4  8  4 0 0)
 {
-  "XC_functional": "GGA_C_PBE+0.750*GGA_X_PBE+0.250*HF_X",
+  "XC_functional": "HYB_GGA_XC_PBEH",
   "x_qe_xc_icorr": 4,
   "x_qe_xc_icorr_comment": "Perdew-Wang",
   "x_qe_xc_icorr_name": "pw",
@@ -946,15 +913,7 @@ qe_xc: 0.25 PBE0 ( 6  4  8  4 0 0)
 }
 [
   {
-    "XC_functional_name": "GGA_C_PBE"
-  },
-  {
-    "XC_functional_name": "GGA_X_PBE",
-    "XC_functional_weight": 0.75
-  },
-  {
-    "XC_functional_name": "HF_X",
-    "XC_functional_weight": 0.25
+    "XC_functional_name": "HYB_GGA_XC_PBEH"
   }
 ]
 qe_xc: 0.00 PBE0 ( 6  4  8  4 0 0)
