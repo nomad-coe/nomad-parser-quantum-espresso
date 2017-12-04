@@ -678,7 +678,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
         }],
         'xc_terms_remove': [{
             'XC_functional_name': 'LDA_X',
-         }],
+        }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "q2dx",
             'x_qe_xc_igcx_comment':    "Q2D exchange grad corr",
@@ -695,10 +695,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
         }],
         'xc_terms_remove': [{
             'XC_functional_name': 'LDA_X',
-         }, {
+        }, {
             'XC_functional_name': 'GGA_C_PBE',
             'exx_compute_weight': lambda exx: 1.0 if (abs(exx) > 0.01) else 0.0
-         }],
+        }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "gaup",
             'x_qe_xc_igcx_comment':    "Gau-PBE hybrid exchange",
