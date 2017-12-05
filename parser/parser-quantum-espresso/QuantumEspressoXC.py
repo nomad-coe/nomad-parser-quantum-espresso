@@ -142,12 +142,12 @@ def apply_terms_filter(xc_data):
             v.pop('exx_compute_weight', None)
 
 
-def xc_functional_str(xc_data):
+def xc_functional_str(xc_data, separator='+'):
     result = ''
     for k in sorted(xc_data.keys()):
         v = xc_data[k]
         if len(result) > 0 and v.get('XC_functional_weight', 1.0) > 0:
-            result += '+'
+            result += separator
         if v.get('XC_functional_weight', None) is not None:
             result += '%.3f*' % (v['XC_functional_weight'])
         result += v['XC_functional_name']
