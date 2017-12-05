@@ -121,6 +121,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         if pp['x_qe_t_pp_filename'] is not None:
             fpath = pp['x_qe_t_pp_filename'][-1]
             basename = re.sub(r".*\/", r"", fpath)
+            if len(basename) > 0:
+                backend.addValue('method_atom_kind_pseudopotential_name',
+                                 basename)
             renorm_info = self.cache_t_pp_renorm_wfc.get(basename, None)
             if renorm_info is not None:
                 backend.addValue('x_qe_pp_renormalized_wfc', renorm_info)
