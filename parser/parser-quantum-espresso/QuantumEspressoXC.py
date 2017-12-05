@@ -1155,13 +1155,6 @@ LIBXC_SHORTCUT = {
             'XC_functional_name': "HYB_GGA_XC_B3LYP",
         }]
     },
-    "0.810*GGA_C_LYP+GGA_X_B88+0.190*LDA_C_VWN": {
-        'xc_terms': [{
-            'XC_functional_name': "GGA_X_B88",
-        }, {
-            'XC_functional_name': "GGA_C_B3LYP_x_qe",
-        }]
-    },
     "GGA_C_PBE+0.750*GGA_X_PBE+0.250*HF_X": {
         'xc_terms': [{
             'XC_functional_name': "HYB_GGA_XC_PBEH",
