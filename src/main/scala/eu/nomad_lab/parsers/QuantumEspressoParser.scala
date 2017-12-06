@@ -67,7 +67,6 @@ object QuantumEspressoParser extends SimpleExternalParserGenerator(
             val extraInfo: List[(String, jn.JString)] = m.groupNames.map { (name: String) =>
               name -> jn.JString(m.group(name))
             }(breakOut)
-            logger.debug(s"$filePath matches parser $name (extraInfo:${JsonUtils.normalizedStr(jn.JObject(extraInfo))}")
             Some(ParserMatch(mainFileMatchPriority, mainFileMatchWeak, jn.JObject(extraInfo)))
           case None =>
             fallbackRe.findFirstMatchIn(str) match {
@@ -75,10 +74,8 @@ object QuantumEspressoParser extends SimpleExternalParserGenerator(
                 val extraInfo: List[(String, jn.JString)] = m.groupNames.map { (name: String) =>
                   name -> jn.JString(m.group(name))
                 }(breakOut)
-                logger.debug(s"$filePath might match parser $name (extraInfo:${JsonUtils.normalizedStr(jn.JObject(extraInfo))}")
                 Some(ParserMatch(mainFileMatchPriority - 1, true, jn.JObject(extraInfo)))
               case None =>
-                logger.debug(s"$filePath does *NOT* match parser $name")
                 None
             }
         }
