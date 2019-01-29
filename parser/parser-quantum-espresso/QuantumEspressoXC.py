@@ -114,7 +114,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
                 xc_data, this_term, exact_exchange_fraction)
         apply_terms_filter(xc_data)
         xc_functional = xc_functional_str(xc_data)
-    xc_section_method['XC_functional'] = xc_functional
+    xc_section_method['xc_functional'] = xc_functional
     result = []
     for k in sorted(xc_data.keys()):
         v = xc_data[k]
@@ -125,34 +125,34 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
 def apply_term_add(xc_data, this_term, exact_exchange_fraction):
     term = copy.deepcopy(this_term)
     if 'exx_compute_weight' in term:
-        term['XC_functional_weight'] = term['exx_compute_weight'](
+        term['xc_functional_weight'] = term['exx_compute_weight'](
             exact_exchange_fraction)
-    if 'XC_functional_weight' not in term:
-        term['XC_functional_weight'] = 1.0
-    if term['XC_functional_name'] not in xc_data:
-        xc_data[term['XC_functional_name']] = term
+    if 'xc_functional_weight' not in term:
+        term['xc_functional_weight'] = 1.0
+    if term['xc_functional_name'] not in xc_data:
+        xc_data[term['xc_functional_name']] = term
     else:
         LOGGER.info("pre-existing XC term: %s",
-                    term['XC_functional_name'])
+                    term['xc_functional_name'])
     return xc_data
 
 
 def apply_terms_remove(xc_data, xc_data_remove):
     for (k, v) in xc_data_remove.items():
         if k in xc_data:
-            xc_data[k]['XC_functional_weight'] -= v['XC_functional_weight']
+            xc_data[k]['xc_functional_weight'] -= v['xc_functional_weight']
         else:
             xc_data[k] = v
-            xc_data[k]['XC_functional_weight'] *= -1.0
+            xc_data[k]['xc_functional_weight'] *= -1.0
 
 
 def apply_terms_filter(xc_data):
     for (k, v) in list(xc_data.items()):
-        if abs(v['XC_functional_weight']) < 0.01:
+        if abs(v['xc_functional_weight']) < 0.01:
             del xc_data[k]
         else:
-            if abs(v['XC_functional_weight'] - 1.0) < 0.01:
-                del v['XC_functional_weight']
+            if abs(v['xc_functional_weight'] - 1.0) < 0.01:
+                del v['xc_functional_weight']
             v.pop('exx_compute_weight', None)
 
 
@@ -160,11 +160,11 @@ def xc_functional_str(xc_data, separator='+'):
     result = ''
     for k in sorted(xc_data.keys()):
         v = xc_data[k]
-        if len(result) > 0 and v.get('XC_functional_weight', 1.0) > 0:
+        if len(result) > 0 and v.get('xc_functional_weight', 1.0) > 0:
             result += separator
-        if v.get('XC_functional_weight', None) is not None:
-            result += '%.3f*' % (v['XC_functional_weight'])
-        result += v['XC_functional_name']
+        if v.get('xc_functional_weight', None) is not None:
+            result += '%.3f*' % (v['xc_functional_weight'])
+        result += v['xc_functional_name']
     return result
 
 
@@ -173,7 +173,7 @@ EXCHANGE = [
     None,
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       'sla',
@@ -183,8 +183,8 @@ EXCHANGE = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_X',
-            'XC_functional_parameters': {'alpha': 1.0},
+            'xc_functional_name': 'LDA_X',
+            'xc_functional_parameters': {'alpha': 1.0},
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       'sl1',
@@ -194,7 +194,7 @@ EXCHANGE = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'x_qe_LDA_X_RELATIVISTIC',
+            'xc_functional_name': 'x_qe_LDA_X_RELATIVISTIC',
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       'rxc',
@@ -204,7 +204,7 @@ EXCHANGE = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'OEP_EXX',
+            'xc_functional_name': 'OEP_EXX',
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       'oep',
@@ -214,7 +214,7 @@ EXCHANGE = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'HF_X',
+            'xc_functional_name': 'HF_X',
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       'hf',
@@ -224,13 +224,13 @@ EXCHANGE = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'HF_X',
+            'xc_functional_name': 'HF_X',
             'exx_compute_weight': lambda exx: exx,
-            'XC_functional_weight': 0.25,
+            'xc_functional_weight': 0.25,
         }, {
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
             'exx_compute_weight': lambda exx: (1.0 - exx),
-            'XC_functional_weight': 0.75,
+            'xc_functional_weight': 0.75,
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       "pb0x",
@@ -240,13 +240,13 @@ EXCHANGE = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'HF_X',
+            'xc_functional_name': 'HF_X',
             'exx_compute_weight': lambda exx: exx,
-            'XC_functional_weight': 0.20,
+            'xc_functional_weight': 0.20,
         }, {
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
             'exx_compute_weight': lambda exx: (1.0 - exx),
-            'XC_functional_weight': 0.8,
+            'xc_functional_weight': 0.8,
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       "b3lp",
@@ -256,7 +256,7 @@ EXCHANGE = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "LDA_X_KZK",
+            'xc_functional_name': "LDA_X_KZK",
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       "kzk",
@@ -266,13 +266,13 @@ EXCHANGE = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'HF_X',
+            'xc_functional_name': 'HF_X',
             'exx_compute_weight': lambda exx: exx,
-            'XC_functional_weight': 0.218,
+            'xc_functional_weight': 0.218,
         }, {
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
             'exx_compute_weight': lambda exx: (1.0 - exx),
-            'XC_functional_weight': 0.782,
+            'xc_functional_weight': 0.782,
         }],
         'xc_section_method': {
             'x_qe_xc_iexch_name':       "x3lp",
@@ -287,7 +287,7 @@ CORRELATION = [
     None,
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_PZ',
+            'xc_functional_name': 'LDA_C_PZ',
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "pz",
@@ -297,7 +297,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_VWN',
+            'xc_functional_name': 'LDA_C_VWN',
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "vwn",
@@ -307,7 +307,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_LYP',
+            'xc_functional_name': 'LDA_C_LYP',
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "lyp",
@@ -317,7 +317,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "LDA_C_PW",
+            'xc_functional_name': "LDA_C_PW",
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "pw",
@@ -327,7 +327,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_WIGNER',
+            'xc_functional_name': 'LDA_C_WIGNER',
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "wig",
@@ -337,7 +337,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_HL',
+            'xc_functional_name': 'LDA_C_HL',
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "hl",
@@ -347,7 +347,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_OB_PZ',
+            'xc_functional_name': 'LDA_C_OB_PZ',
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "obz",
@@ -357,7 +357,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_OB_PW',
+            'xc_functional_name': 'LDA_C_OB_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "obw",
@@ -367,7 +367,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_GL',
+            'xc_functional_name': 'LDA_C_GL',
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "gl",
@@ -377,7 +377,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "LDA_C_KZK",
+            'xc_functional_name': "LDA_C_KZK",
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "kzk",
@@ -387,7 +387,7 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_VWN_RPA',
+            'xc_functional_name': 'LDA_C_VWN_RPA',
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "vwn-rpa",
@@ -397,11 +397,11 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_VWN',
-            'XC_functional_weight': 0.19,
+            'xc_functional_name': 'LDA_C_VWN',
+            'xc_functional_weight': 0.19,
         }, {
-            'XC_functional_name': 'LDA_C_LYP',
-            'XC_functional_weight': 0.81,
+            'xc_functional_name': 'LDA_C_LYP',
+            'xc_functional_weight': 0.81,
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "b3lp",
@@ -411,11 +411,11 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_VWN_RPA',
-            'XC_functional_weight': 0.19,
+            'xc_functional_name': 'LDA_C_VWN_RPA',
+            'xc_functional_weight': 0.19,
         }, {
-            'XC_functional_name': 'LDA_C_LYP',
-            'XC_functional_weight': 0.81,
+            'xc_functional_name': 'LDA_C_LYP',
+            'xc_functional_weight': 0.81,
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':    "b3lpv1r",
@@ -425,11 +425,11 @@ CORRELATION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': 'LDA_C_VWN_RPA',
-            'XC_functional_weight': 0.129,
+            'xc_functional_name': 'LDA_C_VWN_RPA',
+            'xc_functional_weight': 0.129,
         }, {
-            'XC_functional_name': 'LDA_C_LYP',
-            'XC_functional_weight': 0.871,
+            'xc_functional_name': 'LDA_C_LYP',
+            'xc_functional_weight': 0.871,
         }],
         'xc_section_method': {
             'x_qe_xc_icorr_name':       "x3lp",
@@ -443,10 +443,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     None,
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_B88",
+            'xc_functional_name': "GGA_X_B88",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "b88",
@@ -456,10 +456,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_PW91",
+            'xc_functional_name': "GGA_X_PW91",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "ggx",
@@ -469,10 +469,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_PBE",
+            'xc_functional_name': "GGA_X_PBE",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "pbx",
@@ -482,10 +482,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_PBE_R",
+            'xc_functional_name': "GGA_X_PBE_R",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "rpb",
@@ -495,7 +495,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_XC_HCTH_120",
+            'xc_functional_name': "GGA_XC_HCTH_120",
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "hcth",
@@ -505,7 +505,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_OPTX",
+            'xc_functional_name': "GGA_X_OPTX",
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "optx",
@@ -517,10 +517,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
         # igcx=7 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         'xc_terms': [{
-            'XC_functional_name': "MGGA_X_TPSS",
+            'xc_functional_name': "MGGA_X_TPSS",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':    "tpss",
@@ -530,13 +530,13 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_PBE",
-            'XC_functional_weight': 0.75,
+            'xc_functional_name': "GGA_X_PBE",
+            'xc_functional_weight': 0.75,
             'exx_compute_weight': lambda exx: (1.0 - exx),
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
-            'XC_functional_weight': 0.75,
+            'xc_functional_name': 'LDA_X',
+            'xc_functional_weight': 0.75,
             'exx_compute_weight': lambda exx: (1.0 - exx),
         }],
         'xc_section_method': {
@@ -547,13 +547,13 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_B88",
-            'XC_functional_weight': 0.72,
+            'xc_functional_name': "GGA_X_B88",
+            'xc_functional_weight': 0.72,
             'exx_compute_weight': lambda exx: 0.72 if abs(exx) > 0.01 else 1.0
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
-            'XC_functional_weight': 0.8,
+            'xc_functional_name': 'LDA_X',
+            'xc_functional_weight': 0.8,
             'exx_compute_weight': lambda exx: (1.0 - exx),
         }],
         'xc_section_method': {
@@ -564,10 +564,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_PBE_SOL",
+            'xc_functional_name': "GGA_X_PBE_SOL",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "psx",
@@ -577,10 +577,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_WC",
+            'xc_functional_name': "GGA_X_WC",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "wcx",
@@ -590,16 +590,16 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "HYB_GGA_XC_HSE06",
+            'xc_functional_name': "HYB_GGA_XC_HSE06",
             'exx_compute_weight': lambda exx: 1.0 if (abs(exx) > 0.01) else 0.0
         }, {
-            'XC_functional_name': "GGA_X_PBE",
+            'xc_functional_name': "GGA_X_PBE",
             'exx_compute_weight': lambda exx: 0.0 if (abs(exx) > 0.01) else 1.0
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }, {
-            'XC_functional_name': 'GGA_C_PBE',
+            'xc_functional_name': 'GGA_C_PBE',
             'exx_compute_weight': lambda exx: 1.0 if (abs(exx) > 0.01) else 0.0
         }],
         'xc_section_method': {
@@ -610,10 +610,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_RPW86",
+            'xc_functional_name': "GGA_X_RPW86",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "rw86",
@@ -623,10 +623,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_PBE",
+            'xc_functional_name': "GGA_X_PBE",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "pbe",
@@ -638,10 +638,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
         # igcx=15 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         'xc_terms': [{
-            'XC_functional_name': "MGGA_X_TB09",
+            'xc_functional_name': "MGGA_X_TB09",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':    "tb09",
@@ -651,10 +651,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_C09X",
+            'xc_functional_name': "GGA_X_C09X",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "c09x",
@@ -664,10 +664,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_SOGGA",
+            'xc_functional_name': "GGA_X_SOGGA",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "sox",
@@ -679,7 +679,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
         # igcx=18 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         'xc_terms': [{
-            'XC_functional_name': "MGGA_X_M06_L",
+            'xc_functional_name': "MGGA_X_M06_L",
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':    "m6lx",
@@ -689,10 +689,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_Q2D",
+            'xc_functional_name': "GGA_X_Q2D",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "q2dx",
@@ -702,16 +702,16 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "HYB_GGA_XC_GAU_PBE",
+            'xc_functional_name': "HYB_GGA_XC_GAU_PBE",
             'exx_compute_weight': lambda exx: 1.0 if (abs(exx) > 0.01) else 0.0
         }, {
-            'XC_functional_name': "GGA_X_PBE",
+            'xc_functional_name': "GGA_X_PBE",
             'exx_compute_weight': lambda exx: 0.0 if (abs(exx) > 0.01) else 1.0
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }, {
-            'XC_functional_name': 'GGA_C_PBE',
+            'xc_functional_name': 'GGA_C_PBE',
             'exx_compute_weight': lambda exx: 1.0 if (abs(exx) > 0.01) else 0.0
         }],
         'xc_section_method': {
@@ -722,10 +722,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_PW86",
+            'xc_functional_name': "GGA_X_PW86",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "pw86",
@@ -735,10 +735,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_B86_MGC",
+            'xc_functional_name': "GGA_X_B86_MGC",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "b86b",
@@ -748,10 +748,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_OPTB88_VDW",
+            'xc_functional_name': "GGA_X_OPTB88_VDW",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "obk8",
@@ -761,10 +761,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_OPTB86_VDW",
+            'xc_functional_name': "GGA_X_OPTB86_VDW",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "ob86",
@@ -774,10 +774,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_EV93",
+            'xc_functional_name': "GGA_X_EV93",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "evx",
@@ -787,10 +787,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_B86_R",
+            'xc_functional_name': "GGA_X_B86_R",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "b86r",
@@ -800,10 +800,10 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_LV_RPW86",
+            'xc_functional_name': "GGA_X_LV_RPW86",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }],
         'xc_section_method': {
             'x_qe_xc_igcx_name':       "cx13",
@@ -813,18 +813,18 @@ EXCHANGE_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_X_B88",
-            'XC_functional_weight': 0.542,
+            'xc_functional_name': "GGA_X_B88",
+            'xc_functional_weight': 0.542,
             'exx_compute_weight':
                 lambda exx: 0.542 if (abs(exx) > 0.01) else 1.0
         }, {
-            'XC_functional_name': "GGA_X_PW91",
-            'XC_functional_weight': 0.167,
+            'xc_functional_name': "GGA_X_PW91",
+            'xc_functional_weight': 0.167,
             'exx_compute_weight':
                 lambda exx: 0.167 if (abs(exx) > 0.01) else 0.0
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
             'exx_compute_weight':
                 lambda exx: 0.709 if (abs(exx) > 0.01) else 1.0
         }],
@@ -841,10 +841,10 @@ CORRELATION_GRADIENT_CORRECTION = [
     None,
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_C_P86",
+            'xc_functional_name': "GGA_C_P86",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_PW',
+            'xc_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "p86",
@@ -854,10 +854,10 @@ CORRELATION_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_C_PW91",
+            'xc_functional_name': "GGA_C_PW91",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_PW',
+            'xc_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "ggc",
@@ -867,10 +867,10 @@ CORRELATION_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_C_LYP",
+            'xc_functional_name': "GGA_C_LYP",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_LYP',
+            'xc_functional_name': 'LDA_C_LYP',
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "blyp",
@@ -880,10 +880,10 @@ CORRELATION_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_C_PBE",
+            'xc_functional_name': "GGA_C_PBE",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_PW',
+            'xc_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "pbc",
@@ -893,7 +893,7 @@ CORRELATION_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_XC_HCTH_120",
+            'xc_functional_name': "GGA_XC_HCTH_120",
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "hcth",
@@ -905,10 +905,10 @@ CORRELATION_GRADIENT_CORRECTION = [
         # igcc=6 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         'xc_terms': [{
-            'XC_functional_name': "MGGA_C_TPSS",
+            'xc_functional_name': "MGGA_C_TPSS",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_PW',
+            'xc_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':    "tpss",
@@ -918,12 +918,12 @@ CORRELATION_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_C_LYP",
-            'XC_functional_weight': 0.81,
+            'xc_functional_name': "GGA_C_LYP",
+            'xc_functional_weight': 0.81,
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_LYP',
-            'XC_functional_weight': 0.81,
+            'xc_functional_name': 'LDA_C_LYP',
+            'xc_functional_weight': 0.81,
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "b3lp",
@@ -933,10 +933,10 @@ CORRELATION_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_C_PBE_SOL",
+            'xc_functional_name': "GGA_C_PBE_SOL",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_PW',
+            'xc_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "psc",
@@ -946,10 +946,10 @@ CORRELATION_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_C_PBE",
+            'xc_functional_name': "GGA_C_PBE",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_PW',
+            'xc_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "pbe",
@@ -962,10 +962,10 @@ CORRELATION_GRADIENT_CORRECTION = [
         #        definition taken from 5.0, which did not have separate imeta
         #        functionals.f90 tells that correlation is taken from tpss
         'xc_terms': [{
-            'XC_functional_name': "MGGA_C_TPSS",
+            'xc_functional_name': "MGGA_C_TPSS",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_PW',
+            'xc_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':    "tb09",
@@ -977,7 +977,7 @@ CORRELATION_GRADIENT_CORRECTION = [
         # igcc=11 is not defined in 5.4's funct.f90
         #        definition taken from 5.0, which did not have separate imeta
         'xc_terms': [{
-            'XC_functional_name': "MGGA_C_M06_L",
+            'xc_functional_name': "MGGA_C_M06_L",
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':    "m6lc",
@@ -987,10 +987,10 @@ CORRELATION_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_C_Q2D",
+            'xc_functional_name': "GGA_C_Q2D",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_PW',
+            'xc_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "q2dc",
@@ -1000,12 +1000,12 @@ CORRELATION_GRADIENT_CORRECTION = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "GGA_C_LYP",
-            'XC_functional_weight': 0.871,
+            'xc_functional_name': "GGA_C_LYP",
+            'xc_functional_weight': 0.871,
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_C_LYP',
-            'XC_functional_weight': 0.871,
+            'xc_functional_name': 'LDA_C_LYP',
+            'xc_functional_weight': 0.871,
         }],
         'xc_section_method': {
             'x_qe_xc_igcc_name':       "x3lp",
@@ -1020,14 +1020,14 @@ META_GGA = [
     None,
     {
         'xc_terms': [{
-            'XC_functional_name': "MGGA_X_TPSS",
+            'xc_functional_name': "MGGA_X_TPSS",
         }, {
-            'XC_functional_name': "MGGA_C_TPSS",
+            'xc_functional_name': "MGGA_C_TPSS",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }, {
-            'XC_functional_name': 'LDA_C_PW',
+            'xc_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_imeta_name':       "tpss",
@@ -1037,9 +1037,9 @@ META_GGA = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "MGGA_X_M06_L",
+            'xc_functional_name': "MGGA_X_M06_L",
         }, {
-            'XC_functional_name': "MGGA_C_M06_L",
+            'xc_functional_name': "MGGA_C_M06_L",
         }],
         'xc_section_method': {
             'x_qe_xc_imeta_name':       "m6lx",
@@ -1049,15 +1049,15 @@ META_GGA = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "MGGA_X_TB09",
+            'xc_functional_name': "MGGA_X_TB09",
         }, {
             # confirmed by looking into functionals.f90
-            'XC_functional_name': "MGGA_C_TPSS",
+            'xc_functional_name': "MGGA_C_TPSS",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': 'LDA_X',
+            'xc_functional_name': 'LDA_X',
         }, {
-            'XC_functional_name': 'LDA_C_PW',
+            'xc_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_imeta_name':       "tb09",
@@ -1071,10 +1071,10 @@ VAN_DER_WAALS = [
     None,
     {
         'xc_terms': [{
-            'XC_functional_name': "VDW_C_DF1",
+            'xc_functional_name': "VDW_C_DF1",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': "LDA_C_PW",
+            'xc_functional_name': "LDA_C_PW",
         }],
         'xc_section_method': {
             'x_qe_xc_inlc_name':       "vdw1",
@@ -1084,10 +1084,10 @@ VAN_DER_WAALS = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "VDW_C_DF2",
+            'xc_functional_name': "VDW_C_DF2",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': "LDA_C_PW",
+            'xc_functional_name': "LDA_C_PW",
         }],
         'xc_section_method': {
             'x_qe_xc_inlc_name':       "vdw2",
@@ -1097,10 +1097,10 @@ VAN_DER_WAALS = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "VDW_C_RVV10",
+            'xc_functional_name': "VDW_C_RVV10",
         }],
         'xc_terms_remove': [{
-            'XC_functional_name': "GGA_C_PBE",
+            'xc_functional_name': "GGA_C_PBE",
         }],
         'xc_section_method': {
             'x_qe_xc_inlc_name':       "vv10",
@@ -1110,7 +1110,7 @@ VAN_DER_WAALS = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "VDW_DFX_x_qe",
+            'xc_functional_name': "VDW_DFX_x_qe",
         }],
         'xc_section_method': {
             'x_qe_xc_inlc_name':    "vdwx",
@@ -1121,7 +1121,7 @@ VAN_DER_WAALS = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "VDW_DFY_x_qe",
+            'xc_functional_name': "VDW_DFY_x_qe",
         }],
         'xc_section_method': {
             'x_qe_xc_inlc_name':    "vdwy",
@@ -1132,7 +1132,7 @@ VAN_DER_WAALS = [
     },
     {
         'xc_terms': [{
-            'XC_functional_name': "VDW_DFZ_x_qe",
+            'xc_functional_name': "VDW_DFZ_x_qe",
         }],
         'xc_section_method': {
             'x_qe_xc_inlc_name':    "vdwz",
@@ -1166,12 +1166,12 @@ XC_COMPONENT_NAME = [
 LIBXC_SHORTCUT = {
     "0.810*GGA_C_LYP+0.720*GGA_X_B88+0.200*HF_X+0.190*LDA_C_VWN": {
         'xc_terms': [{
-            'XC_functional_name': "HYB_GGA_XC_B3LYP",
+            'xc_functional_name': "HYB_GGA_XC_B3LYP",
         }]
     },
     "GGA_C_PBE+0.750*GGA_X_PBE+0.250*HF_X": {
         'xc_terms': [{
-            'XC_functional_name': "HYB_GGA_XC_PBEH",
+            'xc_functional_name': "HYB_GGA_XC_PBEH",
         }]
     },
 }

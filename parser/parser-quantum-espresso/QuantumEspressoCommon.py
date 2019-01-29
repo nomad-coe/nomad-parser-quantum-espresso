@@ -84,6 +84,9 @@ QE_SMEARING_KIND = {
              'tetrahedron method': 'tetrahedra',
 }
 
+def metaN(metaName):
+    """Retrurns a normalized meta name"""
+    return metaName.replace(".", "_").lower()
 
 class ParserQuantumEspresso(object):
     """Base class for all Quantum Espresso parsers"""
@@ -259,9 +262,9 @@ class ParserQuantumEspresso(object):
 
     def addDict(self, backend, this_dict):
         for key, value in sorted(this_dict.items()):
-            backend.addValue(key, value)
+            backend.addValue(metaN(key), value)
 
     def addSectionDict(self, backend, section_name, section_dict):
-        gIndex = backend.openSection(section_name)
+        gIndex = backend.openSection(metaN(section_name))
         self.addDict(backend, section_dict)
-        backend.closeSection(section_name, gIndex)
+        backend.closeSection(metaN(section_name), gIndex)
