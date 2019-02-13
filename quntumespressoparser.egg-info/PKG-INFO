@@ -1,0 +1,10 @@
+Metadata-Version: 1.0
+Name: quntumespressoparser
+Version: 0.1
+Summary: NOMAD parser implementation for QuantumEspresso.
+Home-page: UNKNOWN
+Author: Glaweh@debian.org
+Author-email: dts@physik.hu-berlin.de
+License: GPL3
+Description: UNKNOWN
+Platform: UNKNOWN

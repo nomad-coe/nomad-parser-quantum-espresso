@@ -1,13 +1,15 @@
-import setup_paths
+import quantumespressoparser.setup_paths as setup_paths
 import calendar
 import json
 import os
+import sys
 import re
 import numpy as np
 import logging
 from nomadcore.local_meta_info import loadJsonFile, InfoKindEl
 from nomadcore.unit_conversion.unit_conversion import convert_unit
 from nomadcore.simple_parser import mainFunction, SimpleMatcher as SM, CachingLevel
+from nomadcore.baseclasses import ParserInterface
 
 ############################################################
 # This file contains functions and constants that are needed
@@ -39,13 +41,18 @@ def re_vec(name, units='', split="\s+"):
 
 # loading metadata from
 # nomad-meta-info/meta_info/nomad_meta_info/quantum_espresso.nomadmetainfo.json
-META_INFO = loadJsonFile(
-    filePath=os.path.normpath(os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "../../../../nomad-meta-info/meta_info/nomad_meta_info/quantum_espresso.nomadmetainfo.json")),
-    dependencyLoader=None,
-    extraArgsHandling=InfoKindEl.ADD_EXTRA_ARGS,
-    uri=None)[0]
+# META_INFO = loadJsonFile(
+#     filePath=os.path.normpath(os.path.join(
+#         os.path.dirname(os.path.abspath(__file__)),
+#         "../../../../nomad-meta-info/meta_info/nomad_meta_info/quantum_espresso.nomadmetainfo.json")),
+#     dependencyLoader=None,
+#     extraArgsHandling=InfoKindEl.ADD_EXTRA_ARGS,
+#     uri=None)[0]
+
+import nomad_meta_info
+metaInfoPath = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(nomad_meta_info.__file__)), "quantum_espresso.nomadmetainfo.json"))
+metaInfoEnv, warnings = loadJsonFile(filePath = metaInfoPath, dependencyLoader = None, extraArgsHandling = InfoKindEl.ADD_EXTRA_ARGS, uri = None)
+META_INFO = metaInfoEnv
 
 PARSER_INFO_DEFAULT = {
   "name": "parser_quantum_espresso",
@@ -71,13 +78,17 @@ QE_SMEARING_KIND = {
 }
 
 
-class ParserQuantumEspresso(object):
+class ParserQuantumEspresso():
     """Base class for all Quantum Espresso parsers"""
-    def __init__(self,cachingLevelForMetaName=None, coverageIgnoreList=None,
-                 re_program_name=None):
+    def __init__(
+        self, cachingLevelForMetaName=None, coverageIgnoreList=None,
+        re_program_name=None, metainfo_to_keep=None, backend=None, default_units=None,
+        metainfo_units=None, debug=True, log_level=logging.ERROR, store=True):
+
         self.re_program_name = re_program_name
         self.parserInfo = PARSER_INFO_DEFAULT.copy()
         self.cachingLevelForMetaName = {}
+        self.backend = backend
         for name in META_INFO.infoKinds:
             # set all temporaries to caching-only
             if name.startswith('x_qe_t_'):
@@ -92,11 +103,30 @@ class ParserQuantumEspresso(object):
         ]
         self.coverageIgnore = None
 
-    def parse(self):
+    # Old parser definition pre-Nomad-Fair (dts edit 11/02/2019)
+    # def parse(self):
+    #     self.coverageIgnore = re.compile(r"^(?:" + r"|".join(self.coverageIgnoreList) + r")$")
+    #     mainFunction(self.mainFileDescription(), META_INFO, self.parserInfo,
+    #                 cachingLevelForMetaName=self.cachingLevelForMetaName,
+    #                 superContext=self)
+
+    def parse(self, mainfile):
         self.coverageIgnore = re.compile(r"^(?:" + r"|".join(self.coverageIgnoreList) + r")$")
-        mainFunction(self.mainFileDescription(), META_INFO, self.parserInfo,
-                    cachingLevelForMetaName=self.cachingLevelForMetaName,
-                    superContext=self)
+        logging.info('quantum espresso parser started')
+        logging.getLogger('nomadcore').setLevel(logging.WARNING)
+        backend = self.backend(META_INFO)
+        # print("Main File Description in parse()")
+        # print(self.mainFileDescription())
+        # with patch.object(sys, 'argv', ['<exe>', '--uri', 'nmd://uri', mainfile]):
+        mainFunction(
+            self.mainFileDescription(),
+            META_INFO,
+            self.parserInfo,
+            cachingLevelForMetaName=self.cachingLevelForMetaName,
+            superContext=self,
+            superBackend=backend,
+            mainFile=mainfile)
+        return backend
 
     def adHoc_suicide_qe_program_name(self, parser):
         if self.re_program_name is not None:
@@ -155,6 +185,7 @@ class ParserQuantumEspresso(object):
                               SM(name='copyright_msg040', coverageIgnore=True,
                                  startReStr=r"\s*in publications or presentations arising from this work. More details at",
                               ),
+                              # Changed CI to False
                               SM(name='copyright_msg050', coverageIgnore=True,
                                  startReStr=r"\s*http://www.quantum-espresso.org/quote(?:\.php)?",
                               ),

@@ -1,4 +1,3 @@
-import setup_paths
 from nomadcore.simple_parser import mainFunction, SimpleMatcher as SM
 from nomadcore.local_meta_info import loadJsonFile, InfoKindEl
 import os
@@ -9,10 +8,11 @@ import logging
 import nomadcore.unit_conversion.unit_conversion as unit_conversion
 import math
 import numpy as np
-import QuantumEspressoCommon as QeC
+import quantumespressoparser.setup_paths as quantumespressoparser
+import quantumespressoparser.QuantumEspressoCommon as QeC
 from nomadcore.parser_backend import valueForStrValue
-from QuantumEspressoCommon import RE_f, RE_i, cRE_f, cRE_i
-from QuantumEspressoXC import translate_qe_xc_num
+from quantumespressoparser.QuantumEspressoCommon import RE_f, RE_i, cRE_f, cRE_i
+from quantumespressoparser.QuantumEspressoXC import translate_qe_xc_num
 from nomadcore.parser_backend import valueForStrValue
 
 
@@ -48,9 +48,12 @@ QE_MD_RELAX_SAMPLING_METHOD = {
 
 class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
     """main place to keep the parser status, open ancillary files,..."""
-    def __init__(self):
+    def __init__(self, metainfo_to_keep=None, backend=None, default_units=None,
+        metainfo_units=None, debug=True, log_level=logging.ERROR, store=True):
         QeC.ParserQuantumEspresso.__init__(
-            self, re_program_name=re.compile(r"^PWSCF$"))
+            self, re_program_name=re.compile(r"^PWSCF$"), metainfo_to_keep=metainfo_to_keep,
+            backend=backend, default_units=default_units, metainfo_units=metainfo_units,
+            debug=debug, log_level=log_level, store=store)
 
     def initialize_values(self):
         """allows to reset values if the same superContext is used to parse

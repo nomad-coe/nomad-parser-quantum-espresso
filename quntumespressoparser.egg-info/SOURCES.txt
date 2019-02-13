@@ -1,0 +1,13 @@
+README.md
+setup.py
+./quantumespressoparser/FortranNamelistParser.py
+./quantumespressoparser/QuantumEspressoCommon.py
+./quantumespressoparser/QuantumEspressoXC.py
+./quantumespressoparser/__init__.py
+./quantumespressoparser/parser_quantum_espresso.py
+./quantumespressoparser/setup_paths.py
+./quntumespressoparser.egg-info/PKG-INFO
+./quntumespressoparser.egg-info/SOURCES.txt
+./quntumespressoparser.egg-info/dependency_links.txt
+./quntumespressoparser.egg-info/requires.txt
+./quntumespressoparser.egg-info/top_level.txt
