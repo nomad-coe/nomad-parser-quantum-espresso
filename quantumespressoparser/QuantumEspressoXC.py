@@ -37,7 +37,11 @@ def parse_qe_xc_num(xc_functional_num):
         xf_num_split_i = [int(x) for x in re.findall(
             '([ \d]\d)', xc_functional_num)]
     else:
-        raise RuntimeError("unparsable input: '%s'", xc_functional_num)
+        try:
+            xf_num_split_i = [int(x) for x in xc_functional_num.split(' ') if x.strip() != '']
+        except Exception:
+            raise RuntimeError("unparsable input: '%s'", xc_functional_num)
+
     if len(xf_num_split_i) < 1:
         raise RuntimeError("this should not happen")
     # zero-pad up to 6 elements
@@ -50,7 +54,7 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
     if exact_exchange_fraction is None:
         exact_exchange_fraction = 0.0
     xf_num = parse_qe_xc_num(xc_functional_num)
-    LOGGER.debug('num <- input: %s <- %s, exx_fraction: %s',  str(xf_num),
+    LOGGER.debug('num <- input: %s <- %s, exx_fraction: %s', str(xf_num),
                  xc_functional_num, str(exact_exchange_fraction))
     # use dictionaries to ensure uniqueness:
     #   exchange/correlation functionals may be combined into _XC_, and we
