@@ -541,7 +541,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             else:
                 raise RuntimeError("unknown atpos_units: %s" % (atpos_units))
             LOGGER.info('NewAtpos')
-        elif old_system is not None:
+        elif old_system is not None and old_system['atom_positions'] is not None:
             atpos_cart = old_system['atom_positions'][-1]
             LOGGER.info('OldAtpos')
         else:
@@ -587,7 +587,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('x_qe_k_info_vec', np.array([
                 section['x_qe_t_k_info_vec_x'], section['x_qe_t_k_info_vec_y'], section['x_qe_t_k_info_vec_z']
             ]).T)
-        elif old_system is not None:
+        elif old_system is not None and old_system['x_qe_k_info_vec'] is not None:
             # unless espresso explicitly writes new k-points, sampling is kept fixed
             backend.addArrayValues('x_qe_k_info_vec', old_system['x_qe_k_info_vec'][-1])
         else:
@@ -595,7 +595,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
         if section['x_qe_t_k_info_ik'] is not None:
             backend.addArrayValues('x_qe_k_info_ik', np.array(section['x_qe_t_k_info_ik']))
-        elif old_system is not None:
+        elif old_system is not None and old_system['x_qe_k_info_ik'] is not None:
             # unless espresso explicitly writes new k-points, sampling is kept fixed
             backend.addArrayValues('x_qe_k_info_ik', old_system['x_qe_k_info_ik'][-1])
         else:
@@ -603,7 +603,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
 
         if section['x_qe_t_k_info_wk'] is not None:
             backend.addArrayValues('x_qe_k_info_wk', np.array(section['x_qe_t_k_info_wk']))
-        elif old_system is not None:
+        elif old_system is not None and old_system['x_qe_k_info_wk'] is not None:
             # unless espresso explicitly writes new k-points, sampling is kept fixed
             backend.addArrayValues('x_qe_k_info_wk', old_system['x_qe_k_info_wk'][-1])
         else:
@@ -614,7 +614,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('x_qe_dense_FFT_grid', np.array([
                 section['x_qe_t_dense_FFT_grid_x'], section['x_qe_t_dense_FFT_grid_y'], section['x_qe_t_dense_FFT_grid_z']
             ]).T)
-        elif old_system is not None:
+        elif old_system is not None and old_system['x_qe_dense_FFT_grid'] is not None:
             # unless espresso explicitly writes new FFT grid info, sampling is kept fixed
             backend.addArrayValues('x_qe_dense_FFT_grid', old_system['x_qe_dense_FFT_grid'][-1])
         else:
@@ -647,7 +647,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             backend.addArrayValues('number_of_electrons', np.array([
                 section['x_qe_t_number_of_electrons'][-1]
             ]))
-        elif old_system is not None:
+        elif old_system is not None and old_system['number_of_electrons'] is not None:
             backend.addArrayValues('number_of_electrons', old_system['number_of_electrons'][-1])
         else:
             raise Exception("missing info about number of electrons in system")
