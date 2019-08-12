@@ -153,7 +153,7 @@ class ParserQuantumEspresso():
                        # program name, e.g. PWSCF, DOS
                        r"\s*Program\s+(?P<x_qe_program_name>\S+)\s+v\." +
                        # version
-                       r"(?P<program_version>\S+(?:\s+\(svn\s+rev\.\s+\d+\s*\))?)" +
+                       r"(?P<program_version>\S+(?:\s+\(svn\s+rev\.\s+\d*\s*\))?)" +
                        r"\s+starts" +
                        # newer espresso: "on $date"
                        r"(?:(?:\s+on\s+(?P<time_run_date_start__strQeDate>.+?)?)\s*$|" +
