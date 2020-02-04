@@ -78,13 +78,6 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
         component_max = len(XC_COMPONENT[component_i])-1
         this_component = None
         if this_xf_num > component_max:
-
-
-            print("\n\n\t\tI WILL BREAK NOW")  # tmk
-            print("component_i: ", component_i)
-            print('xf_num: ', xf_num)
-
-
             LOGGER.error(
                 "%s[%d] beyond limit of %d",
                 XC_COMPONENT_NAME[component_i], this_xf_num, component_max)
