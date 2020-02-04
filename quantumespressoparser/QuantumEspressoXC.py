@@ -1,3 +1,6 @@
+# original developer: Henning Glawe, henning.glawe@mpsd.mpg.de
+# updated by: temok.salazar@physik.hu-berlin.de
+
 import logging
 import re
 import copy
@@ -75,6 +78,13 @@ def translate_qe_xc_num(xc_functional_num, exact_exchange_fraction=None):
         component_max = len(XC_COMPONENT[component_i])-1
         this_component = None
         if this_xf_num > component_max:
+
+
+            print("\n\n\t\tI WILL BREAK NOW")  # tmk
+            print("component_i: ", component_i)
+            print('xf_num: ', xf_num)
+
+
             LOGGER.error(
                 "%s[%d] beyond limit of %d",
                 XC_COMPONENT_NAME[component_i], this_xf_num, component_max)
@@ -158,7 +168,20 @@ def xc_functional_str(xc_data, separator='+'):
     return result
 
 
+
+
+
+
+
+
+
+
+
 # origin: espresso-5.4.0/Modules/funct.f90
+# update:
+# . New exchange-correlation functionals exist in
+# .     espresso-6.5.0/Modules/funct.f90
+#   short comments mark the corresponding new metainfo
 EXCHANGE = [
     None,
     {
@@ -244,6 +267,8 @@ EXCHANGE = [
             'x_qe_xc_iexch':      7,
         },
     },
+    # LDA_X_KZK is not part of libXC. Look up it at
+    # 'https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-meta-info/wikis/metainfo/XC-functional'
     {
         'xc_terms': [{
             'XC_functional_name': "LDA_X_KZK",
@@ -270,9 +295,20 @@ EXCHANGE = [
             'x_qe_xc_iexch':      9,
         },
     },
+    # update for espresso-6.5.0: KLI
+        {
+        'xc_terms': [{
+            'XC_functional_name': "LDA_X_KLI",
+        }],
+        'xc_section_method': {
+            'x_qe_xc_iexch_name': "kli",
+            'x_qe_xc_iexch_comment': "KLI aproximation for exx",
+            'x_qe_xc_iexch': 10,
+        },
+    },
 ]
 
-
+# Correlation functionals UNchanged between espresso v5.4 & v6.5
 CORRELATION = [
     None,
     {
@@ -428,6 +464,10 @@ CORRELATION = [
         },
     },
 ]
+
+# New "exchange_gradient_correction" functionals for q-espresso (qe) v6.5
+#    igcx=[1..28] unchanged between qe-v5.4 & v6.5
+# New additions:  igcx=[29..42]
 
 EXCHANGE_GRADIENT_CORRECTION = [
     None,
@@ -825,8 +865,222 @@ EXCHANGE_GRADIENT_CORRECTION = [
             'x_qe_xc_igcx':         28,
         },
     },
+# New additions for qe-v6.5.0:  igcx=[29..42]
+# FIXME: bare bones. Check if needs formulae for 'exx', or 'xc_terms_remove'
+
+# - - - - - -
+# igcx: 29. The ingredient 'vdW-DF-cx' is documented in the nomad-meta-info, where it
+# has the name 'vdw_c_df_cx'
+# 'https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-meta-info/-/wikis/metainfo/XC-functional':
+# 'vdW-DF-cx' implies igcx=27 => 'cx13', hence LDA_X is implicit. Full weight.
+    {
+        'xc_terms': [{
+            'XC_functional_name': "vdw_c_df_cx",
+        }, {
+        'XC_functional_name': 'HF_X',
+        'exx_compute_weight': lambda exx: exx,
+        'XC_functional_weight': 0.25,
+        }],
+        'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_X',
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':    "cx0",
+            'x_qe_xc_igcx_comment': "vdW-DF-cx+HF/4 (cx13-0)",
+            'x_qe_xc_igcx':         29,
+        },
+    },
+# - - - - - -
+# igcx:30. Needs full LDA_X removal, due to 'GGA_X_RPW86' (see igcx:27)
+    {
+        'xc_terms': [{
+            'XC_functional_name': "GGA_X_RPW86",
+        },{
+            'XC_functional_name': 'HF_X',
+            'exx_compute_weight': lambda exx: exx,
+            'XC_functional_weight': 0.25,
+        }],
+        'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_X',
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "r860",
+            'x_qe_xc_igcx_comment': "rPW86+HF/4 (rw86-0); (for DF0)",
+            'x_qe_xc_igcx': 30,
+        },
+    },
+# - - - - - -
+# igcx:31. Similar comments as in 'igcx:29'
+    {
+        'xc_terms': [{
+            'XC_functional_name': "vdw_c_df_cx",
+        }, {
+            'XC_functional_name': 'HF_X',
+            'exx_compute_weight': lambda exx: exx,
+            'XC_functional_weight': 0.20,
+        }],
+        'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_X',
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name':    "cx0p",
+            'x_qe_xc_igcx_comment': "vdW-DF-cx+HF/5 (cx13-0p)",
+            'x_qe_xc_igcx':         31,
+        },
+    },
+#
+    {
+        'xc_terms': [{
+            'XC_functional_name': "GGA_X_RESERVED",
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "ahcx",
+            'x_qe_xc_igcx_comment': "vdW-DF-cx based; not yet in use (reserved PH)",
+            'x_qe_xc_igcx': 32,
+        },
+    },
+    {
+        'xc_terms': [{
+            'XC_functional_name': "GGA_X_RESERVED",
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "ahf2",
+            'x_qe_xc_igcx_comment': "vdW-DF2 based; not yet in use (reserved PH)",
+            'x_qe_xc_igcx': 33,
+        },
+    },
+    {
+        'xc_terms': [{
+            'XC_functional_name': "GGA_X_RESERVED",
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "ahpb",
+            'x_qe_xc_igcx_comment': "PBE based; not yet in use (reserved PH)",
+            'x_qe_xc_igcx': 34,
+        },
+    },
+    {
+        'xc_terms': [{
+            'XC_functional_name': "GGA_X_RESERVED",
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "ahps",
+            'x_qe_xc_igcx_comment': "PBE-sol based; not in use (reserved PH)",
+            'x_qe_xc_igcx': 35,
+        },
+    },
+    {
+        'xc_terms': [{
+            'XC_functional_name': "GGA_X_RESERVED",
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "cx14",
+            'x_qe_xc_igcx_comment': "Exporations (typo?: explorations), (reserved PH)",
+            'x_qe_xc_igcx': 36,
+        },
+    },
+    {
+        'xc_terms': [{
+            'XC_functional_name': "GGA_X_RESERVED",
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "cx15",
+            'x_qe_xc_igcx_comment': "Exporations (typo? explorations?)(reserved PH)",
+            'x_qe_xc_igcx': 37,
+        },
+    },
+#
+# igcx': 38. Ingredients:
+#   'b86r' -> 'igcx:26' -> 'GGA_X_B86_R'
+#   'vdW-DF2' -> 'vdw_c_df2' . See nomad's gitlab:
+#   'https://gitlab.mpcdf.mpg.de/nomad-lab/nomad-meta-info/-/wikis/metainfo/XC-functional':
+
+    {
+     'xc_terms': [{
+            'XC_functional_name': "vdw_c_df2",
+        }, {
+            'XC_functional_name': "GGA_X_B86_R",
+        }, {
+            'XC_functional_name': 'HF_X',
+            'exx_compute_weight': lambda exx: exx,
+            'XC_functional_weight': 0.25,
+        }],
+        'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_X',
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "br0",
+            'x_qe_xc_igcx_comment': "vdW-DF2-b86r+HF/4 (b86r-0)",
+            'x_qe_xc_igcx': 38,
+        },
+    },
+    {
+        'xc_terms': [{
+            'XC_functional_name': "GGA_X_RESERVED",
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "cx16",
+            'x_qe_xc_igcx_comment': "Exporations (typo?, explorations?)(reserved PH)",
+            'x_qe_xc_igcx': 39,
+        },
+    },
+#- - - -
+    {
+        'xc_terms': [{
+            'XC_functional_name': "vdw_c_df1",
+        }, {
+            'XC_functional_name': "GGA_X_C09X",
+        }, {
+            'XC_functional_name': 'HF_X',
+            'exx_compute_weight': lambda exx: exx,
+            'XC_functional_weight': 0.25,
+        }],
+        'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_X',
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "c090",
+            'x_qe_xc_igcx_comment': "vdW-DF-c09+HF/4 (c09-0)",
+            'x_qe_xc_igcx': 40,
+        },
+    },
+# - - - - - - -
+# 'igcx:41' Note: 'B86b' is defined in 'igcx:22'
+    {
+        'xc_terms': [{
+            'XC_functional_name': "GGA_X_B86_MGC",
+        }],
+            'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_X',
+            'XC_functional_weight': 0.75,
+            'exx_compute_weight': lambda exx: (1.0 - exx),
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "b86x",
+            'x_qe_xc_igcx_comment': "B86b exchange * 0.75",
+            'x_qe_xc_igcx': 41,
+        },
+    },
+# - - - - - - -
+# 'B88' is defined in 'igcx:1'
+    {
+        'xc_terms': [{
+            'XC_functional_name': "GGA_X_B88",
+        }],
+        'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_X',
+            'XC_functional_weight': 0.50,
+            'exx_compute_weight': lambda exx: (1.0 - exx),
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcx_name': "b88x",
+            'x_qe_xc_igcx_comment': "B88 exchange * 0.50",
+            'x_qe_xc_igcx': 42,
+        },
+    },
 ]
 
+# UNchanged between espresso v5.4 & v6.5
 CORRELATION_GRADIENT_CORRECTION = [
     None,
     {
@@ -972,7 +1226,7 @@ CORRELATION_GRADIENT_CORRECTION = [
         'xc_section_method': {
             'x_qe_xc_igcc_name':    "m6lc",
             'x_qe_xc_igcc_comment': "M06L Meta-GGA (Espresso-version < 5.1)",
-            'x_qe_xc_igcc':         2,
+            'x_qe_xc_igcc':         11,
         },
     },
     {
@@ -1003,9 +1257,24 @@ CORRELATION_GRADIENT_CORRECTION = [
             'x_qe_xc_igcc':      13,
         },
     },
+    {
+    #  igcc=14 is not defined in NEITHER of v5.1, v6.1, v6.4's Modules/funct.f90
+    # "BEEF-vdW, a GGA with vdW-DF2 type nonlocal correlation"
+        'xc_terms': [{
+            'XC_functional_name':  "GGA_C_BEEF-vdW",
+        }],
+        'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_C_PW',
+        }],
+        'xc_section_method': {
+            'x_qe_xc_igcc_name':  "BEEF-vdW",
+            'x_qe_xc_igcc_comment':  "libbeef V0.1.1 library",
+            'x_qe_xc_igcc':  14,
+        },
+    },
 ]
 
-
+# New additions for espresso-6.5.0:  imeta=[4, 5, 6]
 META_GGA = [
     None,
     {
@@ -1053,6 +1322,55 @@ META_GGA = [
             'x_qe_xc_imeta_name':       "tb09",
             'x_qe_xc_imeta_comment':    "TB09 Meta-GGA",
             'x_qe_xc_imeta':      3,
+        },
+    },
+    # imeta = [4,5,6] are new espresso-6.5.0/Modules/funct.f90
+    {
+        'xc_terms': [{
+            'XC_functional_name': "MGGA_X_?",
+        }, {
+            'XC_functional_name': "MGGA_C_?",
+        }],
+        'xc_section_method': {
+            'x_qe_xc_imeta_name': "+meta",
+            'x_qe_xc_imeta_comment': "activate MGGA even without MGGA-XC",
+            'x_qe_xc_imeta': 4,
+        },
+    },
+    # - - - - - - - -
+    {
+        'xc_terms': [{
+            'XC_functional_name': "MGGA_X_SCAN",
+        }, {
+            'XC_functional_name': "MGGA_C_SCAN",
+        }],
+        'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_X',
+        }, {
+            'XC_functional_name': 'LDA_C_PW',
+        }],
+        'xc_section_method': {
+            'x_qe_xc_imeta_name': "scan",
+            'x_qe_xc_imeta_comment': "SCAN Meta-GGA ",
+            'x_qe_xc_imeta': 5,
+        },
+    },
+# - - - - - - - -
+    {
+        'xc_terms': [{
+            'XC_functional_name': "HYB_MGGA_X_SCAN0",
+        }, {
+            'XC_functional_name': "MGGA_C_SCAN",
+        }],
+        'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_X',
+        }, {
+            'XC_functional_name': 'LDA_C_PW',
+        }],
+        'xc_section_method': {
+            'x_qe_xc_imeta_name': "sca0",
+            'x_qe_xc_imeta_comment': "SCAN0  Meta-GGA",
+            'x_qe_xc_imeta': 6,
         },
     },
 ]
