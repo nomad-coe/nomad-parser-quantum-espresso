@@ -859,8 +859,6 @@ EXCHANGE_GRADIENT_CORRECTION = [
         },
     },
 # New additions for qe-v6.5.0:  igcx=[29..42]
-# FIXME: bare bones. Check if needs formulae for 'exx', or 'xc_terms_remove'
-
 # - - - - - -
 # igcx: 29. The ingredient 'vdW-DF-cx' is documented in the nomad-meta-info, where it
 # has the name 'vdw_c_df_cx'
@@ -921,7 +919,7 @@ EXCHANGE_GRADIENT_CORRECTION = [
             'x_qe_xc_igcx':         31,
         },
     },
-#
+# - - - - - -
     {
         'xc_terms': [{
             'XC_functional_name': "GGA_X_RESERVED",
@@ -1320,9 +1318,14 @@ META_GGA = [
     # imeta = [4,5,6] are new espresso-6.5.0/Modules/funct.f90
     {
         'xc_terms': [{
-            'XC_functional_name': "MGGA_X_?",
+            'XC_functional_name': "MGGA_X_TPSS",
         }, {
-            'XC_functional_name': "MGGA_C_?",
+            'XC_functional_name': "MGGA_C_TPSS",
+        }],
+        'xc_terms_remove': [{
+            'XC_functional_name': 'LDA_X',
+        }, {
+            'XC_functional_name': 'LDA_C_PW',
         }],
         'xc_section_method': {
             'x_qe_xc_imeta_name': "+meta",

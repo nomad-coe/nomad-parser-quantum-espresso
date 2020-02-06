@@ -143,6 +143,7 @@ class ParserQuantumEspresso():
             name='root',
             weak=True,
             startReStr="",
+            sections=['section_run'],
             subMatchers=[
                 SM(name='ktab_cIgn', coverageIgnore=True,
                    # early output seen in benchmark.out.v5.3.0.inp\=vdw1.in.1452257026
@@ -160,10 +161,10 @@ class ParserQuantumEspresso():
                        # older espresso has just "..." and date on new line
                        r"(?:\s*\.\.\.)\s*$)"
                    ),
+                   startReAction = lambda backend, groups: self.on_starts_job(backend),
                    adHoc = self.adHoc_suicide_qe_program_name,
                    fixedStartValues={'program_name': 'Quantum Espresso',
                                      'program_basis_set_type': 'plane waves'},
-                   sections=['section_run'],
                    subMatchers=([
                        # older espresso versions have start date on separate line
                        SM(name='run_date',
