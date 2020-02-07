@@ -656,21 +656,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         self.sectionIdx['section_system'] = gIndex
         self.section['section_system'] = section
 
-    def on_starts_job(
-            self, backend):
+    def onOpen_section_run(self, backend, gIndex, section):
         """trigger called when section_single_configuration_calculation
         is closed"""
-
-        frames = self.tmp.get('frames', None)
-        if frames:
-            sampling_method_gIndex = backend.openSection('section_sampling_method')
-            backend.addValue('sampling_method', QE_MD_RELAX_SAMPLING_METHOD[self.tmp['md_relax']])
-            backend.closeSection('section_sampling_method', sampling_method_gIndex)
-            frame_sequence_gIndex = backend.openSection('section_frame_sequence')
-            backend.addValue('frame_sequence_to_sampling_ref', sampling_method_gIndex)
-            backend.addArrayValues('frame_sequence_local_frames_ref', np.array(self.tmp['frames']))
-            backend.closeSection('section_frame_sequence', frame_sequence_gIndex)
-
         self.initialize_values()
 
         self.tmp.pop('x_qe_t_profile_caller', None)
