@@ -259,6 +259,7 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
                 LOGGER.info("EXX refinement in MD/relax run")
             else:
                 raise Exception('running MD/relax calculation, but no new cell or atom coordinates found')
+
         if exx_refine:
             backend.addValue('x_qe_exx_refine', True)
             exx_fraction = self.tmp.pop('exx_fraction', None)
@@ -292,6 +293,11 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             self, backend, gIndex, section):
         """trigger called when section_single_configuration_calculation
         is closed"""
+
+        if 'extra_SCF' in self.tmp:
+            backend.addValue('x_qe_extra_SCF', True)
+            del(self.tmp['extra_SCF'])
+
         backend.addValue('single_configuration_to_calculation_method_ref', self.sectionIdx['section_method'])
         backend.addValue('single_configuration_calculation_to_system_ref', self.sectionIdx['section_system'])
         # extract k band structure data if available
@@ -660,7 +666,6 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         """trigger called when section_single_configuration_calculation
         is closed"""
         self.initialize_values()
-
         self.tmp.pop('x_qe_t_profile_caller', None)
         self.tmp.pop('x_qe_t_profile_category', None)
         # manually open header sections, closed at the beginning of scf
@@ -1238,10 +1243,14 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
         ]
 
     def SMs_relax_bfgs(self):
-        return [
+        return self.SMs_md_system_new(suffix='extra_SCF') + [
             SM(name="bfgs_info",
                startReStr=r"\s*BFGS Geometry Optimization\s*$",
                adHoc = lambda p: self.setTmp('md_relax', 'BFGS')
+            ),
+            SM(name="lsda_relax_nonmag",
+               startReStr=r"\s*lsda relaxation :  a final configuration with zero\s*$",
+               adHoc = lambda p: self.setTmp('extra_SCF', True)
             ),
             SM(name="bfgs_scf_cycles",
                startReStr=r"\s*number of scf cycles\s*=\s*(?P<x_qe_t_md_bfgs_scf_cycles>\d+)\s*$",
