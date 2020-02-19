@@ -251,7 +251,9 @@ class QuantumEspressoParserPWSCF(QeC.ParserQuantumEspresso):
             elif exx_refine is not None:
                 LOGGER.info('new scc due to exx_refine=="%s"', str(exx_refine))
             else:
-                raise Exception('encountered new section_single_configuration_calculation without knowing why')
+                del(self.section['single_configuration_calculation'])
+                del(self.sectionIdx['single_configuration_calculation'])
+                LOGGER.warn("encountered new section_single_configuration_calculation without knowing why")
         if md_relax:
             if have_new_system:
                 self.tmp['frames'].append(gIndex)
