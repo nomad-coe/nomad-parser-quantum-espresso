@@ -17,7 +17,7 @@ from setuptools import setup, find_packages
 
 def main():
     setup(
-        name='quntumespressoparser',
+        name='quantumespressoparser',
         version='0.1',
         description='NOMAD parser implementation for QuantumEspresso.',
         author='Glaweh@debian.org',
