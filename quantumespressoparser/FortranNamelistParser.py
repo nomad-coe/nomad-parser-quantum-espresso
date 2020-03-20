@@ -1,4 +1,3 @@
-import setup_paths
 import re
 import sys
 import os
@@ -73,7 +72,7 @@ def unquote_string(value):
 cRE_string_quoted = re.compile(r"(?:'[^']*'|\"[^\"]*\")")
 cRE_comment = re.compile(r"\s*!(?P<comment>.*)")
 RE_identifier = r"[a-zA-Z]\w*" # fortran identifier
-cRE_start_group = re.compile(r'\s*&(' + RE_identifier + r')') # beginning of namelist group 
+cRE_start_group = re.compile(r'\s*&(' + RE_identifier + r')') # beginning of namelist group
 cRE_end_group = re.compile(r'\s*/')
 cRE_assigned_value = re.compile(
     r'\s*(?:' + '|'.join([

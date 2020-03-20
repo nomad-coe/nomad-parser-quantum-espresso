@@ -1,4 +1,3 @@
-import quantumespressoparser.setup_paths as setup_paths
 import calendar
 import json
 import os

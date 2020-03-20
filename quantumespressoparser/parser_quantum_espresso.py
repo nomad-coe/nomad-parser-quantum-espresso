@@ -8,7 +8,6 @@ import logging
 import nomadcore.unit_conversion.unit_conversion as unit_conversion
 import math
 import numpy as np
-import quantumespressoparser.setup_paths as quantumespressoparser
 import quantumespressoparser.QuantumEspressoCommon as QeC
 from nomadcore.parser_backend import valueForStrValue
 from quantumespressoparser.QuantumEspressoCommon import RE_f, RE_i, cRE_f, cRE_i
