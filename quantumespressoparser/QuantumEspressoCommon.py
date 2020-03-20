@@ -39,21 +39,6 @@ def re_vec(name, units='', split="\s+"):
     return res
 
 
-# loading metadata from
-# nomad-meta-info/meta_info/nomad_meta_info/quantum_espresso.nomadmetainfo.json
-# META_INFO = loadJsonFile(
-#     filePath=os.path.normpath(os.path.join(
-#         os.path.dirname(os.path.abspath(__file__)),
-#         "../../../../nomad-meta-info/meta_info/nomad_meta_info/quantum_espresso.nomadmetainfo.json")),
-#     dependencyLoader=None,
-#     extraArgsHandling=InfoKindEl.ADD_EXTRA_ARGS,
-#     uri=None)[0]
-
-import nomad_meta_info
-metaInfoPath = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(nomad_meta_info.__file__)), "quantum_espresso.nomadmetainfo.json"))
-metaInfoEnv, warnings = loadJsonFile(filePath = metaInfoPath, dependencyLoader = None, extraArgsHandling = InfoKindEl.ADD_EXTRA_ARGS, uri = None)
-META_INFO = metaInfoEnv
-
 PARSER_INFO_DEFAULT = {
   "name": "parser_quantum_espresso",
   "version": "0.0.1"
@@ -89,10 +74,7 @@ class ParserQuantumEspresso():
         self.parserInfo = PARSER_INFO_DEFAULT.copy()
         self.cachingLevelForMetaName = {}
         self.backend = backend
-        for name in META_INFO.infoKinds:
-            # set all temporaries to caching-only
-            if name.startswith('x_qe_t_'):
-                self.cachingLevelForMetaName[name] = CachingLevel.Cache
+
         # common prosa in espresso output
         self.coverageIgnoreList = [
             # ignore empty lines
@@ -103,24 +85,20 @@ class ParserQuantumEspresso():
         ]
         self.coverageIgnore = None
 
-    # Old parser definition pre-Nomad-Fair (dts edit 11/02/2019)
-    # def parse(self):
-    #     self.coverageIgnore = re.compile(r"^(?:" + r"|".join(self.coverageIgnoreList) + r")$")
-    #     mainFunction(self.mainFileDescription(), META_INFO, self.parserInfo,
-    #                 cachingLevelForMetaName=self.cachingLevelForMetaName,
-    #                 superContext=self)
-
     def parse(self, mainfile):
         self.coverageIgnore = re.compile(r"^(?:" + r"|".join(self.coverageIgnoreList) + r")$")
         logging.info('quantum espresso parser started')
         logging.getLogger('nomadcore').setLevel(logging.WARNING)
-        backend = self.backend(META_INFO)
-        # print("Main File Description in parse()")
-        # print(self.mainFileDescription())
-        # with patch.object(sys, 'argv', ['<exe>', '--uri', 'nmd://uri', mainfile]):
+        backend = self.backend('quantum_espresso.nomadmetainfo.json')
+
+        for name in backend.metaInfoEnv().infoKinds:
+            # set all temporaries to caching-only
+            if name.startswith('x_qe_t_'):
+                self.cachingLevelForMetaName[name] = CachingLevel.Cache
+
         mainFunction(
             self.mainFileDescription(),
-            META_INFO,
+            None,
             self.parserInfo,
             cachingLevelForMetaName=self.cachingLevelForMetaName,
             superContext=self,
