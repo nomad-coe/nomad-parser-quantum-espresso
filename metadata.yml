@@ -1,0 +1,13 @@
+code-label: QUANTUM ESPRESSO
+code-label-style: All in capitals, separated by space
+code-url: http://www.quantum-espresso.org/
+parser-dir-name: dependencies/parsers/quantum-espresso/
+parser-git-url: https://gitlab.mpcdf.mpg.de/nomad-lab/parser-quantum-espresso
+parser-specific: ''
+table-of-files: |
+  |Filename| Description|
+  |---|---|
+  |`<text_file>`|**Mainfile:** a plain text file w/arbitrary name. \
+  One of the top lines must contain '`Program PWSCF.*starts`', \
+  where '`.*`' means an arbitrary number '`*`' of arbitrary \
+  characters '`.`'|"
