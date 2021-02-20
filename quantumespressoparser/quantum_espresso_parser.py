@@ -1720,7 +1720,7 @@ class QuantumEspressoOutParser(TextParser):
                     Quantity(
                         'axes', r'(\w+)\s*axes'),
                     Quantity(
-                        'units', r'site n\.\s*atom\s*positions\s*(\S+)'),
+                        'units', r'site n\.\s*atom\s*positions\s*\(\s*(\S+)'),
                     Quantity(
                         'labels', r'(\w+)\s*tau', repeats=True),
                     Quantity(
@@ -2298,7 +2298,7 @@ class QuantumEspressoParser(FairdiParser):
             units = source.get(units_key) if units is None else units
             alat = run.get_header('alat', 1.0)
             value = np.array(value, dtype=float)
-            if units in ['alat', 'a0']:
+            if units in ['alat', 'a_0']:
                 value *= alat
             elif units in ['bohr', 'angstrom']:
                 value = pint.Quantity(value, units)
