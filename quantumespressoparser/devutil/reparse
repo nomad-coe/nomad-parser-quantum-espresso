@@ -1,5 +1,0 @@
-#!/bin/bash
-for file in $*; do
-    SRC_FILE=${file/.annotate/}
-    python $PYTHON_OPTS parser_quantum_espresso.py $PARSER_OPTS --annotate "$SRC_FILE" > "$SRC_FILE.stream.json"
-done

@@ -12,4 +12,4 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-from quantumespressoparser.parser_quantum_espresso import QuantumEspressoParserPWSCF
+from quantumespressoparser.quantum_espresso_parser import QuantumEspressoParser

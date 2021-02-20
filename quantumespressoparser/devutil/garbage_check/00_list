@@ -1,2 +1,0 @@
-#!/bin/bash
-grep '1247594562.annotate$' testsuite.parsed_missing > 1247594562.annotate

@@ -1,2 +1,0 @@
-#!/bin/bash
-(exec 3<1247594562.annotate ; while read -u 3 nmissing annfile ; do grep '    no|' $annfile; read -p "was it only garbage ($annfile, $nmissing)?" was_garbage ; if [ "$was_garbage" == "y" ] ; then echo ${annfile/.annotate/} >> 1247594562.garbage ; fi ; done)
