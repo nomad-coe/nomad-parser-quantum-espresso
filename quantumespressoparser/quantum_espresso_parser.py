@@ -1562,7 +1562,7 @@ class QuantumEspressoOutParser(TextParser):
                 'xc_functional_user_enforced',
                 r'IMPORTANT: XC functional enforced from input :\s*Exchange\-correlation\s*=\s*(\w+)'),
             Quantity(
-                'gamma_algorithms',
+                'x_qe_gamma_algorithms',
                 r'(gamma\-point specific algorithms are used)'),
             Quantity(
                 'x_qe_diagonalization_algorithm',
@@ -1571,26 +1571,26 @@ class QuantumEspressoOutParser(TextParser):
                 'g_vector_sticks',
                 r'G-vecs:\s*dense\s*smooth\s*PW\s*([\s\S]+?)\n *\n', str_operation=str_to_sticks, convert=False),
             Quantity(
-                'ibrav',
+                'x_qe_ibrav',
                 r'bravais\-lattice index\s*=\s*(\d+)', dtype=int),
             Quantity(
                 'alat',
                 rf'lattice parameter \((?:alat|a_0)\)\s*=\s*({re_float})', unit='bohr', dtype=float),
             Quantity(
-                'cell_volume',
+                'x_qe_cell_volume',
                 rf'unit-cell volume\s*=\s*({re_float})', unit='bohr**3', dtype=float),
             Quantity(
                 'number_of_atoms',
                 r'number of atoms/cell\s*=\s*(\d+)', dtype=int),
             Quantity(
-                'number_of_species',
+                'x_qe_number_of_species',
                 r'number of atomic types\s*=\s*(\d+)', dtype=int),
             Quantity(
                 'number_of_electrons',
                 rf'number of electrons\s*=\s*({re_float})\s*(?:\(up:\s*({re_float})\s*,\s*down:\s*({re_float}))?',
                 dtype=float),
             Quantity(
-                'number_of_states',
+                'x_qe_number_of_states',
                 r'number of Kohn\-Sham states\s*=\s*(\d+)', dtype=int),
             Quantity(
                 'wavefunction_cutoff',
@@ -1639,10 +1639,10 @@ class QuantumEspressoOutParser(TextParser):
                 'assume_isolated',
                 r'Assuming isolated system,\s*(.*?)\s*method'),
             Quantity(
-                'celldm',
+                'x_qe_celldm',
                 rf'celldm\(1\)=\s*({re_float})\s*celldm\(2\)=\s*({re_float})\s*celldm\(3\)=\s*({re_float})\s*'
                 rf'celldm\(4\)=\s*({re_float})\s*celldm\(5\)=\s*({re_float})\s*celldm\(6\)=\s*({re_float})\s*',
-                dtype=float),
+                dtype=float, unit='bohr'),
             Quantity(
                 'units',
                 r'crystal axes: \(cart\. coord\. in units of ([\w ]+)\)\s*'),
@@ -1663,11 +1663,11 @@ class QuantumEspressoOutParser(TextParser):
                 sub_parser=TextParser(quantities=[
                     Quantity('idx', r'PseudoPot\. # (\d+)'),
                     Quantity('label', r'for (\w+)'),
-                    Quantity('filename', r'read from file:\s*(\S+)'),
+                    Quantity('filename', r'read from file:?\s*\s*(\S+)'),
                     Quantity('md5sum', r'MD5 check sum:\s*(\S+)'),
                     Quantity('type', r'Pseudo is\s*(.*?),', flatten=False),
                     Quantity('valence', rf'Zval\s*=\s*({re_float})'),
-                    Quantity('comment', r'(Generated.+?)\n', flatten=False),
+                    Quantity('comment', r'\s*(.+?)\s*Using radial', flatten=False),
                     Quantity(
                         'integral_ndirections',
                         r'Setup to integrate on\s*(\d+)\s+directions:'),
@@ -1676,7 +1676,7 @@ class QuantumEspressoOutParser(TextParser):
                     Quantity(
                         'augmentation_shape', r'Shape of augmentation charge:\s*(.*?)\s*'),
                     Quantity(
-                        'ndmx', r'Using radial grid of\s*(\d+) points', dtype=int),
+                        'ndmx', r'grid of\s*(\d+) points', dtype=int),
                     Quantity(
                         'nbeta', r',\s*(\d+) beta functions', dtype=int),
                     Quantity(
@@ -1697,7 +1697,7 @@ class QuantumEspressoOutParser(TextParser):
                 r'Starting magnetic structure\s*atomic species\s*magnetization([\s\S]+?)\n\n',
                 str_operation=str_to_atom_data, convert=False),
             Quantity(
-                'md_cell_mass',
+                'x_qe_md_cell_mass',
                 rf'cell mass\s*=\s*({re_float})\s*AMU/\(a\.u\.\)\^2', dtype=float),
             Quantity(
                 'symmetry',
@@ -1738,7 +1738,7 @@ class QuantumEspressoOutParser(TextParser):
                         'width',
                         rf'width\s*\(Ry\)=\s*({re_float})', dtype=float, unit='rydberg'),
                     Quantity('units', r'cart\. coord\. in units (2pi/alat)'),
-                    Quantity('ik', r'k\(\s*(\d+)\s*\)'),
+                    Quantity('ik', r'k\(\s*(\d+)\s*\)', repeats=True),
                     Quantity(
                         'points',
                         rf'=\s*\(\s*({re_float}\s*{re_float}\s*{re_float})\)', repeats=True),
@@ -1746,13 +1746,13 @@ class QuantumEspressoOutParser(TextParser):
                     Quantity('warning', 'Number of k-points >= 100: set verbosity')])),
             Quantity(
                 'dense_grid',
-                rf'(?:G\s+cutoff\s*=\s*{re_float}|Dense\s*grid:)\s*(\d+)\s*'
-                r'G\-vectors\s*FFT\s+(?:dimensions|grid):\s*\(\s*([\d ,]+)\)',
+                rf'(?:G\s+cutoff\s*=\s*({re_float})\s*\(|Dense\s*grid:)\s*(\d+)\s*'
+                r'G\-vectors\)*\s*FFT\s+(?:dimensions|grid):\s*\(\s*([\d ,]+)\)',
                 convert=False),
             Quantity(
                 'smooth_grid',
-                rf'(?:G\s+cutoff\s*=\s*{re_float}|Smooth\s*grid:)\s*(\d+)\s*'
-                r'G\-vectors\s*(?:FFT|smooth)\s+(?:dimensions|grid):\s*\(\s*([\d ,]+)\)',
+                rf'(?:G\s+cutoff\s*=\s*({re_float})\s*\(|Smooth\s*grid:)\s*(\d+)\s*'
+                r'G\-vectors\s*(?:smooth grid|FFT dimensions)\s*:\s*\(\s*([\d ,]+)\)',
                 convert=False),
             Quantity(
                 'x_qe_core_charge_realspace',
@@ -1946,7 +1946,7 @@ class QuantumEspressoOutParser(TextParser):
 
         scf_quantities = [Quantity(
             'iteration',
-            r'(ation #[\s\S]+?)(?:\n *iter|End)', repeats=True,
+            r'(ation #[\s\S]+?(?:\n *iter|End))', repeats=True,
             sub_parser=TextParser(quantities=[
                 Quantity('number', r'n #\s*(\d+)'),
                 Quantity('ecutwfc', r'ecut=\s*([\d\.]+)', unit='rydberg'),
@@ -2019,7 +2019,7 @@ class QuantumEspressoOutParser(TextParser):
                 'program_name_version',
                 r'Program\s*(\w+\s*v\.\S+\s*(?:\(svn rev\.\s*\d+\))*)'),
             Quantity(
-                'start_date_time', r'starts on\s*(\w+)\s*at\s*([\d: ]+)', flatten=False),
+                'start_date_time', r'starts (?:on|\.\.\.\s*Today is)\s*(\w+)\s*at\s*([\d: ]+)', flatten=False),
             Quantity(
                 'compile_parallel_version',
                 r'(Serial multi\-threaded|Serial|Parallel)\s*version\s*(\(MPI\))*', flatten=False),
@@ -2364,17 +2364,21 @@ class QuantumEspressoParser(FairdiParser):
         if len(sec_run.section_system) != 1:
             return sec_system
 
+        # TODO In old parser, celldm[0] is alat, I do not know why
         keys = [
-            'md_cell_mass', 'celldm', 'ibrav', 'alat', 'cell_volume', 'number_of_species',
-            'number_of_states']
+            'x_qe_md_cell_mass', 'x_qe_celldm', 'x_qe_ibrav', 'alat', 'x_qe_cell_volume',
+            'x_qe_number_of_species', 'x_qe_number_of_states', 'number_of_atoms']
         for key in keys:
             val = run.get_header(key)
             if key == 'alat':
+                key = 'x_qe_alat'
                 val = val.to('m').magnitude
-            elif key == 'cell_volume':
+            elif key == 'x_qe_celldm':
+                val = val.to('m').magnitude
+            elif key == 'x_qe_cell_volume':
                 val = val.to('m**3').magnitude
             if val is not None:
-                setattr(sec_system, 'x_qe_%s' % key, val)
+                setattr(sec_system, key, val)
 
         symmetry = run.get_header('symmetry', None)
         if symmetry is not None:
@@ -2393,6 +2397,9 @@ class QuantumEspressoParser(FairdiParser):
             grid = run.get_header('%s_grid' % grid_type)
             if grid is None:
                 continue
+            if len(grid) == 5:
+                setattr(sec_system, 'x_qe_%s_g_cutoff' % grid_type, float(grid[0]))
+                grid = grid[1:]
             setattr(sec_system, 'x_qe_%s_g_vectors' % grid_type, int(grid[0]))
             setattr(sec_system, 'x_qe_%s_FFT_grid' % grid_type, [
                 int(n.strip(',')) for n in grid[1:]])
@@ -2407,6 +2414,8 @@ class QuantumEspressoParser(FairdiParser):
             number_of_electrons = [number_of_electrons] if isinstance(
                 number_of_electrons, float) else number_of_electrons
             sec_system.number_of_electrons = number_of_electrons
+
+        return sec_system
 
     def parse_configurations(self, run):
         sec_run = self.archive.section_run[-1]
@@ -2423,7 +2432,8 @@ class QuantumEspressoParser(FairdiParser):
         for calculation_type in ['self_consistent', 'bandstructure']:
             calculation = run.get(calculation_type)
             if calculation is not None:
-                self.sampling_method = 'single_point'
+                # TODO add single_point in workflow
+                self.sampling_method = 'geometry_optimization'
                 parse_configuration(calculation)
 
         methods = {
@@ -2456,10 +2466,10 @@ class QuantumEspressoParser(FairdiParser):
         if run.get_header('xc_functional_user_enforced') is not None:
             sec_method.x_qe_xc_functional_user_enforced = True
 
-        sec_method.x_qe_gamma_algorithms = run.get_header('gamma_algorithms') is not None
-
         xc_section_method, xc_functionals = run.get_xc_functional()
         for key, val in xc_section_method.items():
+            if key == 'XC_functional':
+                continue
             setattr(sec_method, key, val)
 
         for xc_functional in xc_functionals:
@@ -2501,7 +2511,7 @@ class QuantumEspressoParser(FairdiParser):
             'x_qe_potential_mixing_beta', 'x_qe_md_max_steps',
             'x_qe_input_potential_recalculated_file', 'x_qe_starting_density_file',
             'x_qe_starting_potential', 'x_qe_starting_charge_negative', 'x_qe_starting_wfc',
-            'x_qe_time_setup_cpu1_end', 'x_qe_per_process_mem']
+            'x_qe_time_setup_cpu1_end', 'x_qe_per_process_mem', 'x_qe_gamma_algorithms']
         for key in names:
             val = run.get_header(key)
             if val is None:
