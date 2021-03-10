@@ -1412,7 +1412,7 @@ class QuantumEspressoRunParser(TextParser):
         xc_functional_str = gen_string(xc_terms)
         if xc_functional_str in _libxc_shortcut:
             # override for libXC compliance
-            xc_terms = get_data(_libxc_shortcut[xc_functional]['xc_terms'])
+            xc_terms = get_data(_libxc_shortcut[xc_functional_str]['xc_terms'])
             xc_terms = filter_data(xc_terms)
 
             xc_functional_str = gen_string(xc_terms)
@@ -1559,11 +1559,13 @@ class QuantumEspressoOutParser(TextParser):
                 r'new r_m :\s*[\d\.]+\s*\(alat units\)\s*([\d\.]+) \(a\.u\.\) for type\s*(\d+)',
                 repeats=True),
             Quantity(
-                'xc_functional_user_enforced',
-                r'IMPORTANT: XC functional enforced from input :\s*Exchange\-correlation\s*=\s*(\w+)'),
+                'x_qe_xc_functional_user_enforced',
+                r'IMPORTANT: XC functional enforced from input :\s*Exchange\-correlation\s*=\s*(\w+)',
+                str_operation=lambda x: True),
             Quantity(
                 'x_qe_gamma_algorithms',
-                r'(gamma\-point specific algorithms are used)'),
+                r'(gamma\-point specific algorithms are used)',
+                str_operation=lambda x: True),
             Quantity(
                 'x_qe_diagonalization_algorithm',
                 r'of the eigenvalue problem:\s*a (serial) algorithm will be used'),
@@ -1748,12 +1750,12 @@ class QuantumEspressoOutParser(TextParser):
                 'dense_grid',
                 rf'(?:G\s+cutoff\s*=\s*({re_float})\s*\(|Dense\s*grid:)\s*(\d+)\s*'
                 r'G\-vectors\)*\s*FFT\s+(?:dimensions|grid):\s*\(\s*([\d ,]+)\)',
-                convert=False),
+                str_operation=lambda x: x.replace(',', ' ').split()),
             Quantity(
                 'smooth_grid',
                 rf'(?:G\s+cutoff\s*=\s*({re_float})\s*\(|Smooth\s*grid:)\s*(\d+)\s*'
                 r'G\-vectors\s*(?:smooth grid|FFT dimensions)\s*:\s*\(\s*([\d ,]+)\)',
-                convert=False),
+                str_operation=lambda x: x.replace(',', ' ').split()),
             Quantity(
                 'x_qe_core_charge_realspace',
                 r'(Real space treatment of Q\(r\))'),
@@ -1946,9 +1948,9 @@ class QuantumEspressoOutParser(TextParser):
 
         scf_quantities = [Quantity(
             'iteration',
-            r'(ation #[\s\S]+?(?:\n *iter|End))', repeats=True,
+            r'(ation\s*#[\s\S]+?(?:\n *iter|End))', repeats=True,
             sub_parser=TextParser(quantities=[
-                Quantity('number', r'n #\s*(\d+)'),
+                Quantity('number', r'n\s*#\s*(\d+)'),
                 Quantity('ecutwfc', r'ecut=\s*([\d\.]+)', unit='rydberg'),
                 Quantity('beta', r'beta=\s*([\d\.]+)'),
                 Quantity(
@@ -2191,7 +2193,8 @@ class QuantumEspressoParser(FairdiParser):
         fermi_energy = calculation.get('fermi_energy')
         if fermi_energy is not None:
             fermi_energy = [fermi_energy] if isinstance(fermi_energy, float) else fermi_energy
-            sec_scc.energy_reference_fermi = pint.Quantity(fermi_energy, 'eV')
+            if np.array(fermi_energy).dtype == float:
+                sec_scc.energy_reference_fermi = pint.Quantity(fermi_energy, 'eV')
 
         n_electrons = run.get_header('number_of_electrons')
         if homo is None and fermi_energy is None and n_electrons is None:
@@ -2216,7 +2219,7 @@ class QuantumEspressoParser(FairdiParser):
             if not diagonalization:
                 return
 
-            if source.get('number') is not None:
+            if source.get('number') is not None or source.get('ecutwfc') is not None or source.get('beta') is not None:
                 metainfo_ext = '_scf'
                 diagonalization_section = x_qe_section_scf_diagonalization
             else:
@@ -2402,7 +2405,7 @@ class QuantumEspressoParser(FairdiParser):
                 grid = grid[1:]
             setattr(sec_system, 'x_qe_%s_g_vectors' % grid_type, int(grid[0]))
             setattr(sec_system, 'x_qe_%s_FFT_grid' % grid_type, [
-                int(n.strip(',')) for n in grid[1:]])
+                int(n) for n in grid[1:]])
 
         supercell = run.get_header('supercell')
         if supercell is not None:
@@ -2463,9 +2466,6 @@ class QuantumEspressoParser(FairdiParser):
             for i in range(len(names)):
                 setattr(sec_method, 'x_qe_sticks_%s' % names[i], g_vector_sticks[i])
 
-        if run.get_header('xc_functional_user_enforced') is not None:
-            sec_method.x_qe_xc_functional_user_enforced = True
-
         xc_section_method, xc_functionals = run.get_xc_functional()
         for key, val in xc_section_method.items():
             if key == 'XC_functional':
@@ -2511,7 +2511,8 @@ class QuantumEspressoParser(FairdiParser):
             'x_qe_potential_mixing_beta', 'x_qe_md_max_steps',
             'x_qe_input_potential_recalculated_file', 'x_qe_starting_density_file',
             'x_qe_starting_potential', 'x_qe_starting_charge_negative', 'x_qe_starting_wfc',
-            'x_qe_time_setup_cpu1_end', 'x_qe_per_process_mem', 'x_qe_gamma_algorithms']
+            'x_qe_time_setup_cpu1_end', 'x_qe_per_process_mem', 'x_qe_gamma_algorithms',
+            'x_qe_xc_functional_user_enforced']
         for key in names:
             val = run.get_header(key)
             if val is None:
@@ -2591,6 +2592,8 @@ class QuantumEspressoParser(FairdiParser):
         for pp in pseudopotential:
             sec_method_atom_kind = sec_method.m_create(MethodAtomKind)
             for key, val in pp.items():
+                if val is None:
+                    continue
                 if key == 'beta':
                     val = np.transpose(val)
                     sec_method_atom_kind.x_qe_pp_l_idx = val[0]
