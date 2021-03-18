@@ -1763,7 +1763,7 @@ class QuantumEspressoOutParser(TextParser):
                         'points',
                         rf'=\s*\(\s*({re_float}\s*{re_float}\s*{re_float})\)', repeats=True),
                     Quantity('wk', rf',\s*wk\s*=\s*({re_float})', repeats=True),
-                    Quantity('warning', 'Number of k-points >= 100: set verbosity')])),
+                    Quantity('warning', r'(Number of k-points >= 100: set verbosity)')])),
             Quantity(
                 'dense_grid',
                 rf'(?:G\s+cutoff\s*=\s*({re_float})\s*\(|Dense\s*grid:)\s*(\d+)\s*'
@@ -1961,7 +1961,7 @@ class QuantumEspressoOutParser(TextParser):
                 r'negative rho \(up, down\):\s*([\d\.E\-\+]+)\s*([\d\.E\-\+]+)', dtype=float),
             Quantity(
                 'total_time',
-                r'total cpu time spent up to now is\s*[\d\.]+', unit='seconds', repeats=True),
+                r'total cpu time spent up to now is\s*([\d\.]+)', unit='seconds', repeats=True),
         ]
 
         scf_quantities = [Quantity(
