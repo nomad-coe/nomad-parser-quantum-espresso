@@ -25,10 +25,10 @@ import os
 
 from .metainfo import m_env
 from nomad.parsing import FairdiParser
-from nomad.parsing.file_parser.text_parser import TextParser, Quantity
+from nomad.parsing.file_parser.text_parser import TextParser, Quantity, DataTextParser
 from nomad.datamodel.metainfo.common_dft import Run, Method, XCFunctionals,\
     SingleConfigurationCalculation, ScfIteration, System, Eigenvalues, BasisSetCellDependent,\
-    MethodBasisSet, MethodAtomKind, SamplingMethod
+    MethodBasisSet, MethodAtomKind, SamplingMethod, Dos
 from .metainfo.quantum_espresso import x_qe_section_scf_diagonalization,\
     x_qe_section_bands_diagonalization, x_qe_section_compile_options, x_qe_section_parallel
 
@@ -1400,17 +1400,16 @@ class QuantumEspressoRunParser(TextParser):
         xc_section_method = dict()
         xc_terms = dict()
         xc_terms_remove = dict()
-        xc_names = [
-            'exchange', 'correlation', 'exchange_gradient_correction',
-            'correlation_gradient_correction', 'van_der_waals', 'meta_gga']
-
+        # xc_names = [
+        #     'exchange', 'correlation', 'exchange_gradient_correction',
+        #     'correlation_gradient_correction', 'van_der_waals', 'meta_gga']
         for i in range(6):
             xc_component = self._xc_functional_map[i]
             xc_number = numbers_split[i]
             if xc_number >= len(xc_component) or xc_component[xc_number] is None:
-                self.logger.warn(
-                    'Cannot resolve XC functional',
-                    data=dict(name=xc_names[i], index=xc_number))
+                # self.logger.warn(
+                #     'Cannot resolve XC functional',
+                #     data=dict(name=xc_names[i], index=xc_number))
                 continue
             xc_section_method.update(xc_component[xc_number]['xc_section_method'])
             xc_terms.update(get_data(xc_component[xc_number]['xc_terms']))
@@ -1840,7 +1839,7 @@ class QuantumEspressoOutParser(TextParser):
             'energy_total': rf'total energy\s*=\s*({re_float})',
             'x_qe_energy_total_harris_foulkes_estimate': rf'Harris-Foulkes estimate\s*=\s*({re_float})',
             'x_qe_energy_total_accuracy_estimate': rf'estimated scf accuracy\s*<\s*({re_float})',
-            'x_qe_energy_total_paw_all_electron': rf'estimated scf accuracy\s*<\s*({re_float})'
+            'x_qe_energy_total_paw_all_electron': rf'total all-electron energy\s*=\s*({re_float})'
         }
 
         energy_quantities = [Quantity(
@@ -2117,11 +2116,13 @@ class QuantumEspressoParser(FairdiParser):
             mainfile_contents_re=(r'(Program PWSCF.*starts)|(Current dimensions of program PWSCF are)'))
         self._metainfo_env = m_env
         self.out_parser = QuantumEspressoOutParser()
+        self.dos_parser = DataTextParser()
         self.smearing_map = {
             '-99': 'fermi', '-1': 'marzari-vanderbilt', '0': 'gaussian',
             '1': 'methfessel-paxton', 'Marzari-Vanderbilt': 'marzari-vanderbilt',
             'Methfessel-Paxton': 'methfessel-paxton', 'gaussian': 'gaussian',
             'Fermi-Dirac': 'fermi', 'tetrahedron': 'tetrahedra'}
+        self._re_label = re.compile(r'([A-Z][a-z]?)')
 
     def parse_scc(self, run, calculation):
         sec_run = self.archive.section_run[-1]
@@ -2339,7 +2340,7 @@ class QuantumEspressoParser(FairdiParser):
             return
 
         sec_system = sec_run.m_create(System)
-        sec_system.atom_labels = labels_positions[0]
+        sec_system.atom_labels = [self._re_label.match(label).group(1) for label in labels_positions[0]]
         sec_system.atom_positions = labels_positions[1]
 
         simulation_cell = _convert('simulation_cell', calculation)
@@ -2369,11 +2370,6 @@ class QuantumEspressoParser(FairdiParser):
             magnetization = {m[0]: m[1] for m in starting_magnetization}
             sec_system.x_qe_atom_starting_magnetization = [
                 magnetization.get(atom, 0.0) for atom in labels_positions[0]]
-
-        # for key in []:
-        #     val = calculation.get(key)
-        #     if val is not None:
-        #         setattr(sec_system, 'x_qe_%s' % key, val)
 
         k_points = calculation.get(
             'k_points', run.get_header('k_points', {}).get('points'))
@@ -2472,6 +2468,20 @@ class QuantumEspressoParser(FairdiParser):
                 for calculation in sampling.get('self_consistent', []):
                     parse_configuration(calculation)
             # TODO include additional method-specific metainfo
+
+        # dos
+        dos_files = [p for p in os.listdir(self.out_parser.maindir) if p.endswith('.dos')]
+        for dos_file in dos_files:
+            self.dos_parser.mainfile = os.path.join(self.out_parser.maindir, dos_file)
+            if self.dos_parser.data is not None:
+                sec_dos = sec_run.section_single_configuration_calculation[-1].m_create(Dos)
+                data = np.transpose(self.dos_parser.data)
+                nspin = run.get_number_of_spin_channels()
+                energies = np.reshape(data[0], (nspin, len(data[0]) // nspin))
+                sec_dos.dos_energies = pint.Quantity(energies[0], 'eV')
+                dos = np.reshape(data[1], (nspin, len(energies[0])))
+                sec_dos.dos_values = pint.Quantity(dos, '1/eV').to('1/J').magnitude
+                sec_dos.dos_integrated_values = np.reshape(data[2], (nspin, len(energies[0])))
 
     def parse_method(self, run):
         sec_method = self.archive.section_run[-1].m_create(Method)
@@ -2648,6 +2658,8 @@ class QuantumEspressoParser(FairdiParser):
     def init_parser(self):
         self.out_parser.mainfile = self.filepath
         self.out_parser.logger = self.logger
+        self.dos_parser.mainfile = self.filepath
+        self.dos_parser.logger = self.logger
 
     def parse(self, filepath, archive, logger):
         self.filepath = filepath
