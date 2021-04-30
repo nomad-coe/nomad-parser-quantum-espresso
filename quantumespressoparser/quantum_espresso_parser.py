@@ -1469,9 +1469,15 @@ class QuantumEspressoOutParser(TextParser):
             return pressure, stress
 
         def str_to_labels_positions(val_in):
-            val = [v.split()[:4] for v in val_in.strip().split('\n')]
-            val = np.transpose([v for v in val if v[1][0].isdecimal()])
-            return val[0], pint.Quantity(np.array(val[1:], dtype=float).T, 'angstrom')
+            units = re.search(r'ATOMIC_POSITIONS \((.+)\)', val_in)
+            out = dict()
+            if units:
+                out['units'] = units.group(1)
+            val = [v.split()[:4] for v in val_in.strip().split('\n')[1:]]
+            val = np.transpose([v for v in val if v[1][-1].isdecimal()])
+            out['labels'] = val[0]
+            out['positions'] = np.array(val[1:], dtype=float).T
+            return out
 
         def str_to_atom_data(val_in):
             val = [v.replace('(', ' ').replace(')', ' ').split() for v in val_in.strip().split('\n')]
@@ -1922,7 +1928,7 @@ class QuantumEspressoOutParser(TextParser):
                 dtype=float, shape=(3, 3)),
             Quantity(
                 'labels_positions',
-                r'ATOMIC_POSITIONS \(angstrom\)([\s\S]+?)\n\n',
+                r'(ATOMIC_POSITIONS \(.+\)[\s\S]+?)\n\n',
                 str_operation=str_to_labels_positions, convert=False),
             Quantity(
                 'starting_magnetization',
@@ -2333,9 +2339,9 @@ class QuantumEspressoParser(FairdiParser):
         if labels_positions is None:
             # get it from header
             labels_positions = run.get_header('labels_positions')
-            if labels_positions is not None:
-                labels_positions = (
-                    labels_positions.get('labels'), _convert('positions', labels_positions))
+        if labels_positions is not None:
+            labels_positions = (
+                labels_positions.get('labels'), _convert('positions', labels_positions))
         if labels_positions is None:
             return
 
