@@ -39,14 +39,14 @@ def test_scf(parser):
     sec_run = archive.section_run[0]
     assert sec_run.program_version == '5.2.1 (svn rev. 11920)'
     assert sec_run.x_qe_input_filename == 'uspp1.in'
-    assert sec_run.time_run_date_start.magnitude == approx(1.45113728e+09)
+    assert sec_run.time_run_date_start.magnitude == 1451140876.0
     assert sec_run.x_qe_section_compile_options[0].x_qe_lmaxx == 3
     assert sec_run.x_qe_section_parallel[0].x_qe_nproc == 4
     assert sec_run.section_basis_set_cell_dependent[0].basis_set_cell_dependent_name == 'PW_25.0'
     assert sec_run.section_basis_set_cell_dependent[1].basis_set_planewave_cutoff.magnitude == approx(2.17987236e-16,)
     assert sec_run.section_sampling_method[0].sampling_method == 'geometry_optimization'
     assert 'rdiaghg' in sec_run.x_qe_profile_function
-    assert sec_run.time_run_date_end.magnitude == approx(1.45113728e+09)
+    assert sec_run.time_run_date_end.magnitude == 1451140881.0
     assert sec_run.run_clean_end
 
     sec_method = sec_run.section_method[0]

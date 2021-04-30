@@ -20,7 +20,7 @@ import logging
 import numpy as np
 import pint
 import re
-import time
+from datetime import datetime
 import os
 
 from .metainfo import m_env
@@ -2687,8 +2687,8 @@ class QuantumEspressoParser(FairdiParser):
 
             date_time = run.get('start_date_time')
             if date_time is not None:
-                date_time = time.strptime(date_time.replace(' ', ''), '%d%b%Y%H:%M:%S')
-                sec_run.time_run_date_start = time.mktime(date_time)
+                date_time = datetime.strptime(date_time.replace(' ', ''), '%d%b%Y%H:%M:%S')
+                sec_run.time_run_date_start = (date_time - datetime(1970, 1, 1)).total_seconds()
 
             sec_compile_options = sec_run.m_create(x_qe_section_compile_options)
             for key in ['compile_parallel_version', 'ntypx', 'npk', 'lmaxx', 'nchix', 'ndmx', 'nbrx']:
@@ -2728,8 +2728,8 @@ class QuantumEspressoParser(FairdiParser):
 
             date_time = run.get('end_date_time')
             if date_time is not None:
-                date_time = time.strptime(date_time.replace(' ', ''), '%H:%M:%S%d%b%Y')
-                sec_run.time_run_date_end = time.mktime(date_time)
+                date_time = datetime.strptime(date_time.replace(' ', ''), '%H:%M:%S%d%b%Y')
+                sec_run.time_run_date_end = (date_time - datetime(1970, 1, 1)).total_seconds()
 
             job_done = run.get('job_done')
             if job_done:
