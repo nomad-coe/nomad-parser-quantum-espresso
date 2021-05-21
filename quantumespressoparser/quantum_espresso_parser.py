@@ -18,12 +18,12 @@
 #
 import logging
 import numpy as np
-import pint
 import re
 from datetime import datetime
 import os
 
 from .metainfo import m_env
+from nomad.units import ureg
 from nomad.parsing import FairdiParser
 from nomad.parsing.file_parser.text_parser import TextParser, Quantity, DataTextParser
 from nomad.datamodel.metainfo.common_dft import Run, Method, XCFunctionals,\
@@ -1455,17 +1455,17 @@ class QuantumEspressoOutParser(TextParser):
     def init_quantities(self):
         def str_to_energy_contributions(val_in):
             val = [v.split('=') for v in val_in.strip().split('\n')]
-            return {v[0].strip(): pint.Quantity(float(v[1].split()[0]), 'rydberg') for v in val}
+            return {v[0].strip(): float(v[1].split()[0]) * ureg.rydberg for v in val}
 
         def str_to_forces(val_in):
             val = val_in.strip().split('\n')
             val = [v.split('=')[1].split() for v in val if 'force =' in v]
-            return pint.Quantity(np.array(val, dtype=float), 'rydberg/bohr')
+            return np.array(val, dtype=float) * ureg.rydberg / ureg.bohr
 
         def str_to_stress(val_in):
             val = [v.split() for v in val_in.strip().split('\n')]
-            pressure = pint.Quantity(float(val[0][0]), 'kilobar')
-            stress = pint.Quantity(np.array([v[3:6] for v in val[1:4]], dtype=float), 'kilobar')
+            pressure = float(val[0][0]) * ureg.kilobar
+            stress = np.array([v[3:6] for v in val[1:4]], dtype=float) * ureg.kilobar
             return pressure, stress
 
         def str_to_labels_positions(val_in):
@@ -2187,7 +2187,7 @@ class QuantumEspressoParser(FairdiParser):
             try:
                 eigenvalues = np.reshape(eigenvalues, (n_spin, len(k_points), n_eigs))
 
-                sec_eigenvalues.eigenvalues_values = pint.Quantity(eigenvalues, 'eV')
+                sec_eigenvalues.eigenvalues_values = eigenvalues * ureg.eV
                 sec_eigenvalues.eigenvalues_kpoints = k_points
 
                 number_of_planewaves = calculation.get('number_of_planewaves')
@@ -2210,16 +2210,16 @@ class QuantumEspressoParser(FairdiParser):
             lumo = None
             if isinstance(homo, list):
                 homo, lumo = homo
-            sec_scc.energy_reference_highest_occupied = pint.Quantity([homo], 'eV')
+            sec_scc.energy_reference_highest_occupied = [homo] * ureg.eV
             if lumo is not None:
-                sec_scc.energy_reference_lowest_unoccupied = pint.Quantity(lumo, 'eV')
+                sec_scc.energy_reference_lowest_unoccupied = [lumo] * ureg.eV
 
         # fermi energy
         fermi_energy = calculation.get('fermi_energy')
         if fermi_energy is not None:
             fermi_energy = [fermi_energy] if isinstance(fermi_energy, float) else fermi_energy
             if np.array(fermi_energy).dtype == float:
-                sec_scc.energy_reference_fermi = pint.Quantity(fermi_energy, 'eV')
+                sec_scc.energy_reference_fermi = fermi_energy * ureg.eV
 
         n_electrons = run.get_header('number_of_electrons')
         if homo is None and fermi_energy is None and n_electrons is None:
@@ -2320,6 +2320,7 @@ class QuantumEspressoParser(FairdiParser):
 
     def parse_system(self, run, calculation):
         def _convert(key, source, units_key='units', units=None):
+            units_mapping = dict(bohr=ureg.bohr, angstrom=ureg.angstrom)
             value = source.get(key)
             if value is None:
                 return
@@ -2329,7 +2330,7 @@ class QuantumEspressoParser(FairdiParser):
             if units in ['alat', 'a_0']:
                 value *= alat
             elif units in ['bohr', 'angstrom']:
-                value = pint.Quantity(value, units)
+                value = value * units_mapping.get(units)
             elif units == '2 pi/alat':
                 value *= (2 * np.pi / alat)
             return value
@@ -2484,9 +2485,9 @@ class QuantumEspressoParser(FairdiParser):
                 data = np.transpose(self.dos_parser.data)
                 nspin = run.get_number_of_spin_channels()
                 energies = np.reshape(data[0], (nspin, len(data[0]) // nspin))
-                sec_dos.dos_energies = pint.Quantity(energies[0], 'eV')
+                sec_dos.dos_energies = energies[0] * ureg.eV
                 dos = np.reshape(data[1], (nspin, len(energies[0])))
-                sec_dos.dos_values = pint.Quantity(dos, '1/eV').to('1/J').magnitude
+                sec_dos.dos_values = (dos / ureg.eV).to('1/J').magnitude
                 sec_dos.dos_integrated_values = np.reshape(data[2], (nspin, len(energies[0])))
 
     def parse_method(self, run):
@@ -2523,14 +2524,12 @@ class QuantumEspressoParser(FairdiParser):
         array = run.get_header('allocated_arrays', None)
         if array is not None:
             sec_method.x_qe_allocated_array_name = array[0]
-            sec_method.x_qe_allocated_array_size = pint.Quantity(
-                array[1], 'mebibyte').to('bit').magnitude
+            sec_method.x_qe_allocated_array_size = (array[1] * ureg.mebibyte).to('bit').magnitude
             sec_method.x_qe_allocated_array_dimensions = array[2]
         array = run.get_header('temporary_arrays', None)
         if array is not None:
             sec_method.x_qe_temporary_array_name = array[0]
-            sec_method.x_qe_temporary_array_size = pint.Quantity(
-                array[1], 'mebibyte').to('bit').magnitude
+            sec_method.x_qe_temporary_array_size = (array[1] * ureg.mebibyte).to('bit').magnitude
             sec_method.x_qe_temporary_array_dimensions = array[2]
 
         spin_orbit_mode = run.get_header('spin_orbit_mode')
@@ -2616,7 +2615,7 @@ class QuantumEspressoParser(FairdiParser):
             r[0]: ' '.join(r[1:]) for r in run.get_header('renormalized_wavefunction', [])}
 
         atom_radii = {
-            r[1]: pint.Quantity(r[0], 'bohr') for r in run.get_header('atom_radii', [])}
+            r[1]: r[0] * ureg.bohr for r in run.get_header('atom_radii', [])}
 
         atom_species = {r[3]: r for r in run.get_header('atom_species_pp', [])}
         atom_species_names = [
