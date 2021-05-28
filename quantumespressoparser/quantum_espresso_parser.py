@@ -28,7 +28,7 @@ from nomad.parsing import FairdiParser
 from nomad.parsing.file_parser.text_parser import TextParser, Quantity, DataTextParser
 from nomad.datamodel.metainfo.common_dft import Run, Method, XCFunctionals,\
     SingleConfigurationCalculation, ScfIteration, System, Eigenvalues, BasisSetCellDependent,\
-    MethodBasisSet, MethodAtomKind, SamplingMethod, Dos
+    MethodBasisSet, MethodAtomKind, SamplingMethod, Dos, DosValues
 from .metainfo.quantum_espresso import x_qe_section_scf_diagonalization,\
     x_qe_section_bands_diagonalization, x_qe_section_compile_options, x_qe_section_parallel
 
@@ -2481,14 +2481,18 @@ class QuantumEspressoParser(FairdiParser):
         for dos_file in dos_files:
             self.dos_parser.mainfile = os.path.join(self.out_parser.maindir, dos_file)
             if self.dos_parser.data is not None:
-                sec_dos = sec_run.section_single_configuration_calculation[-1].m_create(Dos)
+                sec_dos = sec_run.section_single_configuration_calculation[-1].m_create(Dos, SingleConfigurationCalculation.dos_electronic)
                 data = np.transpose(self.dos_parser.data)
                 nspin = run.get_number_of_spin_channels()
                 energies = np.reshape(data[0], (nspin, len(data[0]) // nspin))
                 sec_dos.dos_energies = energies[0] * ureg.eV
                 dos = np.reshape(data[1], (nspin, len(energies[0])))
-                sec_dos.dos_values = (dos / ureg.eV).to('1/J').magnitude
-                sec_dos.dos_integrated_values = np.reshape(data[2], (nspin, len(energies[0])))
+                integrated = np.reshape(data[2], (nspin, len(energies[0])))
+                for spin in range(len(dos)):
+                    sec_dos_values = sec_dos.m_create(DosValues, Dos.dos_total)
+                    sec_dos_values.dos_spin = spin
+                    sec_dos_values.dos_values = (dos[spin] / ureg.eV).to('1/J').magnitude
+                    sec_dos_values.dos_integrated = integrated[spin]
 
     def parse_method(self, run):
         sec_method = self.archive.section_run[-1].m_create(Method)

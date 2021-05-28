@@ -135,9 +135,9 @@ def test_dos(parser):
     archive = EntryArchive()
     parser.parse('tests/data/W_dos/w.dos.out', archive, None)
 
-    sec_dos = archive.section_run[0].section_single_configuration_calculation[0].section_dos[0]
-    assert np.shape(sec_dos.dos_values) == (1, 1801)
+    sec_dos = archive.section_run[0].section_single_configuration_calculation[0].dos_electronic[0]
+    assert np.shape(sec_dos.dos_total[0].dos_values) == (1801,)
     assert len(sec_dos.dos_energies) == 1801
     assert sec_dos.dos_energies[269].magnitude == approx(1.23207383e-18)
-    assert sec_dos.dos_values[0][150] == approx(2.8991809650870246e+17)
-    assert sec_dos.dos_integrated_values[0][1316] == 8.582
+    assert sec_dos.dos_total[0].dos_values[150] == approx(2.8991809650870246e+17)
+    assert sec_dos.dos_total[0].dos_integrated[1316] == 8.582
