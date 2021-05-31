@@ -22,8 +22,6 @@ import re
 from datetime import datetime
 import os
 
-from numpy.linalg import eig
-
 from .metainfo import m_env
 from nomad.units import ureg
 from nomad.parsing import FairdiParser
