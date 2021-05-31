@@ -3293,13 +3293,13 @@ class section_scf_iteration(public.section_scf_iteration):
         a_legacy=LegacyDefinition(name='x_qe_section_scf_diagonalization'))
 
 
-class section_eigenvalues(public.section_eigenvalues):
+class section_eigenvalues(public.BandEnergies):
 
     m_def = Section(validate=False, extends_base_section=True, a_legacy=LegacyDefinition(name='section_eigenvalues'))
 
     x_qe_eigenvalues_number_of_planewaves = Quantity(
         type=np.dtype(np.int32),
-        shape=['number_of_eigenvalues_kpoints'],
+        shape=['n_band_energies_kpoints'],
         description='''
         Number of plane waves for each k-point
         ''',

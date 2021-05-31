@@ -84,9 +84,9 @@ def test_scf(parser):
     assert sec_scc.x_qe_energy_decomposition_value[1] == approx(7.42289975e-17)
     assert sec_scc.atom_forces_raw[1][1].magnitude == approx(-3.57815176e-10)
     assert sec_scc.stress_tensor[2][2].magnitude == approx(-1.68e+08)
-    assert np.shape(sec_scc.section_eigenvalues[0].eigenvalues_kpoints) == (1, 3)
-    assert np.shape(sec_scc.section_eigenvalues[0].eigenvalues_values) == (1, 1, 4)
-    assert sec_scc.section_eigenvalues[0].eigenvalues_values[0][0][2].magnitude == approx(-1.42427094e-18)
+    assert np.shape(sec_scc.eigenvalues[0].band_energies_kpoints) == (1, 3)
+    assert np.shape(sec_scc.eigenvalues[0].band_energies[0].band_energies_values) == (4,)
+    assert sec_scc.eigenvalues[0].band_energies[0].band_energies_values[2].magnitude == approx(-1.42427094e-18)
     assert sec_scc.energy_reference_highest_occupied.magnitude == approx(-1.15444837e-18)
     assert sec_scc.x_qe_output_datafile == 'pwscf.save'
     sec_scfs = sec_scc.section_scf_iteration
@@ -108,15 +108,15 @@ def test_multirun(parser):
     assert len(sec_runs[1].section_single_configuration_calculation[0].section_scf_iteration) == 111
     assert sec_runs[2].section_single_configuration_calculation[0].section_scf_iteration[45].x_qe_iter_mpersite_magn[6] == -0.3325
     assert sec_runs[0].section_system[0].x_qe_atom_starting_magnetization[1] == 0.133
-    assert np.shape(sec_runs[0].section_single_configuration_calculation[0].section_eigenvalues[0].eigenvalues_values) == (2, 20, 100)
-    assert np.shape(sec_runs[1].section_single_configuration_calculation[0].section_eigenvalues[0].eigenvalues_values) == (2, 20, 100)
-    assert np.shape(sec_runs[2].section_single_configuration_calculation[0].section_eigenvalues[0].eigenvalues_values) == (2, 20, 100)
-    assert len(sec_runs[0].section_single_configuration_calculation[0].section_eigenvalues[0].eigenvalues_kpoints) == 20
-    assert len(sec_runs[1].section_single_configuration_calculation[0].section_eigenvalues[0].eigenvalues_kpoints) == 20
-    assert len(sec_runs[2].section_single_configuration_calculation[0].section_eigenvalues[0].eigenvalues_kpoints) == 20
-    assert sec_runs[0].section_single_configuration_calculation[0].section_eigenvalues[0].eigenvalues_kpoints[10][1] == approx(-0.1667096)
-    assert sec_runs[1].section_single_configuration_calculation[0].section_eigenvalues[0].eigenvalues_values[0][3][-5].magnitude == approx(1.42385437e-19)
-    assert sec_runs[2].section_single_configuration_calculation[0].section_eigenvalues[0].eigenvalues_values.magnitude[1][-10][35] == approx(-7.25180392e-18)
+    assert np.shape(sec_runs[0].section_single_configuration_calculation[0].eigenvalues[0].band_energies[39].band_energies_values) == (100,)
+    assert np.shape(sec_runs[1].section_single_configuration_calculation[0].eigenvalues[0].band_energies[39].band_energies_values) == (100,)
+    assert np.shape(sec_runs[2].section_single_configuration_calculation[0].eigenvalues[0].band_energies[39].band_energies_values) == (100,)
+    assert len(sec_runs[0].section_single_configuration_calculation[0].eigenvalues[0].band_energies_kpoints) == 20
+    assert len(sec_runs[1].section_single_configuration_calculation[0].eigenvalues[0].band_energies_kpoints) == 20
+    assert len(sec_runs[2].section_single_configuration_calculation[0].eigenvalues[0].band_energies_kpoints) == 20
+    assert sec_runs[0].section_single_configuration_calculation[0].eigenvalues[0].band_energies_kpoints[10][1] == approx(-0.1667096)
+    assert sec_runs[1].section_single_configuration_calculation[0].eigenvalues[0].band_energies[3].band_energies_values[-5].magnitude == approx(1.42385437e-19)
+    assert sec_runs[2].section_single_configuration_calculation[0].eigenvalues[0].band_energies[30].band_energies_values.magnitude[35] == approx(-7.25180392e-18)
 
 
 def test_md(parser):
