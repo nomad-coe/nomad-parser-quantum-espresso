@@ -2190,7 +2190,7 @@ class QuantumEspressoParser(FairdiParser):
                 if occupations is not None:
                     occupations = np.reshape(occupations, (n_spin, len(k_points), n_eigs))
 
-                sec_eigenvalues.band_energies_kpoints = k_points
+                sec_eigenvalues.kpoints = k_points
 
                 number_of_planewaves = calculation.get('number_of_planewaves')
                 if number_of_planewaves is not None:
@@ -2201,11 +2201,11 @@ class QuantumEspressoParser(FairdiParser):
                 for spin in range(len(eigenvalues)):
                     for kpt in range(len(eigenvalues[spin])):
                         sec_eigenvalues_values = sec_eigenvalues.m_create(BandEnergiesValues)
-                        sec_eigenvalues_values.band_energies_spin = spin
-                        sec_eigenvalues_values.band_energies_kpoints_index = kpt
-                        sec_eigenvalues_values.band_energies_values = eigenvalues[spin][kpt]
+                        sec_eigenvalues_values.spin = spin
+                        sec_eigenvalues_values.kpoints_index = kpt
+                        sec_eigenvalues_values.value = eigenvalues[spin][kpt]
                         if occupations is not None:
-                            sec_eigenvalues.eigenvalues_occupation = occupations[spin][kpt]
+                            sec_eigenvalues.occupations = occupations[spin][kpt]
 
             except Exception:
                 self.logger.warn('Error reading eigenvalues.')
