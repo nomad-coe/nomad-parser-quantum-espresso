@@ -79,11 +79,11 @@ def test_scf(parser):
     assert sec_system.number_of_electrons[0] == 8
 
     sec_scc = sec_run.section_single_configuration_calculation[0]
-    assert sec_scc.energy_total.magnitude == approx(-7.49748432e-17)
+    assert sec_scc.energy_total.value.magnitude == approx(-7.49748432e-17)
     assert 'ewald contribution' in sec_scc.x_qe_energy_decomposition_name
     assert sec_scc.x_qe_energy_decomposition_value[1] == approx(7.42289975e-17)
-    assert sec_scc.atom_forces_raw[1][1].magnitude == approx(-3.57815176e-10)
-    assert sec_scc.stress_tensor[2][2].magnitude == approx(-1.68e+08)
+    assert sec_scc.forces_total.value_raw[1][1].magnitude == approx(-3.57815176e-10)
+    assert sec_scc.stress_total.value[2][2].magnitude == approx(-1.68e+08)
     assert np.shape(sec_scc.eigenvalues[0].kpoints) == (1, 3)
     assert np.shape(sec_scc.eigenvalues[0].band_energies[0].value) == (4,)
     assert sec_scc.eigenvalues[0].band_energies[0].value[2].magnitude == approx(-1.42427094e-18)
@@ -127,7 +127,7 @@ def test_md(parser):
     sec_sccs = archive.section_run[0].section_single_configuration_calculation
     assert len(sec_sccs) == 50
     assert archive.section_run[0].section_system[6].atom_positions[1][2].magnitude == approx(6.66987013e-11)
-    assert sec_sccs[-3].atom_forces_raw[1][1].magnitude == approx(9.55685747e-10)
+    assert sec_sccs[-3].forces_total.value_raw[1][1].magnitude == approx(9.55685747e-10)
     assert len(sec_sccs[22].section_scf_iteration) == 3
 
 

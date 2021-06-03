@@ -28,7 +28,8 @@ from nomad.parsing import FairdiParser
 from nomad.parsing.file_parser.text_parser import TextParser, Quantity, DataTextParser
 from nomad.datamodel.metainfo.common_dft import Run, Method, XCFunctionals,\
     SingleConfigurationCalculation, ScfIteration, System, BandEnergies, BandEnergiesValues,\
-    BasisSetCellDependent, MethodBasisSet, MethodAtomKind, SamplingMethod, Dos, DosValues
+    BasisSetCellDependent, MethodBasisSet, MethodAtomKind, SamplingMethod, Dos, DosValues,\
+    Energy, Forces, Stress
 from .metainfo.quantum_espresso import x_qe_section_scf_diagonalization,\
     x_qe_section_bands_diagonalization, x_qe_section_compile_options, x_qe_section_parallel
 
@@ -2139,7 +2140,11 @@ class QuantumEspressoParser(FairdiParser):
         for key, val in energies.items():
             if val is None:
                 continue
-            setattr(sec_scc, key, val.to('joule').magnitude)
+            if key.startswith('energy_'):
+                sec_scc.m_add_sub_section(getattr(
+                    SingleConfigurationCalculation, key), Energy(value=val))
+            else:
+                setattr(sec_scc, key, val.to('joule').magnitude)
 
         # enery contributions
         energy_contributions = calculation.get('energy_contributions')
@@ -2151,7 +2156,8 @@ class QuantumEspressoParser(FairdiParser):
         # forces
         forces = calculation.get('forces')
         if forces is not None:
-            sec_scc.atom_forces_raw = forces
+            sec_scc.m_add_sub_section(
+                SingleConfigurationCalculation.forces_total, Forces(value_raw=forces))
         total_force = calculation.get('total_force')
         if total_force is not None:
             total_force = total_force.to('newton').magnitude
@@ -2167,8 +2173,9 @@ class QuantumEspressoParser(FairdiParser):
         # stress
         stress = calculation.get('stress')
         if stress is not None:
-            sec_scc.x_qe_pressure = stress[0].to('pascal').magnitude
-            sec_scc.stress_tensor = stress[1]
+            sec_scc.pressure = stress[0].to('pascal')
+            sec_scc.m_add_sub_section(SingleConfigurationCalculation.stress_total, Stress(
+                value=stress[1]))
 
         # eigenvalues
         eigenvalues = calculation.get('band_energies')
