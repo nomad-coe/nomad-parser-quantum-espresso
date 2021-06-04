@@ -27,7 +27,7 @@ from nomad.units import ureg
 from nomad.parsing import FairdiParser
 from nomad.parsing.file_parser.text_parser import TextParser, Quantity, DataTextParser
 from nomad.datamodel.metainfo.common_dft import Run, Method, XCFunctionals,\
-    SingleConfigurationCalculation, ScfIteration, System, BandEnergies, BandEnergiesValues,\
+    SingleConfigurationCalculation, ScfIteration, System, BandEnergies,\
     BasisSetCellDependent, MethodBasisSet, MethodAtomKind, SamplingMethod, Dos, DosValues,\
     Energy, Forces, Stress
 from .metainfo.quantum_espresso import x_qe_section_scf_diagonalization,\
@@ -2204,15 +2204,9 @@ class QuantumEspressoParser(FairdiParser):
                     number_of_planewaves = np.reshape(
                         number_of_planewaves, (n_spin, len(number_of_planewaves) // n_spin))
                     sec_eigenvalues.x_qe_eigenvalues_number_of_planewaves = number_of_planewaves[0]
-
-                for spin in range(len(eigenvalues)):
-                    for kpt in range(len(eigenvalues[spin])):
-                        sec_eigenvalues_values = sec_eigenvalues.m_create(BandEnergiesValues)
-                        sec_eigenvalues_values.spin = spin
-                        sec_eigenvalues_values.kpoints_index = kpt
-                        sec_eigenvalues_values.value = eigenvalues[spin][kpt]
-                        if occupations is not None:
-                            sec_eigenvalues.occupations = occupations[spin][kpt]
+                sec_eigenvalues.value = eigenvalues
+                if occupations is not None:
+                    sec_eigenvalues.occupations = occupations
 
             except Exception:
                 self.logger.warn('Error reading eigenvalues.')
