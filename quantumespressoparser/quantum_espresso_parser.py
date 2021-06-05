@@ -2287,8 +2287,9 @@ class QuantumEspressoParser(FairdiParser):
                 if val is None:
                     continue
                 if key == 'energy_total':
-                    key = '%s_scf' % key
-                setattr(sec_scf_iteration, '%s_iteration' % key, val.to('joule').magnitude)
+                    sec_scf_iteration.energy_total = Energy(value=val)
+                else:
+                    setattr(sec_scf_iteration, '%s_iteration' % key, val.to('joule').magnitude)
 
             for key in ['number', 'ecutwfc', 'beta']:
                 val = iteration.get(key)
@@ -2314,7 +2315,7 @@ class QuantumEspressoParser(FairdiParser):
 
             time = iteration.get('total_time')
             if time is not None:
-                sec_scf_iteration.time_scf_iteration_cpu1_end = time
+                sec_scf_iteration.time_calculation = time
 
             parse_diagonalization(iteration, sec_scf_iteration)
 

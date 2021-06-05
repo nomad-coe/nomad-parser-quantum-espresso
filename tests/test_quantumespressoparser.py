@@ -89,12 +89,12 @@ def test_scf(parser):
     assert sec_scc.eigenvalues[0].value[0][0][2].magnitude == approx(-1.42427094e-18)
     assert sec_scc.energy_reference_highest_occupied.magnitude == approx(-1.15444837e-18)
     assert sec_scc.x_qe_output_datafile == 'pwscf.save'
-    sec_scfs = sec_scc.section_scf_iteration
+    sec_scfs = sec_scc.scf_iteration
     assert len(sec_scfs) == 8
-    assert sec_scfs[4].energy_total_scf_iteration.magnitude == approx(-7.49748038e-17)
+    assert sec_scfs[4].energy_total.value.magnitude == approx(-7.49748038e-17)
     assert sec_scfs[1].x_qe_energy_total_accuracy_estimate_iteration == approx(1.15623477e-18)
     assert sec_scfs[6].x_qe_iteration_ecutwfc == approx(5.4496809027589626e-17)
-    assert sec_scfs[0].time_scf_iteration_cpu1_end.magnitude == 1.2
+    assert sec_scfs[0].time_calculation.magnitude == 1.2
     assert sec_scfs[3].x_qe_iteration_charge_negative_up == 0.06614
 
 
@@ -105,8 +105,8 @@ def test_multirun(parser):
     sec_runs = archive.section_run
     assert len(sec_runs) == 3
     assert sec_runs[0].section_method[0].smearing_width == approx(2.3978595972139434e-20)
-    assert len(sec_runs[1].section_single_configuration_calculation[0].section_scf_iteration) == 111
-    assert sec_runs[2].section_single_configuration_calculation[0].section_scf_iteration[45].x_qe_iter_mpersite_magn[6] == -0.3325
+    assert len(sec_runs[1].section_single_configuration_calculation[0].scf_iteration) == 111
+    assert sec_runs[2].section_single_configuration_calculation[0].scf_iteration[45].x_qe_iter_mpersite_magn[6] == -0.3325
     assert sec_runs[0].section_system[0].x_qe_atom_starting_magnetization[1] == 0.133
     assert np.shape(sec_runs[0].section_single_configuration_calculation[0].eigenvalues[0].value[1][19]) == (100,)
     assert np.shape(sec_runs[1].section_single_configuration_calculation[0].eigenvalues[0].value[1][19]) == (100,)
@@ -128,7 +128,7 @@ def test_md(parser):
     assert len(sec_sccs) == 50
     assert archive.section_run[0].section_system[6].atom_positions[1][2].magnitude == approx(6.66987013e-11)
     assert sec_sccs[-3].forces_total.value_raw[1][1].magnitude == approx(9.55685747e-10)
-    assert len(sec_sccs[22].section_scf_iteration) == 3
+    assert len(sec_sccs[22].scf_iteration) == 3
 
 
 def test_dos(parser):
