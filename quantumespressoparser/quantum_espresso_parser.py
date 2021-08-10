@@ -22,16 +22,25 @@ import re
 from datetime import datetime
 import os
 
-from .metainfo import m_env
 from nomad.units import ureg
 from nomad.parsing import FairdiParser
 from nomad.parsing.file_parser.text_parser import TextParser, Quantity, DataTextParser
-from nomad.datamodel.metainfo.common_dft import Run, Method, XCFunctionals,\
-    SingleConfigurationCalculation, ScfIteration, System, BandEnergies,\
-    BasisSetCellDependent, MethodBasisSet, MethodAtomKind, SamplingMethod, Dos, DosValues,\
-    Energy, Forces, Stress
-from .metainfo.quantum_espresso import x_qe_section_scf_diagonalization,\
-    x_qe_section_bands_diagonalization, x_qe_section_compile_options, x_qe_section_parallel
+from nomad.datamodel.metainfo.run.run import Run, Program, TimeRun
+from nomad.datamodel.metainfo.run.method import (
+    Electronic, Method, DFT, Smearing, XCFunctional, Functional, BasisSet,
+    BasisSetCellDependent, AtomParameters
+)
+from nomad.datamodel.metainfo.run.system import (
+    System, Atoms
+)
+from nomad.datamodel.metainfo.run.calculation import (
+    Calculation, Energy, EnergyEntry, Forces, ForcesEntry, Stress, StressEntry,
+    Thermodynamics, BandEnergies, ScfIteration, Dos, DosValues
+)
+from nomad.datamodel.metainfo.workflow import Workflow
+from .metainfo.quantum_espresso import (
+    x_qe_section_scf_diagonalization, x_qe_section_bands_diagonalization,
+    x_qe_section_compile_options, x_qe_section_parallel)
 
 
 # origin: espresso-5.4.0/Modules/funct.f90
@@ -2121,7 +2130,6 @@ class QuantumEspressoParser(FairdiParser):
             name='parsers/quantumespresso', code_name='Quantum Espresso',
             code_homepage='https://www.quantum-espresso.org/',
             mainfile_contents_re=(r'(Program PWSCF.*starts)|(Current dimensions of program PWSCF are)'))
-        self._metainfo_env = m_env
         self.out_parser = QuantumEspressoOutParser()
         self.dos_parser = DataTextParser()
         self.smearing_map = {
@@ -2132,17 +2140,18 @@ class QuantumEspressoParser(FairdiParser):
         self._re_label = re.compile(r'([A-Z][a-z]?)')
 
     def parse_scc(self, run, calculation):
-        sec_run = self.archive.section_run[-1]
-        sec_scc = sec_run.m_create(SingleConfigurationCalculation)
+        sec_run = self.archive.run[-1]
+        sec_scc = sec_run.m_create(Calculation)
 
         # energies
         energies = calculation.get('energies', {})
+        sec_energy = sec_scc.m_create(Energy)
         for key, val in energies.items():
             if val is None:
                 continue
             if key.startswith('energy_'):
-                sec_scc.m_add_sub_section(getattr(
-                    SingleConfigurationCalculation, key), Energy(value=val))
+                sec_energy.m_add_sub_section(getattr(
+                    Energy, key.replace('energy_', '').lower()), EnergyEntry(value=val))
             else:
                 setattr(sec_scc, key, val.to('joule').magnitude)
 
@@ -2156,8 +2165,7 @@ class QuantumEspressoParser(FairdiParser):
         # forces
         forces = calculation.get('forces')
         if forces is not None:
-            sec_scc.m_add_sub_section(
-                SingleConfigurationCalculation.forces_total, Forces(value_raw=forces))
+            sec_scc.forces = Forces(total=ForcesEntry(value_raw=forces))
         total_force = calculation.get('total_force')
         if total_force is not None:
             total_force = total_force.to('newton').magnitude
@@ -2171,11 +2179,11 @@ class QuantumEspressoParser(FairdiParser):
             sec_scc.x_qe_dispersion_force_total = total_force.to('newton').magnitude
 
         # stress
+        sec_thermo = sec_scc.m_create(Thermodynamics)
         stress = calculation.get('stress')
         if stress is not None:
-            sec_scc.pressure = stress[0].to('pascal')
-            sec_scc.m_add_sub_section(SingleConfigurationCalculation.stress_total, Stress(
-                value=stress[1]))
+            sec_thermo.pressure = stress[0].to('pascal')
+            sec_scc.stress = Stress(total=StressEntry(value=stress[1]))
 
         # eigenvalues
         eigenvalues = calculation.get('band_energies')
@@ -2188,7 +2196,7 @@ class QuantumEspressoParser(FairdiParser):
 
             # convert k_points from cartesial to crystal coordinates
             k_points *= 2 * np.pi / run.get_header('alat').to('m').magnitude
-            reciprocal_cell = sec_run.section_system[-1].x_qe_reciprocal_cell.to('1/m').magnitude
+            reciprocal_cell = sec_run.system[-1].x_qe_reciprocal_cell.to('1/m').magnitude
             k_points = np.dot(np.linalg.inv(reciprocal_cell), k_points.T).T
 
             try:
@@ -2217,16 +2225,16 @@ class QuantumEspressoParser(FairdiParser):
             lumo = None
             if isinstance(homo, list):
                 homo, lumo = homo
-            sec_scc.energy_reference_highest_occupied = [homo] * ureg.eV
+            sec_energy.highest_occupied = [homo] * ureg.eV
             if lumo is not None:
-                sec_scc.energy_reference_lowest_unoccupied = [lumo] * ureg.eV
+                sec_energy.lowest_unoccupied = [lumo] * ureg.eV
 
         # fermi energy
         fermi_energy = calculation.get('fermi_energy')
         if fermi_energy is not None:
             fermi_energy = [fermi_energy] if isinstance(fermi_energy, float) else fermi_energy
             if np.array(fermi_energy).dtype == float:
-                sec_scc.energy_reference_fermi = fermi_energy * ureg.eV
+                sec_energy.fermi = fermi_energy * ureg.eV
 
         n_electrons = run.get_header('number_of_electrons')
         if homo is None and fermi_energy is None and n_electrons is None:
@@ -2283,11 +2291,12 @@ class QuantumEspressoParser(FairdiParser):
             sec_scf_iteration = sec_scc.m_create(ScfIteration)
 
             energies = iteration.get('energies', {})
+            sec_scf_energy = sec_scf_iteration.m_create(Energy)
             for key, val in energies.items():
                 if val is None:
                     continue
                 if key == 'energy_total':
-                    sec_scf_iteration.energy_total = Energy(value=val)
+                    sec_scf_energy.total = EnergyEntry(value=val)
                 else:
                     setattr(sec_scf_iteration, '%s_iteration' % key, val.to('joule').magnitude)
 
@@ -2343,7 +2352,7 @@ class QuantumEspressoParser(FairdiParser):
                 value *= (2 * np.pi / alat)
             return value
 
-        sec_run = self.archive.section_run[-1]
+        sec_run = self.archive.run[-1]
         labels_positions = calculation.get('labels_positions')
         if labels_positions is None:
             # get it from header
@@ -2355,18 +2364,18 @@ class QuantumEspressoParser(FairdiParser):
             return
 
         sec_system = sec_run.m_create(System)
-        sec_system.atom_labels = [self._re_label.match(label).group(1) for label in labels_positions[0]]
-        sec_system.atom_positions = labels_positions[1]
+        sec_atoms = sec_system.m_create(Atoms)
+        sec_atoms.labels = [self._re_label.match(label).group(1) for label in labels_positions[0]]
+        sec_atoms.positions = labels_positions[1]
 
         simulation_cell = _convert('simulation_cell', calculation)
         if simulation_cell is None:
             # get it from headers
             simulation_cell = _convert('simulation_cell', run.get('header', {}))
         if simulation_cell is not None:
-            sec_system.simulation_cell = simulation_cell
-            sec_system.lattice_vectors = simulation_cell
+            sec_atoms.lattice_vectors = simulation_cell
 
-        sec_system.configuration_periodic_dimensions = [True, True, True]
+        sec_atoms.periodic = [True, True, True]
 
         reciprocal_cell = _convert('reciprocal_cell', calculation, 'reciprocal_cell_units')
         if reciprocal_cell is None and simulation_cell is not None:
@@ -2393,13 +2402,13 @@ class QuantumEspressoParser(FairdiParser):
             sec_system.x_qe_k_info_vec = k_points.to('1/m').magnitude
 
         # assign other info only to representative system
-        if len(sec_run.section_system) != 1:
+        if len(sec_run.system) != 1:
             return sec_system
 
         # TODO In old parser, celldm[0] is alat, I do not know why
         keys = [
             'x_qe_md_cell_mass', 'x_qe_celldm', 'x_qe_ibrav', 'alat', 'x_qe_cell_volume',
-            'x_qe_number_of_species', 'x_qe_number_of_states', 'number_of_atoms']
+            'x_qe_number_of_species', 'x_qe_number_of_states']
         for key in keys:
             val = run.get_header(key)
             if key == 'alat':
@@ -2441,16 +2450,10 @@ class QuantumEspressoParser(FairdiParser):
             sec_system.x_qe_supercell = True
             sec_system.x_qe_vec_supercell = supercell
 
-        number_of_electrons = run.get_header('number_of_electrons')
-        if number_of_electrons is not None:
-            number_of_electrons = [number_of_electrons] if isinstance(
-                number_of_electrons, float) else number_of_electrons
-            sec_system.number_of_electrons = number_of_electrons
-
         return sec_system
 
     def parse_configurations(self, run):
-        sec_run = self.archive.section_run[-1]
+        sec_run = self.archive.run[-1]
 
         def parse_configuration(calculation):
             sec_system = self.parse_system(run, calculation)
@@ -2459,7 +2462,7 @@ class QuantumEspressoParser(FairdiParser):
                 return
             if sec_system is not None:
                 sec_scc.single_configuration_calculation_to_system_ref = sec_system
-            sec_scc.single_configuration_to_calculation_method_ref = sec_run.section_method[-1]
+            sec_scc.single_configuration_to_calculation_method_ref = sec_run.method[-1]
 
         for calculation_type in ['self_consistent', 'bandstructure']:
             calculation = run.get(calculation_type)
@@ -2489,8 +2492,8 @@ class QuantumEspressoParser(FairdiParser):
         for dos_file in dos_files:
             self.dos_parser.mainfile = os.path.join(self.out_parser.maindir, dos_file)
             if self.dos_parser.data is not None:
-                sec_dos = sec_run.section_single_configuration_calculation[-1].m_create(
-                    Dos, SingleConfigurationCalculation.dos_electronic)
+                sec_dos = sec_run.calculation[-1].m_create(
+                    Dos, Calculation.dos_electronic)
                 data = np.transpose(self.dos_parser.data)
                 nspin = run.get_number_of_spin_channels()
                 energies = np.reshape(data[0], (nspin, len(data[0]) // nspin))
@@ -2504,7 +2507,9 @@ class QuantumEspressoParser(FairdiParser):
                     sec_dos_values.value_integrated = integrated[spin]
 
     def parse_method(self, run):
-        sec_method = self.archive.section_run[-1].m_create(Method)
+        sec_method = self.archive.run[-1].m_create(Method)
+        sec_dft = sec_method.m_create(DFT)
+        sec_electronic = sec_method.m_create(Electronic)
 
         g_vector_sticks = run.get_header('g_vector_sticks', {}).get('Sum', None)
         if g_vector_sticks is not None:
@@ -2520,10 +2525,22 @@ class QuantumEspressoParser(FairdiParser):
                 continue
             setattr(sec_method, key, val)
 
+        sec_xc_functional = sec_dft.m_create(XCFunctional)
         for xc_functional in xc_functionals:
-            sec_xc_functional = sec_method.m_create(XCFunctionals)
+            sec_functional = Functional()
             for key, val in xc_functional.items():
-                setattr(sec_xc_functional, key, val)
+                setattr(sec_functional, key.replace('XC_functional_', ''), val)
+            name = sec_functional.name
+            if name is None:
+                sec_xc_functional.contributions.append(sec_functional)
+            elif '_X_' in name or name.endswith('_X'):
+                sec_xc_functional.exchange.append(sec_functional)
+            elif '_C_' in name or name.endswith('_C'):
+                sec_xc_functional.correlation.append(sec_functional)
+            elif 'HYB' in name:
+                sec_xc_functional.hybrid.append(sec_functional)
+            else:
+                sec_xc_functional.contributions.append(sec_functional)
 
         xc_functional = run.get_header('xc_functional')
         if xc_functional is not None:
@@ -2532,7 +2549,7 @@ class QuantumEspressoParser(FairdiParser):
             sec_method.x_qe_xc_functional_num = num.strip().rstrip(')')
 
         # TODO identify if dft+u
-        sec_method.electronic_structure_method = 'DFT'
+        sec_electronic.method = 'DFT'
 
         array = run.get_header('allocated_arrays', None)
         if array is not None:
@@ -2572,14 +2589,15 @@ class QuantumEspressoParser(FairdiParser):
             sec_method.x_qe_potential_mixing_iterations = mixing_scheme[0]
             sec_method.x_qe_potential_mixing_scheme = mixing_scheme[1]
 
+        sec_smearing = sec_electronic.m_create(Smearing)
         smearing = run.get_header('k_points', {}).get('smearing', None)
         if smearing in self.smearing_map:
-            sec_method.smearing_kind = self.smearing_map[smearing]
+            sec_smearing.kind = self.smearing_map[smearing]
 
         smearing_width = run.get_header('k_points', {}).get('width', None)
         if smearing_width is not None:
             # TODO smearing width should have metainfo units
-            sec_method.smearing_width = smearing_width.to('joule').magnitude
+            sec_smearing.width = smearing_width.to('joule').magnitude
 
         martyna_tuckerman_parameters = run.get_header('martyna_tuckerman_parameters')
         if martyna_tuckerman_parameters is not None:
@@ -2605,14 +2623,10 @@ class QuantumEspressoParser(FairdiParser):
             cutoff = run.get_header('%s_cutoff' % name)
             if cutoff is None:
                 continue
-            sec_basis_set = self.archive.section_run[-1].m_create(BasisSetCellDependent)
-            sec_basis_set.basis_set_planewave_cutoff = cutoff
-            sec_basis_set.basis_set_cell_dependent_kind = 'plane_waves'
-            sec_basis_set.basis_set_cell_dependent_name = 'PW_%.1f' % cutoff.magnitude
-
-            sec_method_basis_set = sec_method.m_create(MethodBasisSet)
-            sec_method_basis_set.mapping_section_method_basis_set_cell_associated = sec_basis_set
-            sec_method_basis_set.method_basis_set_kind = name
+            sec_basis_set = sec_method.m_create(BasisSet)
+            sec_basis_set.kind = name
+            sec_basis_set.cell_dependent = BasisSetCellDependent(
+                planewave_cutoff=cutoff, kind='plane_waves', name='PW_%.1f' % cutoff.magnitude)
 
         pseudopotential = run.get_header('pseudopotential', [])
 
@@ -2632,11 +2646,11 @@ class QuantumEspressoParser(FairdiParser):
 
         atom_species = {r[3]: r for r in run.get_header('atom_species_pp', [])}
         atom_species_names = [
-            'method_atom_kind_label', 'method_atom_kind_explicit_electrons',
+            'label', 'n_valence_electrons',
             'x_qe_kind_mass', 'x_qe_pp_label', 'x_qe_pp_weight']
 
         for pp in pseudopotential:
-            sec_method_atom_kind = sec_method.m_create(MethodAtomKind)
+            sec_method_atom_kind = sec_method.m_create(AtomParameters)
             for key, val in pp.items():
                 if val is None:
                     continue
@@ -2673,6 +2687,12 @@ class QuantumEspressoParser(FairdiParser):
                 if atom_sp[i] is not None:
                     setattr(sec_method_atom_kind, atom_species_names[i], atom_sp[i])
 
+        number_of_electrons = run.get_header('number_of_electrons')
+        if number_of_electrons is not None:
+            number_of_electrons = [number_of_electrons] if isinstance(
+                number_of_electrons, float) else number_of_electrons
+            sec_method.electronic.n_electrons = number_of_electrons
+
     def init_parser(self):
         self.out_parser.mainfile = self.filepath
         self.out_parser.logger = self.logger
@@ -2690,17 +2710,16 @@ class QuantumEspressoParser(FairdiParser):
         for run in self.out_parser.get('run', []):
             self.sampling_method = None
             sec_run = self.archive.m_create(Run)
-            sec_run.program_name = 'Quantum Espresso'
-            sec_run.program_basis_set_type = 'plane waves'
+            sec_run.program = Program(name='Quantum Espresso')
             name_version = run.get('program_name_version')
             if name_version is not None:
                 sec_run.x_qe_program_name = name_version[0]
-                sec_run.program_version = ' '.join(name_version[1:]).lstrip('v.')
+                sec_run.program.version = ' '.join(name_version[1:]).lstrip('v.')
 
             date_time = run.get('start_date_time')
             if date_time is not None:
                 date_time = datetime.strptime(date_time.replace(' ', ''), '%d%b%Y%H:%M:%S')
-                sec_run.time_run_date_start = (date_time - datetime(1970, 1, 1)).total_seconds()
+                sec_run.time_run = TimeRun(date_start=(date_time - datetime(1970, 1, 1)).total_seconds())
 
             sec_compile_options = sec_run.m_create(x_qe_section_compile_options)
             for key in ['compile_parallel_version', 'ntypx', 'npk', 'lmaxx', 'nchix', 'ndmx', 'nbrx']:
@@ -2726,8 +2745,8 @@ class QuantumEspressoParser(FairdiParser):
             self.parse_configurations(run)
 
             if self.sampling_method is not None:
-                sec_sampling_method = sec_run.m_create(SamplingMethod)
-                sec_sampling_method.sampling_method = self.sampling_method
+                sec_workflow = self.archive.m_create(Workflow)
+                sec_workflow.type = self.sampling_method
 
             profiling = run.get('profiling')
             if profiling is not None:
@@ -2741,8 +2760,8 @@ class QuantumEspressoParser(FairdiParser):
             date_time = run.get('end_date_time')
             if date_time is not None:
                 date_time = datetime.strptime(date_time.replace(' ', ''), '%H:%M:%S%d%b%Y')
-                sec_run.time_run_date_end = (date_time - datetime(1970, 1, 1)).total_seconds()
+                sec_run.time_run.date_end = (date_time - datetime(1970, 1, 1)).total_seconds()
 
             job_done = run.get('job_done')
             if job_done:
-                sec_run.run_clean_end = True
+                sec_run.clean_end = True
