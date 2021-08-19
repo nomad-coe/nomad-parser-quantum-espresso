@@ -2212,7 +2212,7 @@ class QuantumEspressoParser(FairdiParser):
                     number_of_planewaves = np.reshape(
                         number_of_planewaves, (n_spin, len(number_of_planewaves) // n_spin))
                     sec_eigenvalues.x_qe_eigenvalues_number_of_planewaves = number_of_planewaves[0]
-                sec_eigenvalues.value = eigenvalues
+                sec_eigenvalues.energies = eigenvalues
                 if occupations is not None:
                     sec_eigenvalues.occupations = occupations
 
