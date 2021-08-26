@@ -25,6 +25,9 @@ from nomad.metainfo import (  # pylint: disable=unused-import
 from nomad.datamodel.metainfo import run
 
 
+m_package = Package()
+
+
 class x_qe_section_parallel(MSection):
     '''
     section for run-time parallization options of Quantum Espresso

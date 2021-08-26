@@ -48,8 +48,8 @@ def test_scf(parser):
     assert sec_run.clean_end
 
     sec_method = sec_run.method[0]
-    assert sec_method.basis_set[0].cell_dependent.name == 'PW_25.0'
-    assert sec_method.basis_set[1].cell_dependent.planewave_cutoff.magnitude == approx(2.17987236e-16,)
+    assert sec_method.basis_set[0].cell_dependent[0].name == 'PW_25.0'
+    assert sec_method.basis_set[1].cell_dependent[0].planewave_cutoff.magnitude == approx(2.17987236e-16,)
     assert sec_method.x_qe_sticks_sum_G_smooth == 135043
     assert 'NL pseudopotentials' in sec_method.x_qe_allocated_array_name
     assert sec_method.x_qe_allocated_array_size[2] == 33554432.

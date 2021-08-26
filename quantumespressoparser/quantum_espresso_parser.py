@@ -2624,9 +2624,10 @@ class QuantumEspressoParser(FairdiParser):
             if cutoff is None:
                 continue
             sec_basis_set = sec_method.m_create(BasisSet)
+            sec_basis_set.type = 'plane waves'
             sec_basis_set.kind = name
-            sec_basis_set.cell_dependent = BasisSetCellDependent(
-                planewave_cutoff=cutoff, kind='plane_waves', name='PW_%.1f' % cutoff.magnitude)
+            sec_basis_set.cell_dependent.append(BasisSetCellDependent(
+                planewave_cutoff=cutoff, kind='plane_waves', name='PW_%.1f' % cutoff.magnitude))
 
         pseudopotential = run.get_header('pseudopotential', [])
 
