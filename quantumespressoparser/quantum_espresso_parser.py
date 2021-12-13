@@ -1550,6 +1550,8 @@ class QuantumEspressoOutParser(TextParser):
                     category.append(category_name.strip())
                     function.append(function_name.group(1).strip())
                     res = cpu_time_pattern.findall(sub_section)
+                    if len(res) == 0:
+                        return caller, category, function, cpu_time, wall_time, calls
                     time = sum([float(res[0][i]) * 60 ** (2 - i) if res[0][i] else 0 for i in range(len(res[0]))])
                     cpu_time.append(0. if res is None else time)
                     res = wall_time_pattern.findall(sub_section)
@@ -1585,7 +1587,7 @@ class QuantumEspressoOutParser(TextParser):
                 r'file (\S+): wavefunction\(s\)([\w ]+)renormalized', repeats=True),
             Quantity(
                 'dispersion',
-                r'atom\s*VdW radius\s*C_6\s*([\s\S]+?)\n\n',
+                r'atom\s*VdW radius\s*C_6\s*([\s\S]+?)\n\s*\n',
                 str_operation=str_to_dispersion, convert=False),
             Quantity(
                 'atom_radii',
@@ -1694,7 +1696,7 @@ class QuantumEspressoOutParser(TextParser):
                 dtype=float, shape=(3, 3)),
             Quantity(
                 'pseudopotential',
-                r'(PseudoPot\. #[\s\S]+?\n\n)', repeats=True,
+                r'(PseudoPot\. #[\s\S]+?\n\s*\n)', repeats=True,
                 sub_parser=TextParser(quantities=[
                     Quantity('idx', r'PseudoPot\. # (\d+)'),
                     Quantity('label', r'for (\w+)'),
@@ -1725,18 +1727,18 @@ class QuantumEspressoOutParser(TextParser):
                         str_operation=lambda x: ' '.join(x.split()), convert=False)])),
             Quantity(
                 'atom_species_pp',
-                r'atomic species\s*valence\s*mass\s*pseudopotential([\s\S]+?)\n\n',
+                r'atomic species\s*valence\s*mass\s*pseudopotential([\s\S]+?)\n\s*\n',
                 str_operation=str_to_atom_data, convert=False),
             Quantity(
                 'starting_magnetization',
-                r'Starting magnetic structure\s*atomic species\s*magnetization([\s\S]+?)\n\n',
+                r'Starting magnetic structure\s*atomic species\s*magnetization([\s\S]+?)\n\s*\n',
                 str_operation=str_to_atom_data, convert=False),
             Quantity(
                 'x_qe_md_cell_mass',
                 rf'cell mass\s*=\s*({re_float})\s*AMU/\(a\.u\.\)\^2', dtype=float),
             Quantity(
                 'symmetry',
-                r'(\d+\s*Sym\.\s*Ops\.[\s\S]+?)\n\n', sub_parser=TextParser(quantities=[
+                r'(\d+\s*Sym\.\s*Ops\.[\s\S]+?)\n\s*\n', sub_parser=TextParser(quantities=[
                     Quantity(
                         'nsymm', r'(\d+) Sym\.', dtype=int),
                     Quantity(
@@ -1750,7 +1752,7 @@ class QuantumEspressoOutParser(TextParser):
                         dtype=int)])),
             Quantity(
                 'labels_positions',
-                r'(Cartesian axes\s*site n\.\s*atom\s*positions[\s\S]+?)\n\n',
+                r'(Cartesian axes\s*site n\.\s*atom\s*positions[\s\S]+?)\n\s*\n',
                 repeatas=False, sub_parser=TextParser(quantities=[
                     Quantity(
                         'axes', r'(\w+)\s*axes'),
@@ -1763,7 +1765,7 @@ class QuantumEspressoOutParser(TextParser):
                         repeats=True, dtype=float)])),
             Quantity(
                 'k_points',
-                r'(number of k points=[\s\S]+?)\n\n',
+                r'(number of k points=[\s\S]+?)\n\s*\n',
                 repeats=False, sub_parser=TextParser(quantities=[
                     Quantity('nk', r'number of k points=\s*(\d+)', dtype=int),
                     Quantity(
@@ -1791,7 +1793,7 @@ class QuantumEspressoOutParser(TextParser):
                 str_operation=lambda x: x.replace(',', ' ').split()),
             Quantity(
                 'x_qe_core_charge_realspace',
-                r'(Real space treatment of Q\(r\))'),
+                r'(Real space treatment of Q\(r\))', str_operation=lambda x: True),
             Quantity(
                 'input_occupation',
                 r'Occupations\s*read\s*from\s*input\s*'
@@ -1803,7 +1805,7 @@ class QuantumEspressoOutParser(TextParser):
                 str_operation=str_to_arrays, convert=False),
             Quantity(
                 'temporary_arrays',
-                r'temporary arrays\s*est\. size \(Mb\)\s*dimensions([\s\S]+?)\n\n',
+                r'temporary arrays\s*est\. size \(Mb\)\s*dimensions([\s\S]+?)\n\s*\n',
                 str_operation=str_to_arrays, convert=False),
             Quantity(
                 'martyna_tuckerman_parameters',
@@ -1886,11 +1888,11 @@ class QuantumEspressoOutParser(TextParser):
                 dtype=float),
             Quantity(
                 'energies',
-                r'!\s*(total energy[\s\S]+?)\n\n',
+                r'!\s*(total energy[\s\S]+?)\n\s*\n',
                 sub_parser=TextParser(quantities=energy_quantities)),
             Quantity(
                 'energy_contributions',
-                r'The total energy is the sum of the following terms:\s*([\s\S]+?Ry\n\n)',
+                r'The total energy is the sum of the following terms:\s*([\s\S]+?Ry\n\s*\n)',
                 str_operation=str_to_energy_contributions, convert=False),
             Quantity(
                 'magnetization_total',
@@ -1905,7 +1907,7 @@ class QuantumEspressoOutParser(TextParser):
                 r'convergence has been achieved in\s*([\d]+) iterations', dtype=int),
             Quantity(
                 'forces',
-                r'Forces acting on atoms \(Ry\/au\):\s*([\s\S]+?)(?:The|\n\n)',
+                r'Forces acting on atoms \(Ry\/au\):\s*([\s\S]+?)(?:The|\n\s*\n)',
                 str_operation=str_to_forces, convert=False),
             Quantity(
                 'total_force',
@@ -1913,14 +1915,14 @@ class QuantumEspressoOutParser(TextParser):
                 dtype=float, unit='rydberg/bohr'),
             Quantity(
                 'forces_dispersion',
-                r'Dispersion forces acting on atoms:\s*([\s\S]+?)(?:The|\n\n)',
+                r'Dispersion forces acting on atoms:\s*([\s\S]+?)(?:The|\n\s*\n)',
                 str_operation=str_to_forces, convert=False),
             Quantity(
                 'total_force_dispersion',
                 rf'Total Dispersion Force =\s*({re_float})', dtype=float, unit='rydberg/bohr'),
             Quantity(
                 'stress',
-                r'total\s*stress\s*\(Ry/bohr\*\*3\)\s*\(kbar\)\s*P=\s*([\s\S]+?)\n\n',
+                r'total\s*stress\s*\(Ry/bohr\*\*3\)\s*\(kbar\)\s*P=\s*([\s\S]+?)\n\s*\n',
                 str_operation=str_to_stress, convert=False),
             Quantity(
                 'units',
@@ -1938,11 +1940,11 @@ class QuantumEspressoOutParser(TextParser):
                 dtype=float, shape=(3, 3)),
             Quantity(
                 'labels_positions',
-                r'(ATOMIC_POSITIONS \(.+\)[\s\S]+?)\n\n',
+                r'(ATOMIC_POSITIONS \(.+\)[\s\S]+?)\n\s*\n',
                 str_operation=str_to_labels_positions, convert=False),
             Quantity(
                 'starting_magnetization',
-                r'Starting magnetic structure\s*atomic species\s*magnetization([\s\S]+?)\n\n',
+                r'Starting magnetic structure\s*atomic species\s*magnetization([\s\S]+?)\n\s*\n',
                 str_operation=str_to_atom_data, convert=False),
             # Quantity(
             #     'x_qe_t_md_bfgs_scf_cycles',
@@ -1996,7 +1998,7 @@ class QuantumEspressoOutParser(TextParser):
                     repeats=True, dtype=float),
                 Quantity(
                     'energies',
-                    r'(total energy[\s\S]+?)\n\n',
+                    r'(total energy[\s\S]+?)\n\s*\n',
                     sub_parser=TextParser(quantities=energy_quantities)),
                 Quantity(
                     'magnetization_total',
@@ -2760,7 +2762,7 @@ class QuantumEspressoParser(FairdiParser):
 
             date_time = run.get('end_date_time')
             if date_time is not None:
-                date_time = datetime.strptime(date_time.replace(' ', ''), '%H:%M:%S%d%b%Y')
+                date_time = datetime.strptime(date_time.replace(': ', ':0').replace(' ', ''), '%H:%M:%S%d%b%Y')
                 sec_run.time_run.date_end = (date_time - datetime(1970, 1, 1)).total_seconds()
 
             job_done = run.get('job_done')
