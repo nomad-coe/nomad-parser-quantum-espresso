@@ -2225,11 +2225,11 @@ class QuantumEspressoParser(FairdiParser):
         homo = calculation.get('homo_lumo')
         if homo is not None:
             lumo = None
-            if isinstance(homo, list):
+            if isinstance(homo, np.ndarray) or isinstance(homo, list):
                 homo, lumo = homo
-            sec_energy.highest_occupied = [homo] * ureg.eV
+            sec_energy.highest_occupied = [float(homo)] * ureg.eV
             if lumo is not None:
-                sec_energy.lowest_unoccupied = [lumo] * ureg.eV
+                sec_energy.lowest_unoccupied = [float(lumo)] * ureg.eV
 
         # fermi energy
         fermi_energy = calculation.get('fermi_energy')
