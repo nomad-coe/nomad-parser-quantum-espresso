@@ -42,7 +42,7 @@ def test_scf(parser):
     assert sec_run.time_run.date_start.magnitude == 1451140876.0
     assert sec_run.x_qe_section_compile_options[0].x_qe_lmaxx == 3
     assert sec_run.x_qe_section_parallel[0].x_qe_nproc == 4
-    assert archive.workflow[0].type == 'geometry_optimization'
+    assert archive.workflow[0].type == 'single_point'
     assert 'rdiaghg' in sec_run.x_qe_profile_function
     assert sec_run.time_run.date_end.magnitude == 1451140881.0
     assert sec_run.clean_end

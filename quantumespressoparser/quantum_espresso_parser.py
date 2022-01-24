@@ -2469,8 +2469,7 @@ class QuantumEspressoParser(FairdiParser):
         for calculation_type in ['self_consistent', 'bandstructure']:
             calculation = run.get(calculation_type)
             if calculation is not None:
-                # TODO add single_point in workflow
-                self.sampling_method = 'geometry_optimization'
+                self.sampling_method = 'single_point'
                 parse_configuration(calculation)
 
         methods = {
